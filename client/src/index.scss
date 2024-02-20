@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap");
+    body {
+        font-family: "Roboto", sans-serif;
+        font-size: 16px;
+        @apply text-grayDark font-normal bg-white;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+        background-color: #f5f5f5;
+    }
+    ::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background: linear-gradient(to left, #b0b0b3, #f0f1f4);
+        box-shadow: inset 0 0 1px 1px #9f9f9f;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #eee;
+        // box-shadow: 0 0 1px 1px #bbb;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(to left, #b0b0b3, #dadbdc);
+    }
+}
+
+@layer components {
+    .menu {
+        transition: all 0.3s ease 0s;
+        -webkit-transition: all 0.3s ease 0s;
+
+        .iconBag::before {
+            content: "";
+            position: absolute;
+            top: 20%;
+            left: 15%;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid #fd7e14;
+            z-index: 30;
+        }
+    }
+
+    .login-image {
+        background-image: url("/banner-bg.jpg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .banner-Slideshows {
+        background-image: url("/banner-bg.jpg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .banner-Common {
+        background-image: url("/common-banner.jpg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .footer {
+        display: grid;
+        grid-template-columns: repeat(4, 300px);
+        grid-row: 1;
+        gap: 0 10px;
+    }
+
+    .slider {
+        .rc-slider-rail {
+            background-color: rgb(186, 184, 184);
+        }
+        .rc-slider-track {
+            @apply bg-orange;
+        }
+        .rc-slider-handle {
+            border-color: #f8af73;
+
+            &:hover {
+                @apply border-orange;
+            }
+        }
+        .rc-slider-handle-dragging {
+            border-color: #fd7e14 !important;
+            box-shadow: 0 0 0 5px orange !important;
+        }
+    }
+
+    .skeleton {
+        background-color: #eee;
+        background-image: linear-gradient(110deg, #222222 8%, #362f29 18%, #222222 33%);
+        background-size: 200% 100%;
+        animation: 1.5s shine linear infinite;
+    }
+
+    @keyframes shine {
+        to {
+            background-position-x: -200%;
+        }
+    }
+
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+
+    .displayForm::before {
+        content: "";
+        position: absolute;
+        top: -5%;
+        left: 2%;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 15px solid transparent;
+        border-bottom: 15px solid #f5f5f7;
+    }
+
+    .arrow-top {
+        animation: 1s arrowTop linear infinite;
+    }
+
+    @keyframes arrowTop {
+        0% {
+            opacity: 0;
+            top: -20px;
+        }
+        100% {
+            top: 0px;
+            opacity: 1;
+        }
+    }
+
+    .arrow-bottom {
+        animation: 1s arrowBottom linear 1s infinite;
+    }
+
+    @keyframes arrowBottom {
+        0% {
+            opacity: 0;
+            top: -20px;
+        }
+        100% {
+            top: 10px;
+            opacity: 1;
+        }
+    }
+
+    .backgroundLogin {
+        background-color: #ffffff30;
+        border: 1px solid white;
+    }
+
+    .hoverDropdown {
+        animation: 0.3s hover linear;
+    }
+
+    @keyframes hover {
+        0% {
+            opacity: 0.7;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+    .custom-radio {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+    }
+    .custom-radio input:checked + div {
+        box-shadow:
+            inset 0 0 0 2.5px #ff2929,
+            inset 0 0 0 5px #ffffff;
+        background-color: #ff2929;
+        border: none;
+    }
+
+    .iconDelete:hover .delete-lid {
+        top: -10px;
+        transform: rotate(45deg);
+    }
+
+    .borderCheckOut {
+        background-image: repeating-linear-gradient(
+            45deg,
+            #6fa6d6,
+            #6fa6d6 33px,
+            transparent 0,
+            transparent 41px,
+            #f18d9b 0,
+            #f18d9b 74px,
+            transparent 0,
+            transparent 82px
+        );
+    }
+}

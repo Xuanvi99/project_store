@@ -1,0 +1,160 @@
+const userModel = require("../model/user.model");
+const refreshTokenModel = require("../model/token.model");
+const jwt = require("jsonwebtoken");
+const codeOTPModel = require("../model/codeOTP.model");
+class authController {
+  register = async function (req, res) {
+    try {
+      const { phone, password } = req.body;
+      const newUser = new userModel({ phone, password });
+      await newUser.save();
+      const accessToken = newUser.generateAccessToken();
+      const refreshToken = newUser.generateRefreshToken();
+      await refreshTokenModel.saveToken(newUser, refreshToken);
+      const { password: password1, __v, ...others } = newUser;
+      res
+        .status(201)
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: false,
+          sameSite: "strict",
+        })
+        .json({
+          user: others,
+          accessToken,
+        });
+    } catch (error) {
+      res.status(500).json({ errMessage: error | "server error" });
+    }
+  };
+
+  loginAuth = async function (req, res) {
+    const phoneOrEmail = req.body.phoneOrEmail;
+    const reqPassword = req.body.password;
+    try {
+      const user = await userModel.findOneUser(phoneOrEmail, reqPassword);
+      if (!user)
+        return res
+          .status(403)
+          .json({ errMessage: "Tài khoản hoặc mật khẩu không đúng!" });
+      const accessToken = user.generateAccessToken();
+      const refreshToken = user.generateRefreshToken();
+      await refreshTokenModel.saveToken(user, refreshToken);
+      const { password, __v, ...others } = user._doc;
+      return res
+        .status(200)
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: false,
+          sameSite: "strict",
+        })
+        .json({
+          user: others,
+          accessToken,
+        });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  loginOauthGoogle = async function (req, res) {
+    try {
+      const user = req.user;
+      const { password, ...others } = user._doc;
+      const accessToken = user.generateAccessToken();
+      const refreshToken = user.generateRefreshToken();
+      await refreshTokenModel.saveToken(user._doc, refreshToken);
+      return res
+        .status(200)
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: false,
+          sameSite: "strict",
+        })
+        .json({
+          user: others,
+          accessToken,
+        });
+    } catch (error) {
+      res.status(403).json({ errMessage: "error auth google" });
+    }
+  };
+
+  updatePassword = async (req, res) => {
+    const { phoneOrEmail, code, password } = req.body;
+
+    try {
+      const user = await userModel
+        .findOne({ $or: [{ phone: phoneOrEmail }, { email: phoneOrEmail }] })
+        .exec();
+
+      user.password = password;
+      await user.save();
+      if (code) {
+        await codeOTPModel
+          .findOneAndUpdate({ email: phoneOrEmail, code }, { status: true })
+          .exec();
+      }
+      res.status(200).json({ message: "update password success" });
+    } catch (error) {
+      res.status(500).json({ errMessage: error | "server error" });
+    }
+  };
+
+  logOut = async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken) {
+      await refreshTokenModel.deleteToken(refreshToken);
+    }
+    res.clearCookie("refreshToken");
+    res.status(200).json("Logged out successfully!");
+  };
+
+  refreshToken = async (req, res) => {
+    try {
+      const refreshToken = req.cookies.refreshToken;
+      if (!refreshToken)
+        return res
+          .status(401)
+          .json({ errMessage: "refreshToken is not define" });
+      const checkRfToken = await refreshTokenModel
+        .findOne({
+          token: refreshToken,
+        })
+        .exec();
+      if (!checkRfToken)
+        return res
+          .status(401)
+          .json({ errMessage: "token does not exist!", isLogin: true });
+      jwt.verify(
+        refreshToken,
+        process.env.RF_PRIVATE_KEY,
+        async (err, decode) => {
+          if (err) return res.status(401).json({ errMessage: err });
+          const user = await userModel.findById({ _id: decode.userID }).exec();
+          if (!user)
+            return res
+              .status(401)
+              .json({ errMessage: "refreshToken is not valid" });
+          const newAccessToken = user.generateAccessToken();
+          const newRefreshToken = user.generateRefreshToken();
+          await refreshTokenModel.saveToken(user, newRefreshToken);
+          await refreshTokenModel.deleteToken(refreshToken);
+          const { password, __v, ...others } = user._doc;
+          return res
+            .status(201)
+            .cookie("refreshToken", newRefreshToken, {
+              httpOnly: true,
+              secure: false,
+              sameSite: "strict",
+            })
+            .json({ user: others, accessToken: newAccessToken });
+        }
+      );
+    } catch (error) {
+      res.status(500).json({ errMessage: error | "server error" });
+    }
+  };
+}
+
+module.exports = new authController();
