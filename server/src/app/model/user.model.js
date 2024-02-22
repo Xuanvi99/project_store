@@ -10,20 +10,12 @@ const userSchema = new Schema(
       default: "user" + Math.floor(Math.random() * 100000),
     },
     phone: { type: String, default: "" },
-    email: {
-      type: String,
-      default: "",
-    },
+    email: { type: String, default: "" },
     password: { type: String, default: "" },
     date: { type: String, default: "" },
-    address: {
-      type: String,
-      default: "",
-    },
-    avatar: {
-      type: String,
-      default: "http://localhost:3000/imageDefault.png",
-    },
+    address: { type: String, default: "" },
+    avatar: { type: String, default: "http://localhost:3000/imageDefault.png" },
+    blocked: { type: Boolean, default: false },
     role: { type: String, enum: ["admin", "buyer"], default: "buyer" },
   },
   { timestamps: true }
