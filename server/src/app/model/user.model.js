@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema(
+const UserSchema = new Schema(
   {
     userName: {
       type: String,
@@ -15,13 +15,14 @@ const userSchema = new Schema(
     date: { type: String, default: "" },
     address: { type: String, default: "" },
     avatar: { type: String, default: "http://localhost:3000/imageDefault.png" },
+    cartId: { type: Schema.Types.ObjectId, ref: "cart", default: "" },
     blocked: { type: Boolean, default: false },
     role: { type: String, enum: ["admin", "buyer"], default: "buyer" },
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", function (next) {
+UserSchema.pre("save", function (next) {
   const user = this;
   if (user.password === "") {
     user.password = Math.floor(Math.random() * 1000000).toString();
@@ -36,7 +37,7 @@ userSchema.pre("save", function (next) {
   });
 });
 
-userSchema.statics.findOneUser = async function (phoneOrEmail, password) {
+UserSchema.statics.findOneUser = async function (phoneOrEmail, password) {
   try {
     const user = await this.findOne({
       $or: [{ phone: phoneOrEmail }, { email: phoneOrEmail }],
@@ -52,7 +53,7 @@ userSchema.statics.findOneUser = async function (phoneOrEmail, password) {
   }
 };
 
-userSchema.methods.generateAccessToken = function () {
+UserSchema.methods.generateAccessToken = function () {
   console.log("this");
   const accessToken = jwt.sign(
     { userID: this._id, role: this.role, type: "access_token" },
@@ -63,7 +64,7 @@ userSchema.methods.generateAccessToken = function () {
   return accessToken;
 };
 
-userSchema.methods.generateRefreshToken = function () {
+UserSchema.methods.generateRefreshToken = function () {
   const refreshToken = jwt.sign(
     { userID: this._id, role: this.role, type: "refresh_token" },
     process.env.RF_PRIVATE_KEY,
@@ -73,4 +74,4 @@ userSchema.methods.generateRefreshToken = function () {
   return refreshToken;
 };
 
-module.exports = mongoose.model("user", userSchema);
+module.exports = mongoose.model("user", UserSchema);

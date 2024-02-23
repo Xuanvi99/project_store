@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
-const userModel = require("../model/user.model");
+const userModel = require("../model");
 
-class userMiddleware {
+class verifyMiddleware {
   verifyToken = async function (req, res, next) {
     try {
       const token = req.headers.authorization.split(" ")[1];
@@ -52,4 +52,4 @@ class userMiddleware {
   };
 }
 
-module.exports = new userMiddleware();
+module.exports = new verifyMiddleware();

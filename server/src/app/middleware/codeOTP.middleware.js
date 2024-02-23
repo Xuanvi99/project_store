@@ -1,5 +1,5 @@
-const userModel = require("../model/user.model");
-const codeOTPModel = require("../model/codeOTP.model");
+const { userModel, codeOTPModel } = require("../model");
+
 const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
 class codeOTP {

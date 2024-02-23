@@ -1,11 +1,21 @@
-const mongoose = require("mongoose");
-const slug = require("mongoose-slug-updater");
-const Schema = mongoose.Schema;
-mongoose.plugin(slug);
+const cartModel = require("./cart.model");
+const userModel = require("./user.model");
+const productModel = require("./products.model");
+const commentModel = require("./comments.model");
+const imageModel = require("./image.model");
+const notifyModel = require("./notification.model");
+const orderModel = require("./order.model");
+const tokenModel = require("./token.model");
+const codeOTPModel = require("./codeOTP.model");
 
-const Test = new Schema({
-  title: { type: String, require },
-  slug: { type: String, slug: "title", unique: true },
-});
-
-module.exports = mongoose.model("Test", Test);
+module.exports = {
+  cartModel,
+  userModel,
+  productModel,
+  commentModel,
+  imageModel,
+  notifyModel,
+  orderModel,
+  tokenModel,
+  codeOTPModel,
+};

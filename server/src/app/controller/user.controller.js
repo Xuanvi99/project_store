@@ -1,5 +1,5 @@
-const userModel = require("../model/user.model");
-const codeOTPModel = require("../model/codeOTP.model");
+const { userModel, cartModel } = require("../model");
+
 class userController {
   checkUser = async function (req, res) {
     try {
@@ -18,25 +18,25 @@ class userController {
   getListUser = async (req, res) => {
     try {
       const page = +req.query.page || 1;
-      const text = req.query.text || "";
+      const search = req.query.search || "";
       const limit = process.env.lIMIT_GET_USER;
       const skip = (page - 1) * limit;
       const listUser = await userModel
         .find({
           $or: [
-            { phone: { $regex: text, $options: "i" } },
-            { email: { $regex: text, $options: "i" } },
+            { phone: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
           ],
         })
         .skip(skip)
         .limit(limit);
 
       let totalPage = 0;
-      if (text) {
+      if (search) {
         const countUser = await userModel.find({
           $or: [
-            { phone: { $regex: text, $options: "i" } },
-            { email: { $regex: text, $options: "i" } },
+            { phone: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
           ],
         });
 
@@ -53,17 +53,20 @@ class userController {
   };
 
   getProfile = async (req, res) => {
+    const userId = req.params.userId;
+    if (!userId) {
+      res.status(400).json({ errMessage: "Invalid user ID" });
+    }
     try {
-      const userID = req.params.userID;
-      const user = await userModel.findById(userID, { password: 0 }).exec();
-      if (!user) return res.status(404).json({ message: "User not found" });
+      const user = await userModel.findById(userId, { password: 0 }).exec();
+      if (!user) res.status(400).json({ errMessage: "Invalid user ID" });
       return res.status(200).json({ user });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
     }
   };
 
-  postUser = async (req, res) => {
+  addUser = async (req, res) => {
     const profile = req.body;
     try {
       const newUser = await userModel({
@@ -76,12 +79,15 @@ class userController {
     }
   };
 
-  putUser = async (req, res) => {
-    const userID = req.params.userID;
+  updateUser = async (req, res) => {
+    const userId = req.params.userId;
     const profileUpdate = req.body;
+    if (!userId) {
+      res.status(400).json({ errMessage: "Invalid user ID" });
+    }
     try {
       const user = await userModel
-        .findByIdAndUpdate(userID, { ...profileUpdate }, { new: true })
+        .findByIdAndUpdate(userId, { ...profileUpdate }, { new: true })
         .exec();
       const { password, ...others } = user._doc;
       res.status(200).json({ message: "update user success", user: others });
@@ -91,9 +97,12 @@ class userController {
   };
 
   deleteUser = async (req, res) => {
-    const userID = req.params.userID;
+    const userId = req.params.userId;
+    if (!userId) {
+      res.status(400).json({ errMessage: "Invalid user ID" });
+    }
     try {
-      await userModel.findByIdAndDelete(userID).exec();
+      await userModel.findByIdAndDelete(userId).exec();
       res.status(200).json({ message: "delete user success" });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
@@ -101,10 +110,13 @@ class userController {
   };
 
   isAdmin = async (req, res) => {
-    const userID = req.params.userID;
+    const userId = req.params.userId;
+    if (!userId) {
+      res.status(400).json({ errMessage: "Invalid user ID" });
+    }
     try {
       const user = await userModel
-        .findByIdAndUpdate(userID, { role: "admin" })
+        .findByIdAndUpdate(userId, { role: "admin" })
         .exec();
       res.status(200).json({ message: "update Admin user success" });
     } catch (error) {

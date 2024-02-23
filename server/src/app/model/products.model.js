@@ -2,31 +2,31 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const slug = require("mongoose-slug-updater");
 mongoose.plugin(slug);
-const productSchema = new Schema(
+const ProductSchema = new Schema(
   {
     name: { type: String, required: true, unique: true },
-    title: { type: String, required: true },
     desc: { type: String, required: true },
-    category: { type: String, required: true },
-    banner: { type: String, required: true },
+    brand: { type: String, required: true },
+    banner: { type: Schema.Types.ObjectId, ref: "image" },
     listImage: [
       {
-        type: String,
+        imageId: { type: Schema.Types.ObjectId, ref: "image" },
         required: true,
       },
     ],
+    listSize: [{ type: Number, required: true }],
     status: {
       type: String,
       enum: ["outOfStock", "inStock"],
       default: "inStock",
     },
-    flashSale: { type: Boolean, required: true, default: false },
+    flashSale: { type: Boolean, default: false },
     price: { type: Number, required: true },
-    discount: { type: Number, required: true },
+    discount: { type: Number, default: 0 },
     slug: { type: String, slug: "name", unique: true },
-    sold: { type: number, required: true },
+    sold: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("product", productSchema);
+module.exports = mongoose.model("product", ProductSchema);

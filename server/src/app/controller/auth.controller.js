@@ -1,5 +1,5 @@
-const userModel = require("../model/user.model");
-const refreshTokenModel = require("../model/token.model");
+const { userModel, tokenModel } = require("../model");
+
 const jwt = require("jsonwebtoken");
 const codeOTPModel = require("../model/codeOTP.model");
 class authController {
@@ -10,7 +10,7 @@ class authController {
       await newUser.save();
       const accessToken = newUser.generateAccessToken();
       const refreshToken = newUser.generateRefreshToken();
-      await refreshTokenModel.saveToken(newUser, refreshToken);
+      await tokenModel.saveToken(newUser, refreshToken);
       const { password: password1, __v, ...others } = newUser;
       res
         .status(201)
@@ -39,7 +39,7 @@ class authController {
           .json({ errMessage: "Tài khoản hoặc mật khẩu không đúng!" });
       const accessToken = user.generateAccessToken();
       const refreshToken = user.generateRefreshToken();
-      await refreshTokenModel.saveToken(user, refreshToken);
+      await tokenModel.saveToken(user, refreshToken);
       const { password, __v, ...others } = user._doc;
       return res
         .status(200)
@@ -63,7 +63,7 @@ class authController {
       const { password, ...others } = user._doc;
       const accessToken = user.generateAccessToken();
       const refreshToken = user.generateRefreshToken();
-      await refreshTokenModel.saveToken(user._doc, refreshToken);
+      await tokenModel.saveToken(user._doc, refreshToken);
       return res
         .status(200)
         .cookie("refreshToken", refreshToken, {
@@ -104,7 +104,7 @@ class authController {
   logOut = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     if (refreshToken) {
-      await refreshTokenModel.deleteToken(refreshToken);
+      await tokenModel.deleteToken(refreshToken);
     }
     res.clearCookie("refreshToken");
     res.status(200).json("Logged out successfully!");
@@ -117,7 +117,7 @@ class authController {
         return res
           .status(401)
           .json({ errMessage: "refreshToken is not define" });
-      const checkRfToken = await refreshTokenModel
+      const checkRfToken = await tokenModel
         .findOne({
           token: refreshToken,
         })
@@ -138,8 +138,8 @@ class authController {
               .json({ errMessage: "refreshToken is not valid" });
           const newAccessToken = user.generateAccessToken();
           const newRefreshToken = user.generateRefreshToken();
-          await refreshTokenModel.saveToken(user, newRefreshToken);
-          await refreshTokenModel.deleteToken(refreshToken);
+          await tokenModel.saveToken(user, newRefreshToken);
+          await tokenModel.deleteToken(refreshToken);
           const { password, __v, ...others } = user._doc;
           return res
             .status(201)

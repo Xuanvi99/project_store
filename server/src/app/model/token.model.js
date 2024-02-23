@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const refreshTokenSchema = new Schema({
-  _userId: {
+const TokenSchema = new Schema({
+  userId: {
     type: Schema.Types.ObjectId,
     required: true,
     ref: "user",
@@ -18,17 +18,17 @@ const refreshTokenSchema = new Schema({
   },
 });
 
-refreshTokenSchema.statics.saveToken = async function (user, refreshToken) {
+TokenSchema.statics.saveToken = async function (user, refreshToken) {
   const _object = new this({
-    _userId: user,
+    userId: user,
     token: refreshToken,
   });
   await _object.save();
   return _object;
 };
 
-refreshTokenSchema.statics.deleteToken = async function (refreshToken) {
+TokenSchema.statics.deleteToken = async function (refreshToken) {
   const idRfToken = await this.findOneAndDelete({ token: refreshToken }).exec();
   return idRfToken;
 };
-module.exports = mongoose.model("refreshTokens", refreshTokenSchema);
+module.exports = mongoose.model("refreshTokens", TokenSchema);

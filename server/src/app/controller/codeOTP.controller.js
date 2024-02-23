@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const codeOTPModel = require("../model/codeOTP.model");
+const codeOTPModel = require("../model");
 
 exports.sendEmail = async (req, res) => {
   try {

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const codeOTPSchema = new Schema({
+const CodeOTPSchema = new Schema({
   email: {
     type: String,
     required: true,
@@ -20,7 +20,7 @@ const codeOTPSchema = new Schema({
   },
 });
 
-codeOTPSchema.statics.saveCodeOTP = async function (email, codeOTP) {
+CodeOTPSchema.statics.saveCodeOTP = async function (email, codeOTP) {
   const _object = new this({
     email: email,
     code: codeOTP,
@@ -30,4 +30,4 @@ codeOTPSchema.statics.saveCodeOTP = async function (email, codeOTP) {
   return _object;
 };
 
-module.exports = mongoose.model("codeOTP", codeOTPSchema);
+module.exports = mongoose.model("codeOTP", CodeOTPSchema);

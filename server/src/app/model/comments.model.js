@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const commentSchema = new Schema(
+const CommentSchema = new Schema(
   {
-    user_id: { type: Schema.Types.ObjectId, ref: "user" },
-    product_id: { type: Schema.Types.ObjectId, ref: "product" },
+    userId: { type: Schema.Types.ObjectId, ref: "user" },
+    productId: { type: Schema.Types.ObjectId, ref: "product" },
+    listImage: [{ imageId: { type: Schema.Types.ObjectId, ref: "image" } }],
     text: { type: String, default: "" },
     star: { type: Number },
     like: { type: Number, default: 0 },
@@ -13,4 +14,4 @@ const commentSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("comment", commentSchema);
+module.exports = mongoose.model("comment", CommentSchema);
