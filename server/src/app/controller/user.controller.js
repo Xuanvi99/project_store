@@ -28,6 +28,7 @@ class userController {
             { email: { $regex: search, $options: "i" } },
           ],
         })
+        .populate("avatar")
         .skip(skip)
         .limit(limit);
 
@@ -58,7 +59,10 @@ class userController {
       res.status(400).json({ errMessage: "Invalid user ID" });
     }
     try {
-      const user = await userModel.findById(userId, { password: 0 }).exec();
+      const user = await userModel
+        .findById(userId, { password: 0 })
+        .populate("avatar")
+        .exec();
       if (!user) res.status(400).json({ errMessage: "Invalid user ID" });
       return res.status(200).json({ user });
     } catch (error) {
@@ -82,12 +86,15 @@ class userController {
   updateUser = async (req, res) => {
     const userId = req.params.userId;
     const profileUpdate = req.body;
-    if (!userId) {
-      res.status(400).json({ errMessage: "Invalid user ID" });
-    }
+
+    if (profileUpdate)
+      if (!userId) {
+        res.status(400).json({ errMessage: "Invalid user ID" });
+      }
     try {
       const user = await userModel
         .findByIdAndUpdate(userId, { ...profileUpdate }, { new: true })
+        .populate("avatar")
         .exec();
       const { password, ...others } = user._doc;
       res.status(200).json({ message: "update user success", user: others });
@@ -116,7 +123,7 @@ class userController {
     }
     try {
       const user = await userModel
-        .findByIdAndUpdate(userId, { role: "admin" })
+        .findByIdAndUpdate(userId, { role: "admin" }, { new: true })
         .exec();
       res.status(200).json({ message: "update Admin user success" });
     } catch (error) {

@@ -1,4 +1,5 @@
-const { productModel } = require("../model");
+const { productModel, imageModel, commentModel } = require("../model");
+const cloudinary = require("../../utils/cloudinary");
 class Product {
   getListProduct = async (req, res) => {
     try {
@@ -55,13 +56,19 @@ class Product {
     try {
       const productId = req.params.productId;
       if (productId)
-        return res.status(403).json({ message: "productId undefined" });
+        return res.status(403).json({ message: "Invalid productId " });
       const product = await productModel
-        .exists({ _id: productId })
-        .select("_id")
+        .findOne({ _id: productId })
+        .populate([
+          { path: "banner" },
+          { path: "images" },
+          { path: "comments" },
+        ])
         .lean();
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res
+          .status(404)
+          .json({ message: "ProductId not exit in product" });
       }
       return res.status(200).json({ product });
     } catch (error) {
@@ -70,26 +77,44 @@ class Product {
   };
 
   addProduct = async (req, res) => {
-    const body = req.body;
-    try {
-      const _product = new productModel({ ...body });
-      await _product.save();
-      res.status(200).json({ message: "add product success" });
-    } catch (error) {
-      res.status(500).json({ errMessage: "server error" });
+    const { body, files } = req;
+    if (files.file) {
+      const images = await cloudinary.uploadFile(files.file, "product");
     }
+    // try {
+    //   const _product = new productModel({ ...body });
+    //   await _product.save();
+    //   res.status(200).json({ message: "add product success" });
+    // } catch (error) {
+    //   res.status(500).json({ errMessage: "server error" });
+    // }
   };
 
   updateProduct = async (req, res) => {
     const productId = req.params.productId;
-    if (productId)
-      return res.status(403).json({ message: "productId undefined" });
     const productUpdate = req.body;
+    if (productId)
+      return res.status(403).json({ message: "Invalid productId" });
     try {
+      if (productId.images && productId.images.length > 0) {
+        productId.images.forEach(async (id) => {
+          const imageId = await imageModel
+            .findByIdAndDelete({ _id: id })
+            .select("imageId")
+            .lean();
+          console.log(imageId);
+        });
+      }
+      if (productId.banner) {
+        const imageId = await imageModel
+          .findByIdAndDelete({ _id: productId.banner })
+          .select("imageId")
+          .lean();
+        // await cloudinary.deleteFile(imageId);
+      }
       const product = await userModel
         .findByIdAndUpdate(productId, { ...productUpdate }, { new: true })
         .exec();
-
       res.status(200).json({ message: "update product success", product });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
@@ -99,7 +124,7 @@ class Product {
   deleteProduct = async (req, res) => {
     const productId = req.params.productId;
     if (productId)
-      return res.status(403).json({ message: "productId undefined" });
+      return res.status(403).json({ message: "Invalid productId" });
     try {
       await userModel.findByIdAndDelete(productId).exec();
       res.status(200).json({ message: "Delete product success" });

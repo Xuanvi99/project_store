@@ -8,13 +8,8 @@ const ProductSchema = new Schema(
     desc: { type: String, required: true },
     brand: { type: String, required: true },
     banner: { type: Schema.Types.ObjectId, ref: "image" },
-    listImage: [
-      {
-        imageId: { type: Schema.Types.ObjectId, ref: "image" },
-        required: true,
-      },
-    ],
-    listSize: [{ type: Number, required: true }],
+    images: [{ type: Schema.Types.ObjectId, ref: "image", required: true }],
+    sizes: { type: Array, required: true },
     status: {
       type: String,
       enum: ["outOfStock", "inStock"],
@@ -23,6 +18,7 @@ const ProductSchema = new Schema(
     flashSale: { type: Boolean, default: false },
     price: { type: Number, required: true },
     discount: { type: Number, default: 0 },
+    comments: [{ type: Schema.Types.ObjectId, ref: "comment" }],
     slug: { type: String, slug: "name", unique: true },
     sold: { type: Number, default: 0 },
   },

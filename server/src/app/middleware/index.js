@@ -1,4 +1,4 @@
-const verifyMdw = require("./user.middleware");
+const verifyMdw = require("./verify.middleware");
 const uploadFileMdw = require("./uploadFile.middleware");
 const codeOTPMdw = require("./codeOTP.middleware");
 

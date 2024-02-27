@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const userModel = require("../model");
+const { userModel } = require("../model");
 
 class verifyMiddleware {
   verifyToken = async function (req, res, next) {
@@ -9,17 +9,18 @@ class verifyMiddleware {
         return res.status(401).json({ ErrorMessage: "invalid authorization" });
       const decode = jwt.verify(token, process.env.AC_PRIVATE_KEY);
       const user = await userModel.findById(decode.userID);
-      if (!user) res.status(401).json({ ErrorMessage: "token is not valid" });
+      if (!user)
+        return res.status(401).json({ ErrorMessage: "token is not valid" });
       req.user = user;
       next();
     } catch (error) {
-      res.status(403).json({ ErrorMessage: error });
+      res.status(500).json({ ErrorMessage: "verify token error" });
     }
   };
 
   verifyRole = function (req, res, next) {
     const user = req.user;
-    if (user.role === "admin") {
+    if (user.role === "buyer") {
       next();
     }
     res.status(403).json({ ErrorMessage: "token use not api" });

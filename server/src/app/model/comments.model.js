@@ -5,7 +5,7 @@ const CommentSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "user" },
     productId: { type: Schema.Types.ObjectId, ref: "product" },
-    listImage: [{ imageId: { type: Schema.Types.ObjectId, ref: "image" } }],
+    listImage: [{ type: Schema.Types.ObjectId, ref: "image" }],
     text: { type: String, default: "" },
     star: { type: Number },
     like: { type: Number, default: 0 },

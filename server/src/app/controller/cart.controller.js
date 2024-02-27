@@ -64,8 +64,6 @@ class Cart {
           userId: user._id,
           listProduct: [{ productId, size, quantity, price, totalPrice }],
         });
-        user.cartId = newCart._id;
-        await user.save();
       }
       return res.status(200).json({
         message: "Add to Cart successfully!",

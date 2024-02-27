@@ -14,8 +14,11 @@ const UserSchema = new Schema(
     password: { type: String, default: "" },
     date: { type: String, default: "" },
     address: { type: String, default: "" },
-    avatar: { type: String, default: "http://localhost:3000/imageDefault.png" },
-    cartId: { type: Schema.Types.ObjectId, ref: "cart", default: "" },
+    avatar: {
+      type: Schema.Types.ObjectId,
+      ref: "image",
+      default: "65de3038b3926f0e0c327d5d",
+    },
     blocked: { type: Boolean, default: false },
     role: { type: String, enum: ["admin", "buyer"], default: "buyer" },
   },
@@ -58,7 +61,7 @@ UserSchema.methods.generateAccessToken = function () {
   const accessToken = jwt.sign(
     { userID: this._id, role: this.role, type: "access_token" },
     process.env.AC_PRIVATE_KEY,
-    { expiresIn: "10m" }
+    { expiresIn: "5h" }
   );
 
   return accessToken;

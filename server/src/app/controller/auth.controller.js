@@ -29,10 +29,9 @@ class authController {
   };
 
   loginAuth = async function (req, res) {
-    const phoneOrEmail = req.body.phoneOrEmail;
-    const reqPassword = req.body.password;
+    const { phoneOrEmail, password } = req.body;
     try {
-      const user = await userModel.findOneUser(phoneOrEmail, reqPassword);
+      const user = await userModel.findOneUser(phoneOrEmail, password);
       if (!user)
         return res
           .status(403)
@@ -40,7 +39,7 @@ class authController {
       const accessToken = user.generateAccessToken();
       const refreshToken = user.generateRefreshToken();
       await tokenModel.saveToken(user, refreshToken);
-      const { password, __v, ...others } = user._doc;
+      const { password: pw, __v, ...others } = user._doc;
       return res
         .status(200)
         .cookie("refreshToken", refreshToken, {

@@ -7,7 +7,7 @@ const OrderSchema = new Schema(
     listProduct: [
       {
         productId: { type: Schema.Types.ObjectId, ref: "product" },
-        size: { type: number },
+        size: { type: Number, required: true },
         quantity: {
           type: Number,
           required: true,

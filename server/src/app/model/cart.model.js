@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const CartSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "user" },
+    modifiedOn: { type: Date, default: Date.now },
     listProduct: [
       {
         productId: {
@@ -11,7 +12,7 @@ const CartSchema = new Schema(
           ref: "product",
           require: true,
         },
-        size: { type: number },
+        size: { type: Number, required: true },
         quantity: {
           type: Number,
           required: true,
