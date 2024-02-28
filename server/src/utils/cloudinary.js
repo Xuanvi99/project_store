@@ -40,6 +40,11 @@ class cloudinary {
     });
   };
 
+  uploadOneFile = async function (file, folder) {
+    const imageCloud = await this.createFile(file, folder);
+    return imageCloud;
+  };
+
   uploadFile = async function (file, folder) {
     let arrId = [];
     for (let i = 0; i < file.length; i++) {

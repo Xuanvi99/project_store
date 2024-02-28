@@ -18,7 +18,7 @@ const ProductSchema = new Schema(
     flashSale: { type: Boolean, default: false },
     price: { type: Number, required: true },
     discount: { type: Number, default: 0 },
-    comments: [{ type: Schema.Types.ObjectId, ref: "comment" }],
+    comments: [{ type: Schema.Types.ObjectId, ref: "comment", default: "" }],
     slug: { type: String, slug: "name", unique: true },
     sold: { type: Number, default: 0 },
   },

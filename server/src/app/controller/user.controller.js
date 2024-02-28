@@ -125,7 +125,7 @@ class userController {
       const user = await userModel
         .findByIdAndUpdate(userId, { role: "admin" }, { new: true })
         .exec();
-      res.status(200).json({ message: "update Admin user success" });
+      res.status(200).json({ message: "update Admin user success", user });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
     }

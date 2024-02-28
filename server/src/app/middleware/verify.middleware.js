@@ -22,8 +22,9 @@ class verifyMiddleware {
     const user = req.user;
     if (user.role === "buyer") {
       next();
+    } else {
+      res.status(403).json({ ErrorMessage: "token use not api" });
     }
-    res.status(403).json({ ErrorMessage: "token use not api" });
   };
 
   verifyLoginGoogle = async function (req, res, next) {

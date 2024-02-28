@@ -55,7 +55,7 @@ class Product {
   getOneProduct = async (req, res) => {
     try {
       const productId = req.params.productId;
-      if (productId)
+      if (!productId)
         return res.status(403).json({ message: "Invalid productId " });
       const product = await productModel
         .findOne({ _id: productId })
@@ -70,7 +70,7 @@ class Product {
           .status(404)
           .json({ message: "ProductId not exit in product" });
       }
-      return res.status(200).json({ product });
+      res.status(200).json({ product });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
@@ -78,44 +78,76 @@ class Product {
 
   addProduct = async (req, res) => {
     const { body, files } = req;
-    if (files.file) {
-      const images = await cloudinary.uploadFile(files.file, "product");
+    const checkName = await productModel.findOne({ name: body.name }).lean();
+    if (checkName) {
+      return res.status(400).json({ message: "name product already exist" });
     }
-    // try {
-    //   const _product = new productModel({ ...body });
-    //   await _product.save();
-    //   res.status(200).json({ message: "add product success" });
-    // } catch (error) {
-    //   res.status(500).json({ errMessage: "server error" });
-    // }
+    try {
+      const sizes = body.sizes.split(",");
+      const banner = await cloudinary.uploadFile(files.banner, "product");
+      const images = await cloudinary.uploadFile(files.images, "product");
+      const _product = new productModel({ ...body, banner, images, sizes });
+      await _product.save();
+      res.status(200).json({ message: "add product success" });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
   };
 
   updateProduct = async (req, res) => {
     const productId = req.params.productId;
-    const productUpdate = req.body;
-    if (productId)
+    const { body, files } = req;
+    let productUpdate = { ...body };
+    if (!productId)
       return res.status(403).json({ message: "Invalid productId" });
+    if (body.name) {
+      const checkName = await productModel.findOne({ name: body.name }).lean();
+      if (checkName) {
+        return res.status(400).json({ message: "name product already exist" });
+      }
+    }
     try {
-      if (productId.images && productId.images.length > 0) {
-        productId.images.forEach(async (id) => {
-          const imageId = await imageModel
-            .findByIdAndDelete({ _id: id })
-            .select("imageId")
+      const product = await productModel.findById(productId).lean();
+      if (!product) {
+        return res
+          .status(404)
+          .json({ errMessage: "ProductId not exit in product" });
+      }
+      const { images, banner } = product;
+      if (files.images && images.length > 0) {
+        for (let i = 0; i < images.length; i++) {
+          const items = await imageModel
+            .findByIdAndDelete(images[i])
+            .select("public_id")
             .lean();
-          console.log(imageId);
-        });
+          if (items) {
+            await cloudinary.deleteFile(items.public_id);
+          }
+        }
+        const imagesUpLoad = await cloudinary.uploadFile(
+          files.images,
+          "product"
+        );
+        productUpdate = { ...productUpdate, images: imagesUpLoad };
       }
-      if (productId.banner) {
-        const imageId = await imageModel
-          .findByIdAndDelete({ _id: productId.banner })
-          .select("imageId")
+      if (files.banner && banner) {
+        const items = await imageModel
+          .findByIdAndDelete(banner)
+          .select("public_id")
           .lean();
-        // await cloudinary.deleteFile(imageId);
+        if (items) {
+          await cloudinary.deleteFile(items.public_id);
+        }
+        const bannerUpLoad = await cloudinary.uploadFile(
+          files.banner,
+          "product"
+        );
+        productUpdate = { ...productUpdate, banner: bannerUpLoad };
       }
-      const product = await userModel
+      const result = await productModel
         .findByIdAndUpdate(productId, { ...productUpdate }, { new: true })
         .exec();
-      res.status(200).json({ message: "update product success", product });
+      res.status(200).json({ message: "update product success", result });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
@@ -123,10 +155,32 @@ class Product {
 
   deleteProduct = async (req, res) => {
     const productId = req.params.productId;
-    if (productId)
+    if (!productId)
       return res.status(403).json({ message: "Invalid productId" });
     try {
-      await userModel.findByIdAndDelete(productId).exec();
+      const product = await productModel
+        .findByIdAndDelete(productId)
+        .populate([{ path: "banner" }, { path: "images" }])
+        .lean();
+      const { banner, images } = product;
+      if (banner) {
+        const items = await imageModel.findByIdAndDelete(banner._id);
+        if (items) {
+          await cloudinary.deleteFile(items.public_id);
+        }
+      }
+      if (images.length > 0) {
+        for (let i = 0; i < images.length; i++) {
+          const items = await imageModel
+            .findByIdAndDelete(images[i]._id)
+            .select("public_id")
+            .lean();
+          if (items) {
+            await cloudinary.deleteFile(items.public_id);
+          }
+        }
+      }
+      console.log(product);
       res.status(200).json({ message: "Delete product success" });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });

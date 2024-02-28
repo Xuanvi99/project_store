@@ -7,17 +7,25 @@ const routes = express.Router();
 routes.route("/api/product/getListProduct").post(productCtl.getListProduct);
 routes.route("/api/product/").post(
   uploadFileMdw.fields([
-    { name: "file", maxCount: 10 },
     { name: "banner", maxCount: 1 },
+    { name: "images", maxCount: 10 },
   ]),
   verifyMdw.verifyToken,
   verifyMdw.verifyRole,
   productCtl.addProduct
 );
 routes
-  .route("/api/product/:productID")
+  .route("/api/product/:productId")
   .get(verifyMdw.verifyToken, productCtl.getOneProduct)
-  .put(verifyMdw.verifyToken, verifyMdw.verifyRole, productCtl.updateProduct)
+  .put(
+    uploadFileMdw.fields([
+      { name: "banner", maxCount: 1 },
+      { name: "images", maxCount: 10 },
+    ]),
+    verifyMdw.verifyToken,
+    verifyMdw.verifyRole,
+    productCtl.updateProduct
+  )
   .delete(
     verifyMdw.verifyToken,
     verifyMdw.verifyRole,
