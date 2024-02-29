@@ -4,7 +4,7 @@ const { uploadFileMdw } = require("../middleware");
 const { verifyMdw } = require("../middleware");
 const routes = express.Router();
 
-routes.route("/api/product/getListProduct").post(productCtl.getListProduct);
+routes.route("/api/product/getListProduct").get(productCtl.getListProduct);
 routes.route("/api/product/").post(
   uploadFileMdw.fields([
     { name: "banner", maxCount: 1 },

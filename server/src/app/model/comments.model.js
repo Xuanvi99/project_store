@@ -5,9 +5,10 @@ const CommentSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "user" },
     productId: { type: Schema.Types.ObjectId, ref: "product" },
-    listImage: [{ type: Schema.Types.ObjectId, ref: "image" }],
+    images: [{ type: Schema.Types.ObjectId, ref: "image" }],
+    status: { type: Boolean, default: false },
     text: { type: String, default: "" },
-    star: { type: Number },
+    star: { type: Number, default: 5 },
     like: { type: Number, default: 0 },
     reply: { type: String, default: "" },
   },

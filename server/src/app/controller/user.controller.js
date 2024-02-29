@@ -1,4 +1,4 @@
-const { userModel, cartModel } = require("../model");
+const { userModel, imageModel } = require("../model");
 
 class userController {
   checkUser = async function (req, res) {
@@ -85,18 +85,25 @@ class userController {
 
   updateUser = async (req, res) => {
     const userId = req.params.userId;
-    const profileUpdate = req.body;
-
-    if (profileUpdate)
-      if (!userId) {
-        res.status(400).json({ errMessage: "Invalid user ID" });
-      }
+    let profileUpdate = req.body;
+    const files = req;
+    if (!userId) {
+      res.status(400).json({ errMessage: "Invalid user ID" });
+    }
     try {
-      const user = await userModel
+      const user = await userModel.findById(userId).lean();
+      if (files) {
+        if (user.avatar !== "65de3038b3926f0e0c327d5d") {
+          await imageModel.removeFile(user.avatar);
+        }
+        const avatar = await imageModel.uploadSingleFile(files, "avatar");
+        profileUpdate = { ...profileUpdate, avatar };
+      }
+      const result = await userModel
         .findByIdAndUpdate(userId, { ...profileUpdate }, { new: true })
         .populate("avatar")
         .exec();
-      const { password, ...others } = user._doc;
+      const { password, ...others } = result._doc;
       res.status(200).json({ message: "update user success", user: others });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
@@ -109,8 +116,26 @@ class userController {
       res.status(400).json({ errMessage: "Invalid user ID" });
     }
     try {
-      await userModel.findByIdAndDelete(userId).exec();
+      const user = await userModel.findByIdAndDelete(userId).exec();
+      if (user.avatar !== "65de3038b3926f0e0c327d5d") {
+        await imageModel.removeFile(user.avatar);
+      }
       res.status(200).json({ message: "delete user success" });
+    } catch (error) {
+      res.status(500).json({ errMessage: error | "server error" });
+    }
+  };
+
+  blockedUser = async (req, res) => {
+    const userId = req.params.userId;
+    if (!userId) {
+      res.status(400).json({ errMessage: "Invalid user ID" });
+    }
+    try {
+      const user = await userModel
+        .findByIdAndUpdate(userId, { blocked: true }, { new: true })
+        .exec();
+      res.status(200).json({ message: "user blocked success", user });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
     }

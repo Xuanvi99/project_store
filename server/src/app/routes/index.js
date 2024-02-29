@@ -5,11 +5,12 @@ const authRoutes = require("./auth.routes");
 const uploadFile = require("./uploadFile.routes");
 const otpRoutes = require("./otp.routes");
 const productRoutes = require("./product.routes");
+const commentRoutes = require("./comment.routes");
 
 routes.use(uploadFile);
 routes.use(authRoutes);
 routes.use(userRoutes);
 routes.use(otpRoutes);
 routes.use(productRoutes);
-
+routes.use(commentRoutes);
 module.exports = routes;

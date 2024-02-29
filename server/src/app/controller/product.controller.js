@@ -1,11 +1,11 @@
-const { productModel, imageModel, commentModel } = require("../model");
-const cloudinary = require("../../utils/cloudinary");
+const { productModel, imageModel } = require("../model");
+
 class Product {
   getListProduct = async (req, res) => {
     try {
       const page = +req.query.page || 1;
       const search = req.query.search || "";
-      const limit = process.env.lIMIT_GET_USER;
+      const limit = req.query.limit || 10;
       const skip = (page - 1) * limit;
       const listProduct = await productModel
         .find({
@@ -84,8 +84,14 @@ class Product {
     }
     try {
       const sizes = body.sizes.split(",");
-      const banner = await cloudinary.uploadFile(files.banner, "product");
-      const images = await cloudinary.uploadFile(files.images, "product");
+      const banner = await imageModel.uploadSingleFile(
+        files.banner[0],
+        "product"
+      );
+      const images = await imageModel.uploadMultipleFile(
+        files.images,
+        "product"
+      );
       const _product = new productModel({ ...body, banner, images, sizes });
       await _product.save();
       res.status(200).json({ message: "add product success" });
@@ -116,29 +122,17 @@ class Product {
       const { images, banner } = product;
       if (files.images && images.length > 0) {
         for (let i = 0; i < images.length; i++) {
-          const items = await imageModel
-            .findByIdAndDelete(images[i])
-            .select("public_id")
-            .lean();
-          if (items) {
-            await cloudinary.deleteFile(items.public_id);
-          }
+          await imageModel.removeFile(images[i]);
         }
-        const imagesUpLoad = await cloudinary.uploadFile(
+        const imagesUpLoad = await imageModel.uploadMultipleFile(
           files.images,
           "product"
         );
         productUpdate = { ...productUpdate, images: imagesUpLoad };
       }
       if (files.banner && banner) {
-        const items = await imageModel
-          .findByIdAndDelete(banner)
-          .select("public_id")
-          .lean();
-        if (items) {
-          await cloudinary.deleteFile(items.public_id);
-        }
-        const bannerUpLoad = await cloudinary.uploadFile(
+        await imageModel.removeFile(banner);
+        const bannerUpLoad = await imageModel.uploadSingleFile(
           files.banner,
           "product"
         );
@@ -158,29 +152,16 @@ class Product {
     if (!productId)
       return res.status(403).json({ message: "Invalid productId" });
     try {
-      const product = await productModel
-        .findByIdAndDelete(productId)
-        .populate([{ path: "banner" }, { path: "images" }])
-        .lean();
+      const product = await productModel.findByIdAndDelete(productId).lean();
       const { banner, images } = product;
       if (banner) {
-        const items = await imageModel.findByIdAndDelete(banner._id);
-        if (items) {
-          await cloudinary.deleteFile(items.public_id);
-        }
+        await imageModel.removeFile(banner);
       }
       if (images.length > 0) {
         for (let i = 0; i < images.length; i++) {
-          const items = await imageModel
-            .findByIdAndDelete(images[i]._id)
-            .select("public_id")
-            .lean();
-          if (items) {
-            await cloudinary.deleteFile(items.public_id);
-          }
+          await imageModel.removeFile(images[i]);
         }
       }
-      console.log(product);
       res.status(200).json({ message: "Delete product success" });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });

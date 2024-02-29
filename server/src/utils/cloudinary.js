@@ -1,6 +1,5 @@
 const cloudinaryV2 = require("cloudinary").v2;
 const streamifier = require("streamifier");
-const { imageModel } = require("../app/model");
 
 class cloudinary {
   createFile = (file, folder) => {
@@ -45,20 +44,20 @@ class cloudinary {
     return imageCloud;
   };
 
-  uploadFile = async function (file, folder) {
-    let arrId = [];
-    for (let i = 0; i < file.length; i++) {
-      const imageCloud = await this.createFile(file[i], folder);
-      const newImage = new imageModel({
-        public_id: imageCloud.public_id,
-        url: imageCloud.url,
-        folder: folder,
-      });
-      const result = await newImage.save();
-      arrId.push(result._id);
-    }
-    return arrId;
-  };
+  // uploadFile = async function (file, folder) {
+  //   let arrId = [];
+  //   for (let i = 0; i < file.length; i++) {
+  //     const imageCloud = await this.createFile(file[i], folder);
+  //     const newImage = new imageModel({
+  //       public_id: imageCloud.public_id,
+  //       url: imageCloud.url,
+  //       folder: folder,
+  //     });
+  //     const result = await newImage.save();
+  //     arrId.push(result._id);
+  //   }
+  //   return arrId;
+  // };
 }
 
 module.exports = new cloudinary();

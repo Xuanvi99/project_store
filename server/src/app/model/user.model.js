@@ -17,7 +17,11 @@ const UserSchema = new Schema(
     avatar: {
       type: Schema.Types.ObjectId,
       ref: "image",
-      default: "65de3038b3926f0e0c327d5d",
+    },
+    avatarDefault: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/damahknfx/image/upload/v1709063132/avatar/quz06h6htrcrlrm5furt.png",
     },
     blocked: { type: Boolean, default: false },
     role: { type: String, enum: ["admin", "buyer"], default: "buyer" },

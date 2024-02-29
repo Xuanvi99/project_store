@@ -26,7 +26,6 @@ const OrderSchema = new Schema(
     status: {
       type: String,
       enum: ["PENDING", "SUCCESS", "FAILED"],
-      required: true,
       default: "PENDING",
     },
     transport: {
