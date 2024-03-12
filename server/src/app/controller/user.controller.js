@@ -72,6 +72,12 @@ class userController {
 
   addUser = async (req, res) => {
     const profile = req.body;
+    if (profile.userName) {
+      const checkName = await userModel.find({ userName: profile.userName });
+      if (checkName.length > 0) {
+        return res.status(400).json({ message: "userName already exist" });
+      }
+    }
     try {
       const newUser = await userModel({
         ...profile,
@@ -93,7 +99,7 @@ class userController {
     try {
       const user = await userModel.findById(userId).lean();
       if (files) {
-        if (user.avatar !== "65de3038b3926f0e0c327d5d") {
+        if (user.avatar) {
           await imageModel.removeFile(user.avatar);
         }
         const avatar = await imageModel.uploadSingleFile(files, "avatar");
@@ -117,9 +123,10 @@ class userController {
     }
     try {
       const user = await userModel.findByIdAndDelete(userId).exec();
-      if (user.avatar !== "65de3038b3926f0e0c327d5d") {
+      if (user.avatar) {
         await imageModel.removeFile(user.avatar);
       }
+      await cartModel.deleteOne({ userId });
       res.status(200).json({ message: "delete user success" });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });

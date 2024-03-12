@@ -9,7 +9,7 @@ class Comment {
         .populate([
           { path: "userId" },
           { path: "productId" },
-          { path: "images" },
+          { path: "imageIDs" },
         ])
         .lean();
       const totalComment = await commentModel.countDocuments();
@@ -26,7 +26,7 @@ class Comment {
         .populate([
           { path: "userId" },
           { path: "productId" },
-          { path: "images" },
+          { path: "imageIDs" },
         ])
         .lean();
       res.status(200).json({ comment });
@@ -38,17 +38,18 @@ class Comment {
   addComment = async (req, res) => {
     let { body, files } = req;
     try {
-      const product = await productModel.findById(body.productId).lean();
-      if (!body.productId || product) {
+      const product = await productModel.findById(body.productId);
+      console.log("product: ", product);
+      if (!body.productId || !product) {
         return res.status(400).json({ errMessage: "ProductId invalid" });
       }
       if (files.length > 0) {
-        const images = await imageModel.uploadMultipleFile(files, "comment");
-        body = { ...body, images };
+        const imageIDs = await imageModel.uploadMultipleFile(files, "comment");
+        body = { ...body, imageIDs };
       }
       const _comment = new commentModel({ ...body });
       const result = await _comment.save();
-      product.comments.push(result._id);
+      product.commentIDs.push(result._id);
       await product.save();
       res.status(201).json({ message: "create comment success", result });
     } catch (error) {
@@ -67,15 +68,15 @@ class Comment {
           .json({ errorMessage: "CommentId not exit in comment" });
       }
       if (files.length > 0) {
-        const { images } = comment;
-        for (let i = 0; images.length > 0; i++) {
-          await imageModel.removeFile(images[i]);
+        const { imageIDs } = comment;
+        for (let i = 0; imageIDs.length > 0; i++) {
+          await imageModel.removeFile(imageIDs[i]);
         }
         const imagesUpload = await imageModel.uploadMultipleFile(
           files,
           "comment"
         );
-        body = { ...body, images: imagesUpload };
+        body = { ...body, imageIDs: imagesUpload };
       }
       const result = await commentModel
         .findByIdAndUpdate(commentId, { ...body }, { new: true })
@@ -95,15 +96,17 @@ class Comment {
           .status(404)
           .json({ errorMessage: "CommentId not exit in comment" });
       }
-      const product = await productModel.findById(comment.productId).lean();
-      const { images } = comment;
-      if (images.length > 0) {
-        for (let i = 0; images.length > 0; i++) {
-          await imageModel.removeFile(images[i]);
+      const product = await productModel.findById(comment.productId);
+      const { imageIDs } = comment;
+      if (imageIDs.length > 0) {
+        for (let i = 0; imageIDs.length > 0; i++) {
+          await imageModel.removeFile(imageIDs[i]);
         }
       }
-      const index = product.comments.findIndex((cmtId) => cmtId === commentId);
-      product.comments.splice(index, 1);
+      const index = product.commentIDs.findIndex(
+        (cmtId) => cmtId === commentId
+      );
+      product.commentIDs.splice(index, 1);
       await product.save();
       res.status(200).json({ message: "Delete comment success" });
     } catch (error) {

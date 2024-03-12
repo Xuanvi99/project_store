@@ -23,12 +23,11 @@ const OrderSchema = new Schema(
       type: Number,
       required: true,
     },
-    status: {
-      type: String,
-      enum: ["PENDING", "SUCCESS", "FAILED"],
-      default: "PENDING",
+    is_payment: {
+      type: Boolean,
+      default: false,
     },
-    transport: {
+    status: {
       type: String,
       enum: ["PENDING", "SUCCESS", "FAILED"],
       default: "PENDING",

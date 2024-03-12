@@ -35,8 +35,7 @@ UserSchema.pre("save", function (next) {
     user.password = Math.floor(Math.random() * 1000000).toString();
   }
   if (!user.isModified("password")) return next();
-  bcrypt.genSalt(+process.env.saltRounds, function (err, salt) {
-    if (err) return next(err);
+  bcrypt.genSalt(+process.env.saltRounds, function (_, salt) {
     bcrypt.hash(user.password, salt, function (err, hash) {
       user.password = hash;
       return next();

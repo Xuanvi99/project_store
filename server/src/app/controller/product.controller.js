@@ -1,4 +1,4 @@
-const { productModel, imageModel } = require("../model");
+const { productModel, imageModel, commentModel } = require("../model");
 
 class Product {
   getListProduct = async (req, res) => {
@@ -14,10 +14,8 @@ class Product {
               $or: [
                 { name: { $regex: search, $options: "i" } },
                 { brand: { $regex: search, $options: "i" } },
+                { slug: { $regex: search, $options: "i" } },
               ],
-            },
-            {
-              status: "inStock",
             },
           ],
         })
@@ -27,16 +25,9 @@ class Product {
       let totalPage = 0;
       if (search) {
         const countProduct = await productModel.find({
-          $and: [
-            {
-              $or: [
-                { name: { $regex: search, $options: "i" } },
-                { brand: { $regex: search, $options: "i" } },
-              ],
-            },
-            {
-              status: "inStock",
-            },
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { brand: { $regex: search, $options: "i" } },
           ],
         });
 
@@ -61,8 +52,8 @@ class Product {
         .findOne({ _id: productId })
         .populate([
           { path: "banner" },
-          { path: "images" },
-          { path: "comments" },
+          { path: "imageID" },
+          { path: "commentID" },
         ])
         .lean();
       if (!product) {
@@ -77,9 +68,9 @@ class Product {
   };
 
   addProduct = async (req, res) => {
-    const { body, files } = req;
-    const checkName = await productModel.findOne({ name: body.name }).lean();
-    if (checkName) {
+    const { files, body } = req;
+    const checkName = await productModel.find({ name: body.name }).lean();
+    if (checkName.length > 0) {
       return res.status(400).json({ message: "name product already exist" });
     }
     try {
@@ -88,13 +79,18 @@ class Product {
         files.banner[0],
         "product"
       );
-      const images = await imageModel.uploadMultipleFile(
+      const imageIDs = await imageModel.uploadMultipleFile(
         files.images,
         "product"
       );
-      const _product = new productModel({ ...body, banner, images, sizes });
-      await _product.save();
-      res.status(200).json({ message: "add product success" });
+      const _product = new productModel({
+        ...body,
+        banner,
+        imageIDs,
+        sizes,
+      });
+      const result = await _product.save();
+      res.status(200).json({ message: "add product success", result });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
@@ -119,16 +115,16 @@ class Product {
           .status(404)
           .json({ errMessage: "ProductId not exit in product" });
       }
-      const { images, banner } = product;
-      if (files.images && images.length > 0) {
-        for (let i = 0; i < images.length; i++) {
-          await imageModel.removeFile(images[i]);
+      const { imageIDs, banner } = product;
+      if (files.images && imageIDs.length > 0) {
+        for (let i = 0; i < imageIDs.length; i++) {
+          await imageModel.removeFile(imageIDs[i]);
         }
         const imagesUpLoad = await imageModel.uploadMultipleFile(
           files.images,
           "product"
         );
-        productUpdate = { ...productUpdate, images: imagesUpLoad };
+        productUpdate = { ...productUpdate, imageIDs: imagesUpLoad };
       }
       if (files.banner && banner) {
         await imageModel.removeFile(banner);
@@ -153,13 +149,18 @@ class Product {
       return res.status(403).json({ message: "Invalid productId" });
     try {
       const product = await productModel.findByIdAndDelete(productId).lean();
-      const { banner, images } = product;
+      const { banner, imageIDs, commentIDs } = product;
       if (banner) {
         await imageModel.removeFile(banner);
       }
-      if (images.length > 0) {
-        for (let i = 0; i < images.length; i++) {
-          await imageModel.removeFile(images[i]);
+      if (imageIDs.length > 0) {
+        for (let i = 0; i < imageIDs.length; i++) {
+          await imageModel.removeFile(imageIDs[i]);
+        }
+      }
+      if (commentIDs.length > 0) {
+        for (let i = 0; i < commentIDs.length; i++) {
+          await commentModel.findByIdAndDelete(commentIDs[i]);
         }
       }
       res.status(200).json({ message: "Delete product success" });

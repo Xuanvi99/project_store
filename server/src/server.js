@@ -2,7 +2,7 @@ require("dotenv").config();
 require("events").defaultMaxListeners = 15;
 const express = require("express"),
   app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
@@ -32,5 +32,15 @@ app.use(function (req, res) {
   res.status(404).send({ url: req.originalUrl + " not found" });
 });
 
-app.listen(port);
-console.log("Server started on: " + port);
+app.listen(PORT, function () {
+  console.log("Server started on: " + PORT);
+});
+
+const http = require("http");
+const socket = require("socket.io");
+const server = http.createServer(app);
+const io = socket(server);
+
+io.on("connection", function (socket) {
+  console.log("Made socket connection");
+});

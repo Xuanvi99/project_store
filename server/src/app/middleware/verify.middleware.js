@@ -6,11 +6,11 @@ class verifyMiddleware {
     try {
       const token = req.headers.authorization.split(" ")[1];
       if (!token)
-        return res.status(401).json({ ErrorMessage: "invalid authorization" });
+        return res.status(401).json({ ErrorMessage: "Token is required!" });
       const decode = jwt.verify(token, process.env.AC_PRIVATE_KEY);
       const user = await userModel.findById(decode.userID);
       if (!user)
-        return res.status(401).json({ ErrorMessage: "token is not valid" });
+        return res.status(401).json({ ErrorMessage: "Token is not valid" });
       req.user = user;
       next();
     } catch (error) {
@@ -23,7 +23,7 @@ class verifyMiddleware {
     if (user.role === "buyer") {
       next();
     } else {
-      res.status(403).json({ ErrorMessage: "token use not api" });
+      res.status(403).json({ ErrorMessage: "User not allowed" });
     }
   };
 
