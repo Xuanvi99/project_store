@@ -2,9 +2,9 @@ import axios from "axios";
 import { Button } from ".";
 import { cn } from "../../utils";
 import { useGoogleLogin } from "@react-oauth/google";
-import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../hook";
-import { updateUser } from "../../stores/reducer/authReducer";
+import { updateAuth } from "../../stores/reducer/authReducer";
+import { useNavigate } from "react-router-dom";
 
 type TProps = {
   text: string;
@@ -17,9 +17,8 @@ type TProps = {
 };
 
 function ButtonGoogle({ text, className, redirectUrl }: TProps) {
-  console.log("redirectUrl: ", redirectUrl);
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
@@ -39,8 +38,12 @@ function ButtonGoogle({ text, className, redirectUrl }: TProps) {
             withCredentials: true,
           });
           if (res.data) {
-            dispatch(updateUser(res.data));
-            navigate(redirectUrl);
+            dispatch(updateAuth({ ...res.data, isLogin: true }));
+            if (redirectUrl === "/") {
+              navigate("/");
+            } else {
+              window.location.href = redirectUrl;
+            }
           }
         }
       } catch (error) {

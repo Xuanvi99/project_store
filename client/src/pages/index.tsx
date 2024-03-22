@@ -10,6 +10,7 @@ const ForgotPasswordPage = lazy(() => import("./ForgotPasswordPage"));
 const ProfilePage = lazy(() => import("./ProfilePage"));
 const CartPage = lazy(() => import("./CartPage"));
 const CheckOutPage = lazy(() => import("./CheckOutPage"));
+const DashboardPage = lazy(() => import("./DashboardPage"));
 
 export {
   HomePage,
@@ -22,4 +23,5 @@ export {
   ProfilePage,
   CartPage,
   CheckOutPage,
+  DashboardPage,
 };

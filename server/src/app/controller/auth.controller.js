@@ -59,9 +59,9 @@ class authController {
   loginOauthGoogle = async function (req, res) {
     try {
       const user = req.user;
-      const { password, ...others } = user._doc;
-      const accessToken = user.generateAccessToken();
-      const refreshToken = user.generateRefreshToken();
+      const { password, _v, createdAt, updatedAt, ...others } = user._doc;
+      const accessToken = await user.generateAccessToken();
+      const refreshToken = await user.generateRefreshToken();
       await tokenModel.saveToken(user._doc, refreshToken);
       return res
         .status(200)
@@ -101,21 +101,23 @@ class authController {
   };
 
   logOut = async (req, res) => {
-    const refreshToken = req.cookies.refreshToken;
-    if (refreshToken) {
-      await tokenModel.deleteToken(refreshToken);
+    try {
+      const refreshToken = req.cookies.refreshToken;
+      if (refreshToken) {
+        await tokenModel.deleteToken(refreshToken);
+      }
+      res.clearCookie("refreshToken");
+      res.status(200).json({ message: "Logged out successfully!" });
+    } catch (error) {
+      res.status(500).json({ errMessage: error | "server error" });
     }
-    res.clearCookie("refreshToken");
-    res.status(200).json("Logged out successfully!");
   };
 
   refreshToken = async (req, res) => {
     try {
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken)
-        return res
-          .status(401)
-          .json({ errMessage: "refreshToken is not define" });
+        return res.status(400).json({ errMessage: "Invalid refreshToken" });
       const checkRfToken = await tokenModel
         .findOne({
           token: refreshToken,
@@ -123,8 +125,9 @@ class authController {
         .exec();
       if (!checkRfToken)
         return res
-          .status(401)
-          .json({ errMessage: "token does not exist!", isLogin: true });
+          .status(400)
+          .clearCookie("refreshToken")
+          .json({ errMessage: "token does not exist!" });
       jwt.verify(
         refreshToken,
         process.env.RF_PRIVATE_KEY,

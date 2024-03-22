@@ -12,7 +12,7 @@ import {
   useRegisterMutation,
   useUpdatePasswordMutation,
 } from "../../stores/service/auth.service";
-import { updateUser } from "../../stores/reducer/authReducer";
+import { updateAuth } from "../../stores/reducer/authReducer";
 
 type TProps = {
   account: string;
@@ -61,7 +61,7 @@ function FormUpdatePassword({
         .unwrap()
         .then((res) => {
           if (res.user) {
-            dispatch(updateUser({ ...res }));
+            dispatch(updateAuth({ ...res, isLogin: true }));
             handleActiveForm("3");
           }
         });

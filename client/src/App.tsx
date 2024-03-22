@@ -4,24 +4,40 @@ import { ErrorBoundary } from "react-error-boundary";
 import router from "./router";
 import { useAppDispatch, useAppSelector } from "./hook";
 import { useRefreshTokenMutation } from "./stores/service/auth.service";
-import { updateUser } from "./stores/reducer/authReducer";
+import { logOut, updateAuth } from "./stores/reducer/authReducer";
+import { useGetCartQuery } from "./stores/service/cart.service";
+import { updateCart } from "./stores/reducer/cartReducer";
 
 function App() {
   const user = useAppSelector((state) => state.authSlice.user);
   const [refreshToken] = useRefreshTokenMutation();
   const dispatch = useAppDispatch();
   const effectRun = useRef(false);
+  const id = user ? user._id : "";
+  const { data, status } = useGetCartQuery(id, { skip: !id });
 
   useEffect(() => {
     if (!effectRun.current && !user) {
       refreshToken()
         .unwrap()
-        .then((res) => dispatch(updateUser(res)));
+        .then((res) => {
+          dispatch(updateAuth({ ...res, isLogin: true }));
+        })
+        .catch(() => {
+          dispatch(logOut());
+        });
     }
     return () => {
       effectRun.current = true;
     };
   }, [dispatch, refreshToken, user]);
+
+  useEffect(() => {
+    if (data && status === "fulfilled") {
+      dispatch(updateCart(data));
+    }
+    return () => {};
+  }, [data, dispatch, status]);
 
   return (
     <ErrorBoundary FallbackComponent={fallbackRender}>

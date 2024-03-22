@@ -1,9 +1,10 @@
 const nodemailer = require("nodemailer");
-const codeOTPModel = require("../model");
+const { codeOTPModel } = require("../model");
 
 exports.sendEmail = async (req, res) => {
   try {
     const { user, codeOTP } = req;
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       host: "smtp.gmail.com",
@@ -145,8 +146,8 @@ exports.sendEmail = async (req, res) => {
 
     transporter.sendMail(mailOptions);
     await codeOTPModel.saveCodeOTP(user.email, codeOTP);
-    res.status(200).json({ message: "Email sent successfully." });
+    res.status(200).json({ message: "Email sent code successfully." });
   } catch (error) {
-    res.status(500).json({ errMessage: error | "server error" });
+    res.status(500).json({ errMessage: "server error" });
   }
 };

@@ -1,44 +1,49 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { IUser } from "../../types/userType";
+import { IUser } from "../../types/commonType";
 
-type TAuth = { phoneOrEmail: string; password: string; code?: string };
+type TArg = { phoneOrEmail: string; password: string; code?: string };
 
-type TInfoUser = { user: IUser; accessToken: string };
+type TRes = { user: IUser; accessToken: string };
 
-export const authAPi = createApi({
+export const authApi = createApi({
   reducerPath: "auth",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3000/api/auth/" }),
-
+  baseQuery: fetchBaseQuery({
+    baseUrl: import.meta.env.VITE_DOMAIN_SERVER + "/api/auth/",
+    credentials: "include",
+  }),
   endpoints: (build) => ({
     //generic type query<type Responsive, type argument>
-    register: build.mutation<TInfoUser, TAuth>({
+    register: build.mutation<TRes, TArg>({
       query: ({ phoneOrEmail, password }) => ({
         url: "register",
         method: "POST",
         body: { phone: phoneOrEmail, password },
-        credentials: "include",
       }),
     }),
-    login: build.mutation<TInfoUser, TAuth>({
+    login: build.mutation<TRes, TArg>({
       query: ({ phoneOrEmail, password }) => ({
         url: "login",
         method: "POST",
         body: { phoneOrEmail, password },
-        credentials: "include",
       }),
     }),
-    updatePassword: build.mutation<{ message: string }, TAuth>({
+    updatePassword: build.mutation<{ message: string }, TArg>({
       query: ({ phoneOrEmail, password, code }) => ({
         url: "update_password",
         method: "POST",
         body: { phoneOrEmail, password, code },
       }),
     }),
-    refreshToken: build.mutation<TInfoUser, void>({
+    refreshToken: build.mutation<TRes, void>({
       query: () => ({
         url: "refreshToken",
         method: "POST",
-        credentials: "include",
+      }),
+    }),
+    logOutAuth: build.mutation<{ message: string }, void>({
+      query: () => ({
+        url: "logout",
+        method: "POST",
       }),
     }),
   }),
@@ -49,4 +54,5 @@ export const {
   useLoginMutation,
   useUpdatePasswordMutation,
   useRefreshTokenMutation,
-} = authAPi;
+  useLogOutAuthMutation,
+} = authApi;

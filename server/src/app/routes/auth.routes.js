@@ -10,6 +10,6 @@ routes
   .route("/api/auth/loginGoogle")
   .post(verifyMdw.verifyLoginGoogle, authCtl.loginOauthGoogle);
 routes.route("/api/auth/refreshToken").post(authCtl.refreshToken);
-routes.route("/api/auth/logout").get(authCtl.logOut);
+routes.route("/api/auth/logout").post(authCtl.logOut);
 routes.route("/api/auth/update_password").post(authCtl.updatePassword);
 module.exports = routes;

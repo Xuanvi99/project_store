@@ -13,6 +13,7 @@ function FormStepChangePassword({ phoneOrEmail, indexForm, onBack }: TProps) {
   const [activeForm, setActiveForm] = useState<"1" | "2" | "3">(
     indexForm ? indexForm : "1"
   );
+  const domain = import.meta.env.VITE_DOMAIN_CLIENT;
   const handleActiveForm = (form: "1" | "2" | "3") => {
     setActiveForm(form);
   };
@@ -39,7 +40,7 @@ function FormStepChangePassword({ phoneOrEmail, indexForm, onBack }: TProps) {
           <FormNotifySuccess
             type="change"
             account={phoneOrEmail}
-            path="http://localhost:5173/auth/login"
+            path={domain + "/auth/login"}
           ></FormNotifySuccess>
         );
 

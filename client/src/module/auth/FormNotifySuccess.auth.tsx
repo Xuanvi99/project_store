@@ -51,7 +51,7 @@ function FormNotifySuccess({ type, account, path }: TProps) {
     }
   };
   return (
-    <div className="w-full success_Password flex flex-col justify-center items-center gap-y-5 py-5 px-16">
+    <div className="flex flex-col items-center justify-center w-full px-16 py-5 success_Password gap-y-5">
       <h1 className="text-xl font-bold">
         {type === "create" ? "Đăng ký thành công!" : "Cập nhật thành công!"}
       </h1>
@@ -60,11 +60,11 @@ function FormNotifySuccess({ type, account, path }: TProps) {
       </div>
       <div className="text-center">
         <p>{notification(account).title}</p>
-        <span className="text-orange font-bold">
+        <span className="font-bold text-orange">
           {notification(account).account}
         </span>
       </div>
-      <div ref={timeRedirect} className="text-center px-5">
+      <div ref={timeRedirect} className="px-5 text-center">
         Bạn sẽ được chuyển đến trang Đăng nhập trong 10 giây
       </div>
       <Button

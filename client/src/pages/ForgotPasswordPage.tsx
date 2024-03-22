@@ -7,7 +7,7 @@ import {
 import LayoutFormAuth from "../layout/LayoutFormAuth";
 import { useLocation } from "react-router-dom";
 import { useVerifyEmailMutation } from "../stores/service/otp.service";
-import { isFetchBaseQueryError } from "../stores/service/helpers";
+import { isFetchBaseQueryError } from "../stores/helpers";
 
 type TAccount = {
   phoneOrEmail: string;
@@ -62,7 +62,7 @@ function ForgotPasswordPage() {
 
   const handleError = () => {
     if (expired) {
-      return "Mail xác minh đã hết hạn! Vui lòng nhập thông tin";
+      return "Mail xác minh đã hết hạn!";
     } else if (res.error && isFetchBaseQueryError(res.error)) {
       const data = res.error.data as { errMessage: string };
       return data.errMessage + "! Vui lòng nhập thông tin";

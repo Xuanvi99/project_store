@@ -3,7 +3,7 @@ function IconBag({
   quantity = 0,
 }: {
   size?: number;
-  quantity: number;
+  quantity: number | string;
 }) {
   return (
     <div className={`w-[${size}] relative`}>

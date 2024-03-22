@@ -18,7 +18,8 @@ class Cart {
           .status(404)
           .json({ errMessage: "Cart not found for this user" });
       }
-      return res.status(200).json({ cart });
+      const { __v, ...others } = cart;
+      return res.status(200).json({ cart: others });
     } catch (error) {
       return res.status(500).json({ errMessage: "server error" });
     }

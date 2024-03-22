@@ -1,13 +1,18 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import { userAPi } from "../service/user.service";
+import { userApi } from "../service/user.service";
 import authSlice from "./authReducer";
-import { authAPi } from "../service/auth.service";
-import { otpAPi } from "../service/otp.service";
+import { authApi } from "../service/auth.service";
+import { otpApi } from "../service/otp.service";
+import cartSlice from "./cartReducer";
+import { cartApi } from "../service/cart.service";
+
 const rootReducer = combineReducers({
-  [userAPi.reducerPath]: userAPi.reducer,
-  [authAPi.reducerPath]: authAPi.reducer,
-  [otpAPi.reducerPath]: otpAPi.reducer,
+  [userApi.reducerPath]: userApi.reducer,
+  [authApi.reducerPath]: authApi.reducer,
+  [otpApi.reducerPath]: otpApi.reducer,
+  [cartApi.reducerPath]: cartApi.reducer,
   authSlice: authSlice,
+  cartSlice: cartSlice,
 });
 
 export default rootReducer;

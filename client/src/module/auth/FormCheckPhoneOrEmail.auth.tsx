@@ -119,11 +119,11 @@ function FormCheckPhoneOrEmail({
           />
           <ErrorInput text={errors["phoneOrEmail"]?.message} />
         </Field>
-        <div className="w-full">
+        <div className="w-full ">
           <Button
             type="submit"
             variant="default"
-            className="w-[150px] flex justify-center mx-aut"
+            className="w-[150px] flex justify-center mx-auto"
             disabled={
               errors["phoneOrEmail"] || !dirtyFields.phoneOrEmail ? true : false
             }

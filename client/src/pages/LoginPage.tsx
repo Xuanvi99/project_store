@@ -14,7 +14,7 @@ import LayoutAuth from "../layout/LayoutAuth";
 import { useState } from "react";
 import { ModalNotification } from "../components/modal";
 import { useLoginMutation } from "../stores/service/auth.service";
-import { updateUser } from "../stores/reducer/authReducer";
+import { updateAuth } from "../stores/reducer/authReducer";
 
 const validationSchema = Yup.object({
   phoneOrEmail: Yup.string()
@@ -31,11 +31,8 @@ type FormValues = Yup.InferType<typeof validationSchema>;
 function LoginPage() {
   const query = useLocation().search;
   const params = new URLSearchParams(query);
-  let redirectUrl = params.get("next");
-
-  if (redirectUrl) {
-    redirectUrl = decodeURIComponent(redirectUrl);
-  }
+  const redirectUrl = params.get("next");
+  console.log("redirectUrl: ", redirectUrl);
 
   const navigate = useNavigate();
 
@@ -71,8 +68,12 @@ function LoginPage() {
   const onSubmit = async (data: FormValues) => {
     const res = await login(data).unwrap();
     if (res) {
-      dispatch(updateUser(res));
-      navigate("/");
+      dispatch(updateAuth({ ...res, isLogin: true }));
+      if (redirectUrl === "/" || redirectUrl === null) {
+        navigate("/");
+      } else {
+        window.location.href = decodeURIComponent(redirectUrl);
+      }
     }
   };
 
@@ -160,7 +161,7 @@ function LoginPage() {
         ></div>
         <ButtonGoogle
           text="Đăng nhập với Google"
-          redirectUrl={redirectUrl ? redirectUrl : "/"}
+          redirectUrl={redirectUrl ? decodeURIComponent(redirectUrl) : "/"}
         ></ButtonGoogle>
         <div className="mt-5 text-sm text-center text-gray">
           Bạn mới biết đến XVStore?

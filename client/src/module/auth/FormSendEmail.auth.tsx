@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { IconBack, IconEmail } from "../../components/icon";
 import { Button } from "../../components/button";
 import { useSendEmailMutation } from "../../stores/service/otp.service";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { cn } from "../../utils";
 
 function FormSendEmail({
@@ -14,6 +14,7 @@ function FormSendEmail({
 }) {
   const navigate = useNavigate();
   const [sendEmail] = useSendEmailMutation();
+  const effectRun = useRef(false);
 
   useLayoutEffect(() => {
     const postSendEmail = async (email: string) => {
@@ -24,7 +25,12 @@ function FormSendEmail({
         console.log("error: ", error);
       }
     };
-    postSendEmail(email);
+    if (!effectRun.current) {
+      postSendEmail(email);
+    }
+    return () => {
+      effectRun.current = true;
+    };
   }, [email, sendEmail]);
 
   return (

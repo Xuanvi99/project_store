@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { userModel } = require("../model");
+const { userModel, cartModel } = require("../model");
 
 class verifyMiddleware {
   verifyToken = async function (req, res, next) {
@@ -28,7 +28,7 @@ class verifyMiddleware {
   };
 
   verifyLoginGoogle = async function (req, res, next) {
-    const { name: userName, picture, email, email_verified } = req.body;
+    const { name: userName, email, email_verified } = req.body;
     try {
       if (!email_verified) {
         return res.status(403).json({
@@ -39,14 +39,17 @@ class verifyMiddleware {
       if (!user) {
         const newUser = new userModel({
           userName,
-          picture,
           email,
         });
-        await newUser.save();
-        req.user = newUser;
-        next();
+        const result = await newUser.save();
+        req.user = result;
+        const newCart = new cartModel({
+          userId: result._id,
+        });
+        await newCart.save();
+      } else {
+        req.user = user;
       }
-      req.user = user;
       next();
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });

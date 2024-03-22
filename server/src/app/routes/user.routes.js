@@ -5,7 +5,9 @@ const { uploadFileMdw } = require("../middleware");
 const routes = express.Router();
 
 routes.route("/api/user/checkUser").post(userCtl.checkUser);
-routes.route("/api/user/getListUser").get(userCtl.getListUser);
+routes
+  .route("/api/user/getListUser")
+  .get(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtl.getListUser);
 routes
   .route("/api/user/:userId")
   .get(verifyMdw.verifyToken, userCtl.getProfile)

@@ -46,7 +46,7 @@ function FormStepCreatePassword({
           <FormNotifySuccess
             type="create"
             account={phoneOrEmail}
-            path={redirectUrl ? redirectUrl : "http://localhost:5173"}
+            path={redirectUrl ? redirectUrl : import.meta.env.VITE_DOMAIN}
           ></FormNotifySuccess>
         );
 

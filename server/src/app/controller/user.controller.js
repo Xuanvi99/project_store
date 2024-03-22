@@ -142,7 +142,7 @@ class userController {
       const user = await userModel
         .findByIdAndUpdate(userId, { blocked: true }, { new: true })
         .exec();
-      res.status(200).json({ message: "user blocked success", user });
+      res.status(200).json({ message: " Blocked user success" });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
     }
@@ -157,7 +157,7 @@ class userController {
       const user = await userModel
         .findByIdAndUpdate(userId, { role: "admin" }, { new: true })
         .exec();
-      res.status(200).json({ message: "update Admin user success", user });
+      res.status(200).json({ message: "update Admin user success" });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
     }

@@ -22,7 +22,8 @@ import IconWrite from "./IconWrite";
 import IconDelete from "./IconDelete";
 import IconAlert from "./IconAlert";
 import IconEmail from "./IconEmail";
-
+import IconUser from "./IconUser";
+import * as IconNavBar from "./IconNavBar";
 export {
   IconSearch,
   IconBag,
@@ -49,4 +50,6 @@ export {
   IconDelete,
   IconAlert,
   IconEmail,
+  IconUser,
+  IconNavBar,
 };

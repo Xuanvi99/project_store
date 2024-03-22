@@ -8,6 +8,7 @@ const UserSchema = new Schema(
     userName: {
       type: String,
       default: "user" + Math.floor(Math.random() * 100000),
+      max: [16, "max length 16"],
     },
     phone: { type: String, default: "" },
     email: { type: String, default: "" },
@@ -60,11 +61,10 @@ UserSchema.statics.findOneUser = async function (phoneOrEmail, password) {
 };
 
 UserSchema.methods.generateAccessToken = function () {
-  console.log("this");
   const accessToken = jwt.sign(
     { userID: this._id, role: this.role, type: "access_token" },
     process.env.AC_PRIVATE_KEY,
-    { expiresIn: "5h" }
+    { expiresIn: "5m" }
   );
 
   return accessToken;

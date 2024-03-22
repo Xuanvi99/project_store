@@ -10,8 +10,10 @@ import {
   ProfilePage,
   CartPage,
   CheckOutPage,
+  DashboardPage,
 } from "./pages";
 import LayoutRoot from "./layout/LayoutRoot";
+import LayoutRequireAuth from "./layout/LayoutRequireAuth";
 
 const router = createBrowserRouter([
   {
@@ -50,7 +52,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/auth",
-
+    element: <LayoutRequireAuth></LayoutRequireAuth>,
     children: [
       {
         path: "/auth/login",
@@ -66,6 +68,10 @@ const router = createBrowserRouter([
         element: <ForgotPasswordPage></ForgotPasswordPage>,
       },
     ],
+  },
+  {
+    path: "/dashboard/:slug",
+    element: <DashboardPage></DashboardPage>,
   },
 ]);
 
