@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { IUser } from "../../types/commonType";
-import { baseQueryWithReauth } from "../../utils/baseQueryToken";
+import { baseQueryWithAuth } from "../../utils/baseQueryToken";
 
 type TArg = {
   [Property in keyof Omit<
@@ -12,7 +12,7 @@ type TArg = {
 export const userApi = createApi({
   reducerPath: "user",
   tagTypes: ["Users"],
-  baseQuery: baseQueryWithReauth,
+  baseQuery: baseQueryWithAuth,
   endpoints: (build) => ({
     getListUser: build.query<IUser[], { page: string | "1"; search: string }>({
       query: ({ page, search }) => ({
@@ -33,7 +33,7 @@ export const userApi = createApi({
             ]
           : [{ type: "Users", id: "LIST" }],
     }),
-    getProfile: build.query<IUser, string>({
+    getProfile: build.query<{ user: IUser }, string>({
       query: (id) => ({ url: `user/${id}` }),
       providesTags: (result, error, id) => [{ type: "Users", id }],
     }),
@@ -47,9 +47,9 @@ export const userApi = createApi({
     }),
     updateUser: build.mutation<
       { message: string; user: IUser },
-      { body: TArg; id: string }
+      { id: string; body: FormData }
     >({
-      query: ({ body, id }) => ({
+      query: ({ id, body }) => ({
         url: `user/${id}`,
         method: "PUT",
         body,

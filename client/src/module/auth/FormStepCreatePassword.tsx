@@ -3,12 +3,12 @@ import LayoutFormAuth from "../../layout/LayoutFormAuth";
 import { cn } from "../../utils";
 import FormCheckCodeOtp from "./FormCheckCodeOtp.auth";
 import { FormNotifySuccess, FormUpdatePassword } from ".";
-import { useLocation } from "react-router-dom";
 
 type TProps = {
   title: string;
   phoneOrEmail: string;
   onBack?: () => void;
+  redirectUrl: string;
   indexForm?: "1" | "2" | "3";
 };
 
@@ -17,11 +17,8 @@ function FormStepCreatePassword({
   onBack,
   title,
   indexForm,
+  redirectUrl,
 }: TProps) {
-  const query = useLocation().search;
-  const params = new URLSearchParams(query);
-  const redirectUrl = params.get("next");
-
   const [activeForm, setActiveForm] = useState<"1" | "2" | "3">(
     indexForm ? indexForm : "1"
   );
@@ -46,7 +43,7 @@ function FormStepCreatePassword({
           <FormNotifySuccess
             type="create"
             account={phoneOrEmail}
-            path={redirectUrl ? redirectUrl : import.meta.env.VITE_DOMAIN}
+            path={redirectUrl}
           ></FormNotifySuccess>
         );
 

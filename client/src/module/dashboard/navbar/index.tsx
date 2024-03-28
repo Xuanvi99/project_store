@@ -1,19 +1,5 @@
-import { IconNavBar } from "../../../components/icon";
+import { listNavBarItem } from "../../../constant/navbar.dashboard";
 import NavbarItem from "./NavbarItem";
-
-const size = 30;
-const listNavBarItem = [
-  {
-    icon: <IconNavBar.product size={size} />,
-    title: "Sản phẩm",
-    path: "/dashboard/product",
-  },
-  {
-    icon: <IconNavBar.comment size={size} />,
-    title: "Bình Luận",
-    path: "/dashboard/comment",
-  },
-];
 
 function Navbar() {
   return (

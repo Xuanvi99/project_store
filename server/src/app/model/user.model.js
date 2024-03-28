@@ -13,7 +13,8 @@ const UserSchema = new Schema(
     phone: { type: String, default: "" },
     email: { type: String, default: "" },
     password: { type: String, default: "" },
-    date: { type: String, default: "" },
+    date: { type: String, default: new Date().toISOString().split("T")[0] },
+    gender: { type: String, default: "other" },
     address: { type: String, default: "" },
     avatar: {
       type: Schema.Types.ObjectId,
@@ -64,7 +65,7 @@ UserSchema.methods.generateAccessToken = function () {
   const accessToken = jwt.sign(
     { userID: this._id, role: this.role, type: "access_token" },
     process.env.AC_PRIVATE_KEY,
-    { expiresIn: "5m" }
+    { expiresIn: "30m" }
   );
 
   return accessToken;

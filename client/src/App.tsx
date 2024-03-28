@@ -14,8 +14,7 @@ function App() {
   const dispatch = useAppDispatch();
   const effectRun = useRef(false);
   const id = user ? user._id : "";
-  const { data, status } = useGetCartQuery(id, { skip: !id });
-
+  const { data: cart, status } = useGetCartQuery(id, { skip: !id });
   useEffect(() => {
     if (!effectRun.current && !user) {
       refreshToken()
@@ -33,11 +32,11 @@ function App() {
   }, [dispatch, refreshToken, user]);
 
   useEffect(() => {
-    if (data && status === "fulfilled") {
-      dispatch(updateCart(data));
+    if (cart && status === "fulfilled") {
+      dispatch(updateCart(cart));
     }
     return () => {};
-  }, [data, dispatch, status]);
+  }, [cart, dispatch, status]);
 
   return (
     <ErrorBoundary FallbackComponent={fallbackRender}>

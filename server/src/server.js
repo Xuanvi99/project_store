@@ -16,12 +16,13 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (WHITELIST_DOMAIN.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error(`${origin} not allowed by our CORS policy`));
-  },
+  // origin: function (origin, callback) {
+  //   if (WHITELIST_DOMAIN.includes(origin)) {
+  //     return callback(null, true);
+  //   }
+  //   return callback(new Error(`${origin} not allowed by our CORS policy`));
+  // },
+  origin:"http://localhost:5173",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionSuccessStatus: 200,

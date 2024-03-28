@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 class codeOTP {
   create = async (req, res, next) => {
     const email = req.body.email;
-    console.log("email: ", email);
     try {
       if (!email)
         return res.status(403).json({ message: "email not is valid " });

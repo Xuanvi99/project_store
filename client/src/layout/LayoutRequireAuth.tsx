@@ -10,9 +10,6 @@ function LayoutRequireAuth() {
   useEffect(() => {
     if (user) {
       navigate("/", { replace: true });
-      // pathname === "/auth/login"
-      //   ? navigate("/", { replace: true })
-      //   : navigate(-1);
     }
   }, [navigate, pathname, user]);
 

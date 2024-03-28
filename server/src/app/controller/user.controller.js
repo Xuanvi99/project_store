@@ -72,18 +72,24 @@ class userController {
 
   addUser = async (req, res) => {
     const profile = req.body;
-    if (profile.userName) {
-      const checkName = await userModel.find({ userName: profile.userName });
-      if (checkName.length > 0) {
-        return res.status(400).json({ message: "userName already exist" });
+    if (profile.phone || profile.email) {
+      const checkPhoneOrEmail = await userModel.find({
+        $or: [{ phone: profile.phone }, { email: profile.email }],
+      });
+      if (checkPhoneOrEmail.length > 0) {
+        return res.status(400).json({ message: "Phone hoặc email đã tồn tại" });
       }
+    }
+    let date = "";
+    if (!profile.date) {
+      date = new Date.now();
     }
     try {
       const newUser = await userModel({
         ...profile,
       });
       await newUser.save();
-      res.status(200).json({ message: "create user success" });
+      res.status(200).json({ message: "Tạo user thành công" });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
     }
@@ -92,7 +98,7 @@ class userController {
   updateUser = async (req, res) => {
     const userId = req.params.userId;
     let profileUpdate = req.body;
-    const files = req;
+    const files = req.file;
     if (!userId) {
       res.status(400).json({ errMessage: "Invalid user ID" });
     }
@@ -104,13 +110,14 @@ class userController {
         }
         const avatar = await imageModel.uploadSingleFile(files, "avatar");
         profileUpdate = { ...profileUpdate, avatar };
+        console.log("profileUpdate: ", profileUpdate);
       }
-      const result = await userModel
+      await userModel
         .findByIdAndUpdate(userId, { ...profileUpdate }, { new: true })
         .populate("avatar")
         .exec();
-      const { password, ...others } = result._doc;
-      res.status(200).json({ message: "update user success", user: others });
+      // const { password, ...others } = result._doc;
+      res.status(200).json({ message: "update user success" });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
     }

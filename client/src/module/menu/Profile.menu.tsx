@@ -20,6 +20,7 @@ function Profile({
   handleLogOut,
   displayName,
 }: TProps) {
+  const avatar = user?.avatar || null;
   return (
     <>
       {!isLogin ? (
@@ -33,13 +34,13 @@ function Profile({
           select={
             <div className="flex items-center h-10 tex-sm gap-x-3">
               {displayName && (
-                <span className=" font-semibold">{user?.userName}</span>
+                <span className="font-semibold ">{user?.userName}</span>
               )}
-              <span>
+              <span className="w-9 h-9 rounded-full overflow-hidden">
                 <img
                   alt=""
-                  srcSet={user?.avatar ? user.avatar : user?.avatarDefault}
-                  className="w-9"
+                  srcSet={avatar?.url || user?.avatarDefault}
+                  className="w-full h-full bg-cover"
                 />
               </span>
             </div>
@@ -47,8 +48,8 @@ function Profile({
         >
           <div
             className={cn(
-              "absolute top-[130%] right-0  min-w-[200px] z-50 ",
-              "border-2 rounded-lg border-orange bg-white shadow-shadowButton px-2 py-3 font-medium"
+              "absolute top-[130%] -right-5  w-[200px] z-50 ",
+              "border-2 rounded-lg border-orange bg-white shadow-shadowButton px-2 py-3 font-medium leading-6"
             )}
           >
             <div className="flex text-xs text-slate-400 gap-x-2">
@@ -59,7 +60,7 @@ function Profile({
             </div>
             <div className="flex flex-col gap-y-5">
               <Link
-                to={"/user/profile"}
+                to={"/user/account/"}
                 className="inline-block whitespace-nowrap hover:text-orange"
               >
                 Tài khoản
@@ -68,8 +69,16 @@ function Profile({
                 to={""}
                 className="inline-block whitespace-nowrap hover:text-orange"
               >
-                Quản lí Store
+                Đơn mua
               </Link>
+              {user?.role === "admin" && (
+                <Link
+                  to={"/dashboard/home"}
+                  className="inline-block whitespace-nowrap hover:text-orange"
+                >
+                  Quản lí Store
+                </Link>
+              )}
               <Button type="button" variant="outLine" onClick={handleLogOut}>
                 Đăng xuất
               </Button>

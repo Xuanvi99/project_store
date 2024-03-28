@@ -10,13 +10,13 @@ function NotFoundPage() {
       <main className="py-[80px] flex flex-col items-center gap-y-10">
         <div className="flex flex-col items-center gap-y-5">
           <h1 className="text-6xl font-bold">404</h1>
-          <p className="text-red-600 text-2xl font-semibold">
+          <p className="text-2xl font-semibold text-red-600">
             Oops! Không tìm thấy trang
           </p>
         </div>
         <button
           onClick={() => navigate("/")}
-          className="text-white bg-orangeLinear px-2 py-1 rounded-md text-2xl font-semibold"
+          className="px-2 py-1 text-2xl font-semibold text-white rounded-md bg-orangeLinear"
         >
           Trang chủ
         </button>

@@ -58,11 +58,7 @@ function FormSendEmail({
             <span className="font-bold text-orange">{email}</span>
             <span>Vui lòng xác minh.</span>
           </div>
-          <Button
-            variant="default"
-            type="button"
-            onClick={() => navigate("/auth/login")}
-          >
+          <Button variant="default" type="button" onClick={() => navigate(-1)}>
             OK
           </Button>
         </div>

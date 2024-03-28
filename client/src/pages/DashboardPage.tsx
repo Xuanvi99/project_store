@@ -1,9 +1,30 @@
-import { Comment, Header, Navbar, Product } from "../module/dashboard";
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import {
+  Comment,
+  Dashboard,
+  Header,
+  Navbar,
+  Product,
+} from "../module/dashboard";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAppSelector } from "../hook";
 
 function DashboardPage() {
   const { slug } = useParams();
   console.log("slug: ", slug);
+
+  const navigate = useNavigate();
+  const user = useAppSelector((state) => state.authSlice.user);
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth/login", { replace: true });
+    } else {
+      if (user.role !== "admin") {
+        navigate("/", { replace: true });
+      }
+    }
+  }, [navigate, user]);
 
   const Content = (slug: string | undefined) => {
     switch (slug) {
@@ -14,7 +35,7 @@ function DashboardPage() {
         return <Comment></Comment>;
 
       default:
-        break;
+        return <Dashboard></Dashboard>;
     }
   };
   return (

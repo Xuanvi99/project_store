@@ -1,3 +1,10 @@
+interface avatar {
+  _id: string;
+  public_id: string;
+  url: string;
+  folder: string;
+}
+
 export interface IUser {
   _id: string;
   userName: string;
@@ -5,7 +12,8 @@ export interface IUser {
   email: string;
   date: string;
   address: string;
-  avatar: string;
+  avatar: avatar | null;
+  gender: "male" | "female" | "other";
   avatarDefault: string;
   role: string;
 }

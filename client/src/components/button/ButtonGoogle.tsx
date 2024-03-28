@@ -12,11 +12,11 @@ type TProps = {
     wrap?: string;
     btn?: string;
   };
-  redirectUrl: string;
+  pathname: string;
   onClick?: () => void;
 };
 
-function ButtonGoogle({ text, className, redirectUrl }: TProps) {
+function ButtonGoogle({ text, className, pathname }: TProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const login = useGoogleLogin({
@@ -39,11 +39,7 @@ function ButtonGoogle({ text, className, redirectUrl }: TProps) {
           });
           if (res.data) {
             dispatch(updateAuth({ ...res.data, isLogin: true }));
-            if (redirectUrl === "/") {
-              navigate("/");
-            } else {
-              window.location.href = redirectUrl;
-            }
+            navigate(pathname, { replace: true });
           }
         }
       } catch (error) {

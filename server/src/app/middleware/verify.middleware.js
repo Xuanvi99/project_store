@@ -5,16 +5,28 @@ class verifyMiddleware {
   verifyToken = async function (req, res, next) {
     try {
       const token = req.headers.authorization.split(" ")[1];
-      if (!token)
+      if (!token) {
         return res.status(401).json({ ErrorMessage: "Token is required!" });
-      const decode = jwt.verify(token, process.env.AC_PRIVATE_KEY);
-      const user = await userModel.findById(decode.userID);
-      if (!user)
-        return res.status(401).json({ ErrorMessage: "Token is not valid" });
-      req.user = user;
-      next();
+      }
+      jwt.verify(
+        token,
+        process.env.AC_PRIVATE_KEY,
+        async function (err, decode) {
+          if (err || !decode) {
+            return res.status(401).json({ ErrorMessage: "Token expired" });
+          }
+          const user = await userModel.findById(decode.userID);
+          if (!user) {
+            return res
+              .status(401)
+              .json({ ErrorMessage: "Authentication failed. User not found." });
+          }
+          req.user = user;
+          next();
+        }
+      );
     } catch (error) {
-      res.status(500).json({ ErrorMessage: "verify token error" });
+      return res.status(500).json({ ErrorMessage: "verify token error" });
     }
   };
 
@@ -35,7 +47,10 @@ class verifyMiddleware {
           errorMessage: "Google email not verified",
         });
       }
-      const user = await userModel.findOne({ email: email }).exec();
+      const user = await userModel
+        .findOne({ email: email })
+        .populate("avatar")
+        .exec();
       if (!user) {
         const newUser = new userModel({
           userName,

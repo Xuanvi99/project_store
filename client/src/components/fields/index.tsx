@@ -7,7 +7,7 @@ function Field({
 }: {
   children: React.ReactNode;
   className?: string;
-  variant: "flex-col" | "flex-row";
+  variant?: "flex-col" | "flex-row";
 }) {
   const styleVariant = (variant: string): string => {
     switch (variant) {
@@ -20,7 +20,11 @@ function Field({
     }
   };
 
-  return <div className={cn(styleVariant(variant), className)}>{children}</div>;
+  return (
+    <div className={cn(styleVariant(variant ? variant : ""), className)}>
+      {children}
+    </div>
+  );
 }
 
 export default Field;

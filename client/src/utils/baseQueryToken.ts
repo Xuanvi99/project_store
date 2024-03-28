@@ -3,7 +3,10 @@ import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 import type { BaseQueryFn, FetchArgs } from "@reduxjs/toolkit/query";
 import { Mutex } from "async-mutex";
 import { RootState } from "../stores";
+import { logOut, updateAuth } from "../stores/reducer/authReducer";
+import { IUser } from "../types/commonType";
 
+type TRes = { user: IUser; accessToken: string };
 // create a new mutex
 const mutex = new Mutex();
 const baseQuery = fetchBaseQuery({
@@ -17,7 +20,7 @@ const baseQuery = fetchBaseQuery({
   },
   credentials: "include",
 });
-const baseQueryWithReauth: BaseQueryFn<
+const baseQueryWithAuth: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError
@@ -29,16 +32,15 @@ const baseQueryWithReauth: BaseQueryFn<
       const release = await mutex.acquire();
       try {
         const refreshResult = await baseQuery(
-          "auth/refreshToken",
+          { url: "auth/refreshToken", method: "POST" },
           api,
           extraOptions
         );
         if (refreshResult.data) {
-          console.log(refreshResult);
-          // api.dispatch();
+          api.dispatch(updateAuth(refreshResult.data as TRes));
           result = await baseQuery(args, api, extraOptions);
         } else {
-          // api.dispatch();
+          api.dispatch(logOut());
         }
       } finally {
         release();
@@ -51,4 +53,4 @@ const baseQueryWithReauth: BaseQueryFn<
   return result;
 };
 
-export { baseQueryWithReauth };
+export { baseQueryWithAuth };

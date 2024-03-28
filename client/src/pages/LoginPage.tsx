@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAppDispatch, useToggle } from "../hook";
-import { IconEye } from "../components/icon";
+import { IconAlert, IconEye } from "../components/icon";
 import LayoutAuth from "../layout/LayoutAuth";
 import { useState } from "react";
 import { ModalNotification } from "../components/modal";
@@ -30,9 +30,15 @@ type FormValues = Yup.InferType<typeof validationSchema>;
 
 function LoginPage() {
   const query = useLocation().search;
-  const params = new URLSearchParams(query);
-  const redirectUrl = params.get("next");
-  console.log("redirectUrl: ", redirectUrl);
+  // const params = new URLSearchParams(query);
+  // const redirectUrl = params.get("next");
+
+  const { state: location } = useLocation();
+
+  let pathname = "/";
+  if (location && location["path"]) {
+    pathname = location.path;
+  }
 
   const navigate = useNavigate();
 
@@ -69,17 +75,14 @@ function LoginPage() {
     const res = await login(data).unwrap();
     if (res) {
       dispatch(updateAuth({ ...res, isLogin: true }));
-      if (redirectUrl === "/" || redirectUrl === null) {
-        navigate("/");
-      } else {
-        window.location.href = decodeURIComponent(redirectUrl);
-      }
+      navigate(pathname, { replace: true });
     }
   };
 
   return (
     <LayoutAuth>
       <ModalNotification isOpen={openModal} onClick={handleOpenModal}>
+        <IconAlert size={50}></IconAlert>
         <span className="text-center">
           <p>Tài Khoản hoặc mật khẩu không đúng</p>
         </span>
@@ -161,12 +164,13 @@ function LoginPage() {
         ></div>
         <ButtonGoogle
           text="Đăng nhập với Google"
-          redirectUrl={redirectUrl ? decodeURIComponent(redirectUrl) : "/"}
+          pathname={pathname}
         ></ButtonGoogle>
         <div className="mt-5 text-sm text-center text-gray">
           Bạn mới biết đến XVStore?
           <Link
             to={"/auth/sign_up" + query}
+            state={{ path: pathname }}
             className="ml-1 font-semibold text-blue hover:text-orange"
           >
             Đăng ký

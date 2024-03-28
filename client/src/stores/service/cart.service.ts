@@ -1,5 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithReauth } from "../../utils/baseQueryToken";
+import { baseQueryWithAuth } from "../../utils/baseQueryToken";
 import { ICart } from "../../types/commonType";
 
 type TArg = { id: string };
@@ -9,7 +9,7 @@ type TRes = { cart: ICart };
 export const cartApi = createApi({
   reducerPath: "cart",
   tagTypes: ["Carts"],
-  baseQuery: baseQueryWithReauth,
+  baseQuery: baseQueryWithAuth,
   endpoints: (build) => ({
     getCart: build.query<TRes, string>({
       query: (id) => ({

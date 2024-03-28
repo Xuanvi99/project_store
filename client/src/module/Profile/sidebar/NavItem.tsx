@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { cn } from "../../../utils";
 type TNavItemProps = {
   data: {
@@ -7,21 +7,21 @@ type TNavItemProps = {
     path: string;
     icon: ReactElement;
   };
+  activePath: boolean;
 };
-const NavItem = ({ data }: TNavItemProps) => {
+const NavItem = ({ data, activePath }: TNavItemProps) => {
   const { title, path, icon } = data;
   return (
-    <NavLink
+    <Link
       to={path}
-      className={({ isActive }) =>
-        (isActive ? "text-orange" : "") +
-        " " +
-        cn("flex items-center gap-x-2 text-lg hover:text-orange")
-      }
+      className={cn(
+        activePath ? "text-orange" : "",
+        "flex items-center gap-x-2 text-lg hover:text-orange"
+      )}
     >
       <span>{icon}</span>
       <span>{title}</span>
-    </NavLink>
+    </Link>
   );
 };
 

@@ -1,6 +1,7 @@
 import IconSuccess from "../../components/icon/IconSuccess";
 import { Button } from "../../components/button";
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 type TProps = {
   type: "change" | "create";
@@ -11,6 +12,8 @@ type TProps = {
 function FormNotifySuccess({ type, account, path }: TProps) {
   const timeRedirect = useRef<HTMLParagraphElement>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     let countDown = 10;
     const element = timeRedirect.current;
@@ -20,14 +23,14 @@ function FormNotifySuccess({ type, account, path }: TProps) {
         element.textContent = `Bạn sẽ được chuyển đến trang Đăng nhập trong ${countDown} giây`;
         if (countDown === 0) {
           clearInterval(timer);
-          window.location.replace(path);
+          navigate(path, { replace: true });
         }
       }
     }, 1000);
     return () => {
       clearInterval(timer);
     };
-  }, [path, timeRedirect]);
+  }, [navigate, path, timeRedirect]);
 
   const notification = (account: string) => {
     if (account.includes("@gmail.com")) {

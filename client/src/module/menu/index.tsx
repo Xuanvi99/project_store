@@ -36,7 +36,7 @@ function Menu() {
 
   const handleLogin = async () => {
     const query = encodeURIComponent(redirectUrl);
-    navigate("/auth/login?next=" + query);
+    navigate("/auth/login?next=" + query, { state: { path: pathname } });
   };
 
   const handleLogOut = async () => {
@@ -46,7 +46,7 @@ function Menu() {
       .unwrap()
       .then((res) => console.log("logout", res.message));
     const query = encodeURIComponent(redirectUrl);
-    navigate("/auth/login?next=" + query);
+    navigate("/auth/login?next=" + query, { state: { path: pathname } });
   };
 
   useEffect(() => {

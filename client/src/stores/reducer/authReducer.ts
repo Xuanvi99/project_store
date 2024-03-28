@@ -3,7 +3,7 @@ import { IUser } from "../../types/commonType";
 
 interface IPayload {
   user: IUser | null;
-  accessToken: string;
+  accessToken?: string;
   isLogin?: boolean;
 }
 
