@@ -1,10 +1,13 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import Feature from "../module/home/feature";
 import { ProductSlideshow } from "../components/product";
 import { BannerHome } from "../components/banner";
 import LayoutMain from "../layout/LayoutMain";
 
 function HomePage() {
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
   return (
     <Fragment>
       <BannerHome></BannerHome>

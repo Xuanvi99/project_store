@@ -11,9 +11,8 @@ export interface IUser {
   phone: string;
   email: string;
   date: string;
-  address: string;
-  avatar: avatar | null;
   gender: "male" | "female" | "other";
+  avatar: avatar | null;
   avatarDefault: string;
   role: string;
 }
@@ -26,4 +25,15 @@ export interface ICart {
     size: string;
     quantity: string;
   }[];
+}
+
+export interface IAddress {
+  _id: string;
+  userId: string;
+  name: string;
+  phone: string;
+  province: string;
+  district: string;
+  ward?: string;
+  specific: string;
 }

@@ -11,6 +11,7 @@ import {
   CartPage,
   CheckOutPage,
   DashboardPage,
+  VerifyPage,
 } from "./pages";
 import LayoutRoot from "./layout/LayoutRoot";
 import LayoutRequireAuth from "./layout/LayoutRequireAuth";
@@ -68,6 +69,10 @@ const router = createBrowserRouter([
         element: <ForgotPasswordPage></ForgotPasswordPage>,
       },
     ],
+  },
+  {
+    path: "/verify/:slug",
+    element: <VerifyPage></VerifyPage>,
   },
   {
     path: "/dashboard/:slug",

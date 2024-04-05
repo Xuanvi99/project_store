@@ -7,6 +7,7 @@ const otpRoutes = require("./otp.routes");
 const productRoutes = require("./product.routes");
 const commentRoutes = require("./comment.routes");
 const cartRoutes = require("./cart.routes");
+const addressRoutes = require("./address.routes");
 
 routes.use(uploadFile);
 routes.use(authRoutes);
@@ -15,4 +16,5 @@ routes.use(otpRoutes);
 routes.use(productRoutes);
 routes.use(commentRoutes);
 routes.use(cartRoutes);
+routes.use(addressRoutes);
 module.exports = routes;

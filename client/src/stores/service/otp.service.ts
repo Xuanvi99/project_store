@@ -6,9 +6,16 @@ export const otpApi = createApi({
     baseUrl: import.meta.env.VITE_DOMAIN_SERVER + "/api/otp/",
   }),
   endpoints: (build) => ({
-    sendEmail: build.mutation<{ message: string }, { email: string }>({
+    sendCodeEmail: build.mutation<{ message: string }, { email: string }>({
       query: (body) => ({
-        url: "sendEmail",
+        url: "sendCodeEmail",
+        method: "POST",
+        body: { ...body },
+      }),
+    }),
+    sendOTPEmail: build.mutation<{ message: string }, { email: string }>({
+      query: (body) => ({
+        url: "sendOTPEmail",
         method: "POST",
         body: { ...body },
       }),
@@ -26,4 +33,8 @@ export const otpApi = createApi({
   }),
 });
 
-export const { useSendEmailMutation, useVerifyEmailMutation } = otpApi;
+export const {
+  useSendCodeEmailMutation,
+  useVerifyEmailMutation,
+  useSendOTPEmailMutation,
+} = otpApi;

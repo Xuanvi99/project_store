@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { IconBack, IconEmail } from "../../components/icon";
 import { Button } from "../../components/button";
-import { useSendEmailMutation } from "../../stores/service/otp.service";
+import { useSendCodeEmailMutation } from "../../stores/service/otp.service";
 import { useLayoutEffect, useRef } from "react";
 import { cn } from "../../utils";
 
@@ -13,13 +13,13 @@ function FormSendEmail({
   className?: string;
 }) {
   const navigate = useNavigate();
-  const [sendEmail] = useSendEmailMutation();
+  const [sendCodeEmail] = useSendCodeEmailMutation();
   const effectRun = useRef(false);
 
   useLayoutEffect(() => {
     const postSendEmail = async (email: string) => {
       try {
-        const res = await sendEmail({ email }).unwrap();
+        const res = await sendCodeEmail({ email }).unwrap();
         console.log(res);
       } catch (error) {
         console.log("error: ", error);
@@ -31,7 +31,7 @@ function FormSendEmail({
     return () => {
       effectRun.current = true;
     };
-  }, [email, sendEmail]);
+  }, [email, sendCodeEmail]);
 
   return (
     <div className={cn("w-full", className)}>

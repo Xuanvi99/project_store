@@ -28,7 +28,7 @@ class Collection<T> extends Items<T> {
   }
 }
 
-const letters = new Collection<string>("A", "b", "c");
+const letters = new Collection<string>("a");
 const item = letters.getFirstItem();
 console.log("item =>", item.toUpperCase());
 

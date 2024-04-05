@@ -1,4 +1,4 @@
-import { Fragment, useLayoutEffect } from "react";
+import { Fragment, useEffect, useLayoutEffect } from "react";
 import { BannerCommon } from "../components/banner";
 import LayoutProfile from "../layout/LayoutProfile";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -21,6 +21,10 @@ function ProfilePage() {
       navigate("/auth/login?next=" + query, { state: { path: pathname } });
     }
   }, [navigate, pathname, redirectUrl, user]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   const selectForm = (slug: string | undefined) => {
     switch (slug) {

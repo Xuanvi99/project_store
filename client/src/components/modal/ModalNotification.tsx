@@ -15,7 +15,7 @@ function ModalNotification({ isOpen, onClick, children }: TProps) {
         onClick();
         clearInterval(timer);
       }
-    }, 1000);
+    }, 800);
   }
 
   return (
@@ -25,7 +25,7 @@ function ModalNotification({ isOpen, onClick, children }: TProps) {
       className={{ overlay: "opacity-0" }}
     >
       <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
-        <div className="absolute bg-black opacity-70 inset-0 z-50"></div>
+        <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
         <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
           {children}
         </div>

@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithAuth } from "../../utils/baseQueryToken";
 import { ICart } from "../../types/commonType";
+import { baseQueryWithAuth } from "../baseQueryToken";
 
 type TArg = { id: string };
 

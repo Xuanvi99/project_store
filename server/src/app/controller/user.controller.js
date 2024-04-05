@@ -9,7 +9,7 @@ class userController {
           $or: [{ phone: phoneOrEmail }, { email: phoneOrEmail }],
         })
         .exec();
-      res.status(200).json({ isCheckUser: isChecked ? true : false });
+      return res.status(200).json({ isCheckUser: isChecked ? true : false });
     } catch (error) {
       res.status(500).json({ errMessage: error });
     }
@@ -55,6 +55,7 @@ class userController {
 
   getProfile = async (req, res) => {
     const userId = req.params.userId;
+    console.log("userId: ", userId);
     if (!userId) {
       res.status(400).json({ errMessage: "Invalid user ID" });
     }
@@ -66,7 +67,7 @@ class userController {
       if (!user) res.status(400).json({ errMessage: "Invalid user ID" });
       return res.status(200).json({ user });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: "server error" });
     }
   };
 
@@ -110,13 +111,10 @@ class userController {
         }
         const avatar = await imageModel.uploadSingleFile(files, "avatar");
         profileUpdate = { ...profileUpdate, avatar };
-        console.log("profileUpdate: ", profileUpdate);
       }
       await userModel
         .findByIdAndUpdate(userId, { ...profileUpdate }, { new: true })
-        .populate("avatar")
         .exec();
-      // const { password, ...others } = result._doc;
       res.status(200).json({ message: "update user success" });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
@@ -167,6 +165,35 @@ class userController {
       res.status(200).json({ message: "update Admin user success" });
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
+    }
+  };
+
+  verifyPassword = async function (req, res) {
+    const { phoneOrEmail, password } = req.body;
+    try {
+      const user = await userModel.findOneUser(phoneOrEmail, password);
+      if (!user)
+        return res
+          .status(403)
+          .json({ errMessage: "Tài khoản hoặc mật khẩu không đúng!" });
+      res.status(200).json({ message: "Verify password success!" });
+    } catch (error) {
+      res.status(500).json({ errMessage: error | "server error" });
+    }
+  };
+
+  changePassword = async (req, res) => {
+    const id = req.params.id;
+    const { password } = req.body;
+    try {
+      const user = await userModel.findById(id).exec();
+      user.password = password;
+      const result = await user.save();
+      if (!result)
+        return res.status(400).json({ errMessage: "update password fail" });
+      res.status(200).json({ message: "update password success" });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
     }
   };
 }

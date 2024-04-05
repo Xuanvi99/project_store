@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { userModel, cartModel } = require("../model");
+const bcrypt = require("bcrypt");
 
-class verifyMiddleware {
+class verify {
   verifyToken = async function (req, res, next) {
     try {
       const token = req.headers.authorization.split(" ")[1];
@@ -70,6 +71,27 @@ class verifyMiddleware {
       res.status(500).json({ errMessage: "server error" });
     }
   };
+
+  verifyCheckPassword = async function (req, res, next) {
+    const id = req.params.id;
+    const password = req.body.password;
+    try {
+      const user = await userModel.findById(id).exec();
+      console.log("user: ", user);
+      if (!user) {
+        return res.status(404).json({ errMessage: "User not found!" });
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (isMatch) {
+        return res
+          .status(400)
+          .json({ errMessage: "Matches the current password", isMatch: true });
+      }
+      return next();
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
 }
 
-module.exports = new verifyMiddleware();
+module.exports = new verify();

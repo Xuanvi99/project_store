@@ -1,10 +1,11 @@
 const nodemailer = require("nodemailer");
 const { codeOTPModel } = require("../model");
-
-exports.sendEmail = async (req, res) => {
+exports.sendCodeEmail = async (req, res) => {
   try {
     const { user, codeOTP } = req;
-
+    if (!user) {
+      res.status(404).json({ errMessage: "Email not found!" });
+    }
     const transporter = nodemailer.createTransport({
       service: "gmail",
       host: "smtp.gmail.com",
@@ -48,7 +49,9 @@ exports.sendEmail = async (req, res) => {
             <table width="60%" style=" font-size: 13px" }}>
               <tbody>
                 <tr>
-                  <td>Xin chào buixuanvi_99</td>
+                <td>Xin chào ` +
+        user.username +
+        `</td>
                 </tr>
                 <tr>
                   <td width="100%" height="5">
@@ -149,5 +152,147 @@ exports.sendEmail = async (req, res) => {
     res.status(200).json({ message: "Email sent code successfully." });
   } catch (error) {
     res.status(500).json({ errMessage: "server error" });
+  }
+};
+
+exports.sendOTPEmail = async (req, res) => {
+  try {
+    const { user, OTP } = req;
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+    const mailOptions = {
+      from: { name: "XVStore", address: process.env.EMAIL_USERNAME },
+      to: user.email,
+      subject: "Xác minh OTP ",
+      html:
+        `<table width="100%">
+      <tbody>
+        <tr>
+          <td align="center">
+            <table width="60%">
+              <tbody>
+                <tr>
+                  <td align="center">
+                  <tr>
+                    <img
+                      alt=""
+                      src="http://res.cloudinary.com/damahknfx/image/upload/v1706559426/avatar/jrazcv59uoqhvdey9evn.png"
+                      width={"50"}
+                      height={"auto"}
+                    />
+                    </tr>
+                    <tr align="center" style="font-weight: bolder;color:#fd7e14;font-size:20px">XVStore</tr>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td align="center">
+            <table width="60%" style=" font-size: 13px" }}>
+              <tbody>
+                <tr>
+                  <td>Xin chào ` +
+        user.username +
+        `</td>
+                </tr>
+                <tr>
+                  <td width="100%" height="5">
+                    &nbsp;
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Chúng tôi nhận được yêu cầu xác minh email cho tài
+                    khoản XVStore của bạn.
+                  </td>
+                </tr>
+                <tr>
+                  <td width="100%" height="5">
+                    &nbsp;
+                  </td>
+                </tr>
+                <tr>
+                  <td width="100%" height="5">
+                  Sử dụng mã này để hoàn tất việc thiết lập email khôi phục này:
+                  </td>
+                </tr>
+                <tr>
+                  <td width="100%" height="5">
+                    &nbsp;
+                  </td>
+                </tr>
+                <tr>
+                  <td width="100%" style="text-align:center;font-size:36px" height="5">
+                  ` +
+        OTP +
+        `
+                  </td>
+                </tr>
+                <tr>
+                  <td width="100%" height="5">
+                    &nbsp;
+                  </td>
+                </tr>
+                <tr>
+                  <td width="100%" height="5">
+                   Chú ý! email này chỉ sử dụng được 1 lần xác minh email và hết hạn sau 1h khi bạn nhận được email này
+                  </td>
+                </tr>
+                <tr>
+                  <td width="100%" height="5">
+                    &nbsp;
+                  </td>
+                </tr>
+                <tr style="marginTop:50px">
+                  <td>
+                    <span>
+                      <p>Trân trọng</p>
+                      <p>Đội ngũ XVStore</p>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>`,
+    };
+
+    transporter.sendMail(mailOptions);
+    await codeOTPModel.saveCodeOTP(user.email, OTP);
+    res.status(200).json({ message: "Email sent code successfully." });
+  } catch (error) {
+    res.status(500).json({ errMessage: "server error" });
+  }
+};
+
+exports.notifyEmail = async (req, res) => {
+  const { email, code, isExpired } = req;
+  try {
+    if (code.length === 6) {
+      const checkUpdate = await codeOTPModel
+        .findOneAndUpdate({ email, code }, { status: true })
+        .exec();
+      if (!checkUpdate) {
+        return res.status(404).json({ errMessage: "Code email fail" });
+      }
+    }
+    return res.status(200).json({
+      expired: isExpired,
+      message: isExpired ? "Email is expired" : "Verify email success",
+    });
+  } catch (error) {
+    res.status(500).json({ errMessage: "Server error" });
   }
 };

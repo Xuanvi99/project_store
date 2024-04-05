@@ -11,7 +11,6 @@ import { useAppSelector } from "../hook";
 
 function DashboardPage() {
   const { slug } = useParams();
-  console.log("slug: ", slug);
 
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.authSlice.user);

@@ -9,7 +9,7 @@ import { Button, ButtonGoogle } from "../components/button";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useCheckUserMutation } from "../stores/service/user.service";
+import { useCheckPhoneOrEmailMutation } from "../stores/service/user.service";
 import LayoutAuth from "../layout/LayoutAuth";
 import { useState } from "react";
 import { ModalNotification } from "../components/modal";
@@ -33,7 +33,7 @@ function SignUpPage() {
     pathname = location.path;
   }
 
-  const [checkUser, { isLoading }] = useCheckUserMutation();
+  const [checkUser, { isLoading }] = useCheckPhoneOrEmailMutation();
   const [isCheckUser, setIsCheckUser] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [account, setAccount] = useState<string>("");

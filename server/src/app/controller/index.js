@@ -5,6 +5,8 @@ const codeOTPCtl = require("./codeOTP.controller");
 const productCtl = require("./product.controller");
 const commentCtl = require("./comment.controller");
 const cartCtl = require("./cart.controller");
+const addressCtl = require("./address.controller");
+
 module.exports = {
   userCtl,
   authCtl,
@@ -13,4 +15,5 @@ module.exports = {
   productCtl,
   commentCtl,
   cartCtl,
+  addressCtl,
 };

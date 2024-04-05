@@ -1,3 +1,5 @@
+import { cn } from "../../utils";
+
 function IconEyeOpen({ size }: { size: number }) {
   return (
     <svg
@@ -80,7 +82,10 @@ export default function IconEye({
   className?: string;
 }) {
   return (
-    <div className={className} onClick={onClick}>
+    <div
+      className={cn(className, isOpenEye ? "" : "text-grayCa")}
+      onClick={onClick}
+    >
       {isOpenEye ? (
         <IconEyeOpen size={size}></IconEyeOpen>
       ) : (

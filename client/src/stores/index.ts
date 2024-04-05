@@ -5,6 +5,7 @@ import { userApi } from "./service/user.service";
 import { authApi } from "./service/auth.service";
 import { otpApi } from "./service/otp.service";
 import { cartApi } from "./service/cart.service";
+import { addressApi } from "./service/address.service";
 
 export const store = configureStore({
   reducer: rootReducer,
@@ -14,6 +15,7 @@ export const store = configureStore({
       authApi.middleware,
       otpApi.middleware,
       cartApi.middleware,
+      addressApi.middleware,
     ]),
 });
 

@@ -2,27 +2,43 @@ import Heading from "../../common/Heading";
 import { useAppSelector } from "../../../../hook";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
-import { useCheckUserMutation } from "../../../../stores/service/user.service";
-import { useEffect, useState } from "react";
+import { useCheckPhoneOrEmailMutation } from "../../../../stores/service/user.service";
+import { useEffect, useRef, useState } from "react";
 import { Label } from "../../../../components/label";
 import { InputForm } from "../../../../components/input";
 import { ErrorInput } from "../../../../components/error";
 import { Button } from "../../../../components/button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ModalNotification } from "../../../../components/modal";
+import LoadingSpinner from "../../../../components/loading";
+import { IconAlert, IconError, IconSuccess } from "../../../../components/icon";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function FormPhone() {
+  const navigate = useNavigate();
+  const { pathname, state: statePath } = useLocation();
+
   const user = useAppSelector((state) => state.authSlice.user);
 
   const validationSchema = Yup.object({
     phone: Yup.string()
-      .required("Vui lòng điền vào mục này.")
-      .matches(/^(84|0[3|5|7|8|9])+([0-9]{8})\b/, "Số điện thoại không hợp lệ")
+      .required("Vui lòng điền thông tin.")
       .test(
-        "match",
+        "maxLengthPhone",
+        "Số điện thoại dài không quá 11 ký tự",
+        (value) => {
+          return value.length <= 11;
+        }
+      )
+      .matches(
+        /^(84|0[3|5|7|8|9])+([0-9]{8}|[0-9]{9})\b/,
+        "Số điện thoại không hợp lệ"
+      )
+      .test(
+        "matchPhone",
         "Bạn vừa nhập số điện thoại hiện tại. Vui lòng nhập số điện thoại mới",
         (value) => {
-          return value === user?.phone;
+          return value !== user?.phone;
         }
       ),
   });
@@ -43,46 +59,69 @@ function FormPhone() {
     mode: "onChange",
   });
 
-  const [checkUser, { isLoading }] = useCheckUserMutation();
-  const [isCheckPhone, setIsCheckPhone] = useState<boolean>(true);
-  const [account, setAccount] = useState<string>("");
+  const [checkPhoneOrEmail, { isLoading }] = useCheckPhoneOrEmailMutation();
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const handleOpenModal = useRef<() => void>();
 
   const onSubmit = async (data: formValue) => {
     try {
-      const res = await checkUser({ phoneOrEmail: data.phone }).unwrap();
-      if (!res.isCheckUser) {
-        setAccount(data.phone);
-        setIsCheckPhone(false);
+      const res = await checkPhoneOrEmail({
+        phoneOrEmail: data.phone,
+      }).unwrap();
+      if (res.isCheckUser) {
+        setOpenModal(true);
+      } else {
+        navigate(`/verify/otp?account=${data.phone}&&phoneOrEmail=phone`, {
+          state: { path: pathname },
+        });
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleOpenModal = () => {
+  handleOpenModal.current = () => {
     setOpenModal(false);
     setFocus("phone");
     reset({ phone: "" });
   };
 
   useEffect(() => {
-    reset({ phone: "" });
-    setFocus("phone");
-  }, [reset, setFocus]);
+    handleOpenModal.current;
+  }, [handleOpenModal]);
 
   return (
     <section className="max-w-[1000px] w-full bg-white rounded px-8">
-      <Heading
-        title={user?.email ? "Chỉnh Sửa Số Điện Thoại" : "Thêm Số Điện Thoại"}
-        className="flex flex-col items-start justify-center"
-      />
+      <Heading className="flex flex-col items-start justify-center">
+        <h1 className="text-lg font-medium">
+          {user?.email ? "Chỉnh Sửa Số Điện Thoại" : "Thêm Số Điện Thoại"}
+        </h1>
+      </Heading>
       <div className="pt-10">
-        <ModalNotification isOpen={openModal} onClick={handleOpenModal}>
-          <span className="text-center">
-            <p>Số điện thoại bạn nhập đã đăng ký !</p>
-            <p>Vui lòng nhập số điện thoại mới</p>
-          </span>
+        <ModalNotification isOpen={openModal} onClick={handleOpenModal.current}>
+          {!statePath && (
+            <>
+              <span className="text-danger">
+                <IconAlert size={50}></IconAlert>
+              </span>
+              <span className="text-center">
+                <p>Số điện thoại bạn nhập đã đăng ký !</p>
+                <p>Vui lòng nhập số điện thoại mới</p>
+              </span>
+            </>
+          )}
+          {statePath && (
+            <>
+              <span className="text-success">
+                {statePath.isUpdate ? (
+                  <IconSuccess size={50}></IconSuccess>
+                ) : (
+                  <IconError size={50}></IconError>
+                )}
+              </span>
+              <span className="text-center">{statePath.message}</span>
+            </>
+          )}
         </ModalNotification>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-[150px_500px] gap-x-5 gap-y-3">
@@ -111,12 +150,18 @@ function FormPhone() {
               text={errors["phone"]?.message}
             />
             <Button
-              disabled={errors.phone || !dirtyFields.phone ? true : false}
+              disabled={
+                errors.phone || !dirtyFields.phone || isLoading ? true : false
+              }
               type="submit"
               variant="default"
-              className="col-start-2 col-end-3 max-w-[150px]"
+              className="col-start-2 col-end-3 max-w-[100px] flex justify-center"
             >
-              Đăng nhập
+              {isLoading ? (
+                <LoadingSpinner className={"w-6 h-6"}></LoadingSpinner>
+              ) : (
+                "Tiếp Theo"
+              )}
             </Button>
           </div>
         </form>

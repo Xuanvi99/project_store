@@ -20,6 +20,7 @@ import { updateAuth } from "../../../../stores/reducer/authReducer";
 import LoadingSpinner from "../../../../components/loading";
 import { ModalNotification } from "../../../../components/modal";
 import { IconError, IconSuccess } from "../../../../components/icon";
+import { IUser } from "../../../../types/commonType";
 
 const validatingSchema = Yup.object({
   userName: Yup.string()
@@ -37,14 +38,13 @@ function FormInfoUser() {
   const dispatch = useAppDispatch();
   const [images, setImages] = useState([]);
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [profile, setProfile] = useState<IUser>();
 
   const id = user ? user._id : "";
   const { data, status } = useGetProfileQuery(id, { skip: !id });
 
-  const profile = data?.user;
-
   const [updateUser, updateResult] = useUpdateUserMutation();
-  console.log("updateResult: ", updateResult);
+
   const { isLoading, isSuccess, isError } = updateResult;
 
   const {
@@ -103,15 +103,47 @@ function FormInfoUser() {
     setOpenModal(false);
   };
 
+  const enCodePhone = (phone: string | undefined) => {
+    if (!phone) {
+      return "";
+    }
+    const lengthPhone = phone.length - 2;
+    let result = "";
+    for (let i = 0; i < phone.length; i++) {
+      if (i > lengthPhone - 1) {
+        result += phone[i];
+      } else {
+        result += "*";
+      }
+    }
+    return result;
+  };
+
+  const enCodeEmail = (email: string | undefined) => {
+    if (!email) {
+      return "";
+    }
+    const nameEmail = email?.split("@")[0];
+    let result = "";
+    for (let i = 0; i < nameEmail.length; i++) {
+      if (i < 2) {
+        result += nameEmail[i];
+      } else {
+        result += "*";
+      }
+    }
+    return result + "@" + email?.split("@")[1];
+  };
+
   useEffect(() => {
     if (isSuccess || isError) {
-      console.log(isSuccess);
       setOpenModal(true);
     }
   }, [isError, isSuccess]);
 
   useEffect(() => {
     if (data && status === "fulfilled") {
+      setProfile(data.user);
       dispatch(updateAuth({ user: data.user }));
     }
   }, [data, dispatch, status]);
@@ -135,10 +167,8 @@ function FormInfoUser() {
         </span>
       </ModalNotification>
       <section className="max-w-[1000px] w-full bg-white rounded px-8">
-        <Heading
-          title="Hồ Sơ Của Bạn"
-          className="flex flex-col items-start justify-center"
-        >
+        <Heading className="flex flex-col items-start justify-center">
+          <h1 className="text-lg font-medium">Hồ Sơ Của Bạn</h1>
           <p className="mt-1 text-sm text-gray">
             Quản lý thông tin hồ sơ để bảo mật tài khoản
           </p>
@@ -161,7 +191,7 @@ function FormInfoUser() {
               <Field variant="flex-row" className="gap-x-5">
                 <Label className="w-[150px] text-end">Số điện thoại</Label>
                 <div className="flex gap-x-3">
-                  <span>{profile?.phone}</span>
+                  <span>{enCodePhone(profile?.phone)}</span>
                   <Link
                     to="/user/account/phone"
                     className="underline cursor-pointer text-blue hover:text-orange"
@@ -173,7 +203,7 @@ function FormInfoUser() {
               <Field variant="flex-row" className="gap-x-5">
                 <Label className="w-[150px] text-end">Email</Label>
                 <div className="flex gap-x-3">
-                  <span>{profile?.email}</span>
+                  <span>{enCodeEmail(profile?.email)}</span>
                   <Link
                     to="/user/account/email"
                     className="underline cursor-pointer text-blue hover:text-orange"
@@ -275,12 +305,12 @@ function FormInfoUser() {
             type="submit"
             variant="default"
             disabled={isLoading}
-            className={`mt-5 ml-[100px]`}
+            className={`mt-7 ml-24`}
           >
             {isLoading ? (
               <LoadingSpinner className={"w-6 h-6"}></LoadingSpinner>
             ) : (
-              "Lưu"
+              "Cập nhật"
             )}
           </Button>
         </form>

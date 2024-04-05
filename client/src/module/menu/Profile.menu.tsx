@@ -36,7 +36,7 @@ function Profile({
               {displayName && (
                 <span className="font-semibold ">{user?.userName}</span>
               )}
-              <span className="w-9 h-9 rounded-full overflow-hidden">
+              <span className="overflow-hidden rounded-full w-9 h-9">
                 <img
                   alt=""
                   srcSet={avatar?.url || user?.avatarDefault}
@@ -60,7 +60,7 @@ function Profile({
             </div>
             <div className="flex flex-col gap-y-5">
               <Link
-                to={"/user/account/"}
+                to={"/user/account/profile"}
                 className="inline-block whitespace-nowrap hover:text-orange"
               >
                 Tài khoản

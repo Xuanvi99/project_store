@@ -31,4 +31,4 @@ TokenSchema.statics.deleteToken = async function (refreshToken) {
   const idRfToken = await this.findOneAndDelete({ token: refreshToken }).exec();
   return idRfToken;
 };
-module.exports = mongoose.model("refreshTokens", TokenSchema);
+module.exports = mongoose.model("tokens", TokenSchema);

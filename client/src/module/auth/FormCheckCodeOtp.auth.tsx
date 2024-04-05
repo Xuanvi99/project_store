@@ -1,25 +1,75 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useLayoutEffect,
+} from "react";
 import { cn } from "../../utils";
-import { IconBack } from "../../components/icon";
+import { IconBack, IconError } from "../../components/icon";
 import Button from "../../components/button/Button";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { authFireBase } from "../../fireBase/config";
+import {
+  useSendOTPEmailMutation,
+  useVerifyEmailMutation,
+} from "../../stores/service/otp.service";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../hook";
+import { useUpdateUserMutation } from "../../stores/service/user.service";
 
 type TFormProps = {
   account: string;
-  handleActiveForm: (form: "1" | "2" | "3") => void;
+  phoneOrEmail: "phone" | "email";
+  handleActiveForm?: (form: "1" | "2" | "3") => void;
+  onClick?: () => void;
   onBack?: () => void;
+  className?: string;
 };
 
-function FormCheckCodeOtp({ account, handleActiveForm, onBack }: TFormProps) {
+function FormCheckCodeOtp({
+  account,
+  handleActiveForm,
+  phoneOrEmail,
+  onBack,
+  className,
+}: TFormProps) {
   const [resend, setResend] = useState<boolean>(false);
   const [timeResend, setTimeResend] = useState<boolean>(false);
   const [CheckCode, setCheckCode] = useState<boolean>(false);
   const [codeOtp, setCodeOtp] = useState<string | undefined>("");
-  const [error, setError] = useState<string | undefined>("");
+  const [errorOtp, setErrorOtp] = useState<string>("");
   const inputDivRef = useRef<HTMLDivElement>(null);
   const focusRef = useRef<HTMLDivElement>(null);
   const timeRef = useRef<HTMLParagraphElement>(null);
+  const effectRun = useRef<boolean>(false);
+
+  const user = useAppSelector((state) => state.authSlice.user);
+
+  const navigate = useNavigate();
+  const { state } = useLocation();
+
+  const [sendOTPEmail] = useSendOTPEmailMutation();
+  const [verifyEmail] = useVerifyEmailMutation();
+  const [updateUser] = useUpdateUserMutation();
+
+  const handleUpdate = async () => {
+    const formData = new FormData();
+    formData.append(phoneOrEmail, account);
+    if (user) {
+      await updateUser({ id: user._id, body: formData }).unwrap();
+    }
+  };
+
+  const notifyVeryCode = (expired?: boolean, message?: string) => {
+    navigate(state.path, {
+      state: {
+        message: message,
+        isUpdate: !expired,
+      },
+      replace: true,
+    });
+  };
 
   const handleSendCodeFireBase = (phoneNumber: string) => {
     const phone = "+84" + phoneNumber;
@@ -33,7 +83,57 @@ function FormCheckCodeOtp({ account, handleActiveForm, onBack }: TFormProps) {
       });
   };
 
-  useEffect(() => {
+  const handleOtpVerify = async () => {
+    if (codeOtp) {
+      if (phoneOrEmail === "phone") {
+        const user = await window.confirmationResult.confirm(codeOtp);
+        if (user) {
+          if (handleActiveForm) {
+            handleActiveForm("2");
+          } else {
+            handleUpdate();
+            notifyVeryCode(false, "Cập nhật " + phoneOrEmail + " thành công");
+          }
+        } else {
+          setErrorOtp("Mã xác minh không hợp lệ hoặc hết hạn");
+        }
+      } else {
+        await verifyEmail({
+          email: account,
+          code: codeOtp,
+        })
+          .unwrap()
+          .then((res) => {
+            handleUpdate();
+            notifyVeryCode(
+              res.expired,
+              "Cập nhật " + phoneOrEmail + " thành công"
+            );
+          })
+          .catch((error) => {
+            if (error.status === 404) {
+              setErrorOtp("Mã xác minh không hợp lệ hoặc hết hạn");
+            }
+          });
+      }
+      resetOtp();
+    }
+  };
+
+  const resetOtp = useCallback(() => {
+    const nodeRef = inputDivRef.current;
+    let inputNext = nodeRef?.firstChild as HTMLInputElement;
+    if (!inputNext) return;
+    inputNext.disabled = false;
+    inputNext.focus();
+    for (let i = 0; i < 6; i++) {
+      inputNext.value = "";
+      inputNext = inputNext.nextElementSibling as HTMLInputElement;
+    }
+    setCodeOtp("");
+  }, []);
+
+  useLayoutEffect(() => {
     const sendOtpFireBase = (phoneNumber: string) => {
       try {
         if (!window.recaptchaVerifier) {
@@ -53,34 +153,16 @@ function FormCheckCodeOtp({ account, handleActiveForm, onBack }: TFormProps) {
         console.log("error", error);
       }
     };
-    sendOtpFireBase(account);
-  }, [account]);
 
-  const resetOtp = useCallback(() => {
-    const nodeRef = inputDivRef.current;
-    let inputNext = nodeRef?.firstChild as HTMLInputElement;
-    if (!inputNext) return;
-    inputNext.disabled = false;
-    inputNext.focus();
-    for (let i = 0; i < 6; i++) {
-      inputNext.value = "";
-      inputNext = inputNext.nextElementSibling as HTMLInputElement;
+    if (!effectRun.current) {
+      phoneOrEmail === "phone"
+        ? sendOtpFireBase(account)
+        : sendOTPEmail({ email: account });
     }
-    setCodeOtp("");
-  }, []);
-
-  const handleOtpVerify = async () => {
-    if (codeOtp) {
-      console.log("codeOtp: ", codeOtp);
-      console.log(window.confirmationResult);
-      const user = await window.confirmationResult.confirm(codeOtp);
-      if (user) {
-        handleActiveForm("2");
-      }
-      resetOtp();
-      setError("");
-    }
-  };
+    return () => {
+      effectRun.current = true;
+    };
+  }, [account, phoneOrEmail, sendOTPEmail]);
 
   useEffect(() => {
     const focusDiv = focusRef.current;
@@ -211,7 +293,7 @@ function FormCheckCodeOtp({ account, handleActiveForm, onBack }: TFormProps) {
   }, [timeResend]);
 
   return (
-    <div className="w-full checkCode">
+    <div className={cn("w-full checkCode pb-10", className)}>
       <div id="recaptcha-container"></div>
       <div className="flex items-center py-7">
         <div
@@ -224,6 +306,12 @@ function FormCheckCodeOtp({ account, handleActiveForm, onBack }: TFormProps) {
           <h1>Nhập mã xác minh</h1>
         </div>
       </div>
+      {errorOtp && (
+        <div className="flex items-center w-[calc(500px-160px)] mx-auto my-3 px-2 py-2  text-sm text-red-600 border-red-600 rounded border-1 gap-x-2">
+          <IconError size={15}></IconError>
+          {errorOtp}
+        </div>
+      )}
       <Notification account={account} />
       <div className="relative w-full h-[50px] mt-10">
         <div
@@ -242,7 +330,7 @@ function FormCheckCodeOtp({ account, handleActiveForm, onBack }: TFormProps) {
                 required
                 className={cn(
                   `outline-none w-[50px] h-[50px] text-center text-3xl border-b-2 border-gray text-semibold focus:border-blue`,
-                  error ? "border-red-600" : ""
+                  errorOtp ? "border-red-600" : ""
                 )}
               />
             ))}
@@ -252,7 +340,6 @@ function FormCheckCodeOtp({ account, handleActiveForm, onBack }: TFormProps) {
           className="absolute inset-0 z-30 w-full h-full "
         ></div>
       </div>
-      <div className="mt-5 text-sm text-red-700">{error}</div>
       <div className="mt-10 text-center">
         <Button
           type="button"
@@ -272,7 +359,6 @@ function FormCheckCodeOtp({ account, handleActiveForm, onBack }: TFormProps) {
         <button
           type="button"
           onClick={() => {
-            //   handleCheckMail();
             setTimeResend(!timeResend);
             setResend(false);
           }}

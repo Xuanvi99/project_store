@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { IUser } from "../../types/commonType";
-import { baseQueryWithAuth } from "../../utils/baseQueryToken";
+import { baseQueryWithAuth } from "../baseQueryToken";
 
 type TArg = {
   [Property in keyof Omit<
@@ -72,7 +72,7 @@ export const userApi = createApi({
       }),
       invalidatesTags: (result, error, id) => [{ type: "Users", id }],
     }),
-    checkUser: build.mutation<
+    checkPhoneOrEmail: build.mutation<
       { isCheckUser: boolean },
       { phoneOrEmail: string }
     >({
@@ -81,6 +81,29 @@ export const userApi = createApi({
         method: "POST",
         body,
       }),
+    }),
+    verifyPassword: build.mutation<
+      { message: string },
+      { phoneOrEmail: string; password: string }
+    >({
+      query: (body) => ({
+        url: "user/verifyPw",
+        method: "POST",
+        body,
+      }),
+    }),
+    changePassword: build.mutation<
+      { message: string },
+      { id: string; password: string }
+    >({
+      query: ({ id, password }) => ({
+        url: "user/changePw/" + id,
+        method: "POST",
+        body: { password },
+      }),
+      invalidatesTags: (result, error, data) => [
+        { type: "Users", id: data.id },
+      ],
     }),
   }),
 });
@@ -91,5 +114,7 @@ export const {
   useAddUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
-  useCheckUserMutation,
+  useCheckPhoneOrEmailMutation,
+  useVerifyPasswordMutation,
+  useChangePasswordMutation,
 } = userApi;

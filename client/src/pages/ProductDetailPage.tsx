@@ -1,10 +1,13 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { ProductSlideshow } from "../components/product";
 import { BannerCommon } from "../components/banner";
 import LayoutMain from "../layout/LayoutMain";
 import { ProductSingle, ProductDesc, ProductReviews } from "../module/detail";
 
 function ProductDetailPage() {
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
   return (
     <Fragment>
       <BannerCommon

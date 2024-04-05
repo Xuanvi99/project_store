@@ -1,17 +1,17 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../hook";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 function LayoutRequireAuth() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+
   const user = useAppSelector((state) => state.authSlice.user);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (user) {
       navigate("/", { replace: true });
     }
-  }, [navigate, pathname, user]);
+  }, [navigate, user]);
 
   return <Outlet></Outlet>;
 }

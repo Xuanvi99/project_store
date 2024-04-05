@@ -2,7 +2,7 @@ import { useState } from "react";
 import LayoutFormAuth from "../../layout/LayoutFormAuth";
 import { cn } from "../../utils";
 import FormCheckCodeOtp from "./FormCheckCodeOtp.auth";
-import { FormNotifySuccess, FormUpdatePassword } from ".";
+import { FormNotifyPWSuccess, FormUpdatePassword } from ".";
 
 type TProps = {
   title: string;
@@ -40,17 +40,18 @@ function FormStepCreatePassword({
 
       case "3":
         return (
-          <FormNotifySuccess
+          <FormNotifyPWSuccess
             type="create"
             account={phoneOrEmail}
             path={redirectUrl}
-          ></FormNotifySuccess>
+          ></FormNotifyPWSuccess>
         );
 
       default:
         return (
           <FormCheckCodeOtp
             account={phoneOrEmail}
+            phoneOrEmail="phone"
             handleActiveForm={handleActiveForm}
             onBack={onBack}
           ></FormCheckCodeOtp>

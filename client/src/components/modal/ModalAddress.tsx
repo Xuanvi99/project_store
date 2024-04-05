@@ -5,37 +5,62 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Field from "../fields/index";
 import { Label } from "../label";
 import InputForm from "../input/InputForm";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Button } from "../button";
 import axios from "axios";
 import { DropdownForm } from "../dropdown";
 import ErrorInput from "../error/ErrorInput";
 import IconCLose from "../icon/IconCLose";
+import { IAddress } from "../../types/commonType";
+import {
+  useAddAddressMutation,
+  useGetAddressQuery,
+  useUpDateAddressMutation,
+} from "../../stores/service/address.service";
+import LoadingSpinner from "../loading";
+import { useAppSelector } from "../../hook";
 
 const validatingSchema = Yup.object({
   name: Yup.string()
     .required("Vui lòng điền tên của bạn")
     .matches(
-      /^([a-vxyỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ]+)((\s{1}[a-vxyỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ]+){1,})$/,
+      /^([a|A-vxyỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ]+)((\s{1}[a|A-vxyỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ]+){1,})$/,
       "Họ và tên không hợp lệ"
     ),
   phone: Yup.string()
     .required("Vui lòng điền Số điện thoại")
     .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, "Số điện thoại không hợp lệ"),
-  province: Yup.string().required("!invalid"),
-  district: Yup.string().required("!invalid"),
-  ward: Yup.string().required("!invalid"),
-  address: Yup.string().required("Vui lòng điền thêm thông tin cụ thể"),
+  province: Yup.string().required("Invalid!"),
+  district: Yup.string().required("Invalid!"),
+  ward: Yup.string().required("Invalid!"),
+  specific: Yup.string().required(
+    "Vui lòng điền thêm thông tin địa chỉ cụ thể"
+  ),
 });
 
 type formValues = Yup.InferType<typeof validatingSchema>;
 
 type optionValue = { label: string; value: string; id: string };
 
-function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
-  const [province, setProvince] = useState<optionValue[]>([]);
-  const [district, setDistrict] = useState<optionValue[]>([]);
-  const [ward, setWard] = useState<optionValue[]>([]);
+function ModalAddress({
+  show,
+  handleShow,
+}: {
+  show: boolean;
+  handleShow: () => void;
+}) {
+  const user = useAppSelector((state) => state.authSlice.user);
+
+  const [listProvince, setListProvince] = useState<optionValue[]>([]);
+  const [listDistrict, setListDistrict] = useState<optionValue[]>([]);
+  const [listWard, setListWard] = useState<optionValue[]>([]);
+  const [address, setAddress] = useState<IAddress>();
+
+  const id = user ? user._id : "";
+  const { data, status } = useGetAddressQuery(id, { skip: !id });
+
+  const [addAddress] = useAddAddressMutation();
+  const [upDateAddress, { isLoading }] = useUpDateAddressMutation();
 
   const {
     control,
@@ -51,10 +76,10 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
       province: "",
       district: "",
       ward: "",
-      address: "",
+      specific: "",
     },
     resolver: yupResolver(validatingSchema),
-    mode: "onSubmit",
+    mode: "onChange",
   });
 
   const handleFetchData = async ({
@@ -76,17 +101,17 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
           data.forEach(
             (item: { province_name: string; province_id: string }) => {
               const label = item.province_name.includes("Tỉnh")
-                ? item.province_name.slice(5)
-                : item.province_name.slice(9);
+                ? item.province_name
+                : item.province_name.replace("Thành phố", "Tp");
               results.push({
                 label: label,
-                value: item.province_name,
+                value: label,
                 id: item.province_id,
               });
             }
           );
         }
-        setProvince(results);
+        setListProvince(results);
         break;
       }
 
@@ -108,7 +133,7 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
             }
           );
         }
-        setDistrict(results);
+        setListDistrict(results);
         break;
       }
 
@@ -129,10 +154,10 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
             })
           : results.push({
               label: "Không có Phường xã",
-              value: "xã XXX",
+              value: "",
               id: "0",
             });
-        setWard(results);
+        setListWard(results);
         break;
       }
       default:
@@ -140,11 +165,43 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
     }
   };
 
+  useLayoutEffect(() => {
+    if (data && status === "fulfilled") {
+      setAddress(data.address);
+    }
+  }, [data, status]);
+
+  useEffect(() => {
+    if (address) {
+      setValue("name", address.name);
+      setValue("phone", address.phone);
+      setValue("province", address.province);
+      setValue("district", address.district);
+      setValue("ward", address.ward || "");
+      setValue("specific", address.specific);
+    }
+  }, [address, setValue]);
+
   useEffect(() => {
     handleFetchData({ params: "province" });
   }, []);
 
-  const Onsubmit = (data: formValues) => console.log(data);
+  const Onsubmit = async (data: formValues) => {
+    address
+      ? await upDateAddress({ id: address.userId, body: data }).unwrap()
+      : await addAddress({ body: { ...data, userId: id } }).unwrap();
+    if (!isLoading) {
+      reset({
+        name: "",
+        phone: "",
+        province: "",
+        district: "",
+        ward: "",
+        specific: "",
+      });
+      handleShow();
+    }
+  };
   return (
     <Modal
       isOpenModal={show}
@@ -155,9 +212,9 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
           province: "",
           district: "",
           ward: "",
-          address: "",
+          specific: "",
         });
-        handle();
+        handleShow();
       }}
       className={{
         content:
@@ -165,7 +222,7 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
       }}
     >
       <div
-        onClick={handle}
+        onClick={handleShow}
         className="absolute cursor-pointer top-2 right-2 hover:text-red-600"
       >
         <IconCLose size={25}></IconCLose>
@@ -180,7 +237,6 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
               type="text"
               name="name"
               id="name"
-              value={watch("name")}
               error={errors.name?.message ? true : false}
               placeholder="Nguyễn Văn A"
               className={{ input: "py-1" }}
@@ -194,7 +250,6 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
               type="number"
               name="phone"
               id="phone"
-              value={watch("phone")}
               error={errors.phone?.message ? true : false}
               placeholder="03********"
               className={{
@@ -211,8 +266,8 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
               <DropdownForm
                 control={control}
                 name="province"
-                title="Chọn Tỉnh/Thành phố"
-                options={province}
+                title={address ? address.province : "Chọn Tỉnh/Thành phố"}
+                options={listProvince}
                 error={errors.district && !watch("province")}
                 search={{
                   display: true,
@@ -235,8 +290,12 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
                 control={control}
                 name="district"
                 disable={watch("province") ? false : true}
-                title={"Chọn Quận/Huyện"}
-                options={district}
+                title={
+                  watch("district") === ""
+                    ? "Chọn Quận/Huyện"
+                    : (address?.district as string)
+                }
+                options={listDistrict}
                 error={errors.district && !watch("district")}
                 search={{
                   display: true,
@@ -258,9 +317,15 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
               <DropdownForm
                 control={control}
                 name="ward"
-                title="Chọn Phường/Xã"
+                title={
+                  watch("ward") === ""
+                    ? "Chọn Phường/Xã"
+                    : address && address.ward
+                    ? address.ward
+                    : "không có Phường/Xã"
+                }
                 disable={watch("district") ? false : true}
-                options={ward}
+                options={listWard}
                 error={errors.ward && !watch("ward")}
                 search={{
                   display: true,
@@ -272,7 +337,10 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
                   } `,
                   option: "max-h-[160px] overflow-y-scroll rounded-none",
                 }}
-                onClick={(option) => setValue("ward", option.value)}
+                onClick={(option) => {
+                  console.log("option: ", option);
+                  setValue("ward", option.value ? option.value : "Không");
+                }}
               />
             </Field>
           </div>
@@ -289,23 +357,30 @@ function ModalAddress({ show, handle }: { show: boolean; handle: () => void }) {
           />
         </div>
         <Field variant="flex-col">
-          <Label name="address">Đại chỉ cụ thể:</Label>
+          <Label name="specific">
+            Đại chỉ cụ thể <strong className="text-danger">*</strong>:
+          </Label>
           <InputForm
             control={control}
-            name="address"
-            id="address"
-            value={watch("address")}
-            error={errors.address?.message ? true : false}
-            placeholder="Ví dụ: số nhà,ngõ..."
+            name="specific"
+            id="specific"
+            value={watch("specific")}
+            error={errors.specific?.message ? true : false}
+            placeholder="Ví dụ: số nhà,ngõ,xóm..."
             className={{
               input: `py-1 `,
             }}
           />
-          <ErrorInput text={errors.address?.message} />
+          <ErrorInput text={errors.specific?.message} />
         </Field>
-        <div className="flex justify-end">
-          <Button variant="default" type="submit">
-            Cập nhật
+        <div className="flex justify-end ">
+          <Button
+            variant="default"
+            type="submit"
+            // disabled={!isDirty}
+            className="min-w-[130px] flex justify-center"
+          >
+            {isLoading ? <LoadingSpinner></LoadingSpinner> : "Cập nhật"}
           </Button>
         </div>
       </form>

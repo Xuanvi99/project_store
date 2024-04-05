@@ -3,7 +3,7 @@ import FormCheckCodeOtp from "./FormCheckCodeOtp.auth";
 import FormStepCreatePassword from "./FormStepCreatePassword";
 import FormUpdatePassword from "./FormUpdatePassword.auth";
 import Header from "./Header.auth";
-import FormNotifySuccess from "./FormNotifySuccess.auth";
+import FormNotifyPWSuccess from "./FormNotifyPwSuccess.auth";
 import FormSendEmail from "./FormSendEmail.auth";
 import FormStepChangePassword from "./FormStepChangePassword";
 
@@ -13,7 +13,7 @@ export {
   FormCheckCodeOtp,
   FormUpdatePassword,
   FormStepCreatePassword,
-  FormNotifySuccess,
+  FormNotifyPWSuccess,
   FormSendEmail,
   FormStepChangePassword,
 };

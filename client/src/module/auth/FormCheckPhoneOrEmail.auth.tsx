@@ -10,7 +10,7 @@ import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import IconError from "../../components/icon/IconError";
-import { useCheckUserMutation } from "../../stores/service/user.service";
+import { useCheckPhoneOrEmailMutation } from "../../stores/service/user.service";
 import LoadingSpinner from "../../components/loading";
 import { cn } from "../../utils";
 
@@ -41,13 +41,13 @@ function FormCheckPhoneOrEmail({
 }: TFormCheckAccountProps) {
   const navigate = useNavigate();
 
-  const [checkUser, { isLoading }] = useCheckUserMutation();
+  const [checkPhoneOrEmail, { isLoading }] = useCheckPhoneOrEmailMutation();
 
   const [checkAccount, setCheckAccount] = useState<boolean>(true);
 
   const onSubmit = async (data: formValues) => {
     try {
-      const res = await checkUser(data).unwrap();
+      const res = await checkPhoneOrEmail(data).unwrap();
       if (res.isCheckUser) {
         const type = data?.phoneOrEmail.match(/(0[3|5|7|8|9])+([0-9]{8})\b/)
           ? "phone"

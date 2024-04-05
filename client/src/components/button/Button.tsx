@@ -35,7 +35,9 @@ function Button({
       {...props}
       className={cn(
         "px-3 py-2 rounded-md font-semibold",
-        disabled ? "cursor-not-allowed hover:bg-white" : "cursor-pointer",
+        disabled
+          ? "cursor-not-allowed opacity-60 hover:bg-white"
+          : "cursor-pointer",
         styleVariant(variant),
         className
       )}

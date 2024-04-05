@@ -7,6 +7,7 @@ const notifyModel = require("./notify.model");
 const orderModel = require("./order.model");
 const tokenModel = require("./token.model");
 const codeOTPModel = require("./codeOTP.model");
+const addressModel = require("./address.model");
 
 module.exports = {
   cartModel,
@@ -18,4 +19,5 @@ module.exports = {
   orderModel,
   tokenModel,
   codeOTPModel,
+  addressModel,
 };

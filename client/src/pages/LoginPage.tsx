@@ -30,8 +30,6 @@ type FormValues = Yup.InferType<typeof validationSchema>;
 
 function LoginPage() {
   const query = useLocation().search;
-  // const params = new URLSearchParams(query);
-  // const redirectUrl = params.get("next");
 
   const { state: location } = useLocation();
 
@@ -72,7 +70,14 @@ function LoginPage() {
   };
 
   const onSubmit = async (data: FormValues) => {
-    const res = await login(data).unwrap();
+    const res = await login(data)
+      .unwrap()
+      .catch((error) => {
+        if (error.status === 403) {
+          setOpenModal(true);
+          reset({ phoneOrEmail: "", password: "" });
+        }
+      });
     if (res) {
       dispatch(updateAuth({ ...res, isLogin: true }));
       navigate(pathname, { replace: true });

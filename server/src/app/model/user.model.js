@@ -15,11 +15,7 @@ const UserSchema = new Schema(
     password: { type: String, default: "" },
     date: { type: String, default: new Date().toISOString().split("T")[0] },
     gender: { type: String, default: "other" },
-    address: { type: String, default: "" },
-    avatar: {
-      type: Schema.Types.ObjectId,
-      ref: "image",
-    },
+    avatar: { type: Schema.Types.ObjectId, ref: "image" },
     avatarDefault: {
       type: String,
       default:

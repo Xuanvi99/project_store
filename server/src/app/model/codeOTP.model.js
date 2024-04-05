@@ -21,7 +21,6 @@ const CodeOTPSchema = new Schema({
 });
 
 CodeOTPSchema.statics.saveCodeOTP = async function (email, codeOTP) {
-  console.log(email, codeOTP);
   const _object = new this({
     email: email,
     code: codeOTP,

@@ -9,7 +9,7 @@ type TProps = {
   account: string;
 };
 
-function FormNotifySuccess({ type, account, path }: TProps) {
+function FormNotifyPWSuccess({ type, account, path }: TProps) {
   const timeRedirect = useRef<HTMLParagraphElement>(null);
 
   const navigate = useNavigate();
@@ -73,7 +73,7 @@ function FormNotifySuccess({ type, account, path }: TProps) {
       <Button
         variant="default"
         className="my-5"
-        onClick={() => window.location.replace(path)}
+        onClick={() => navigate(path, { replace: true })}
       >
         Quay lại XVStore
       </Button>
@@ -81,4 +81,4 @@ function FormNotifySuccess({ type, account, path }: TProps) {
   );
 }
 
-export default FormNotifySuccess;
+export default FormNotifyPWSuccess;

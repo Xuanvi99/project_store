@@ -81,12 +81,10 @@ class authController {
 
   updatePassword = async (req, res) => {
     const { phoneOrEmail, code, password } = req.body;
-
     try {
       const user = await userModel
         .findOne({ $or: [{ phone: phoneOrEmail }, { email: phoneOrEmail }] })
         .exec();
-
       user.password = password;
       await user.save();
       if (code) {
