@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { BannerCommon } from "../components/banner";
 import LayoutProfile from "../layout/LayoutProfile";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -15,12 +15,15 @@ function ProfilePage() {
 
   const redirectUrl = import.meta.env.VITE_DOMAIN_CLIENT + pathname;
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!user) {
       const query = encodeURIComponent(redirectUrl);
       navigate("/auth/login?next=" + query, { state: { path: pathname } });
     }
-  }, [navigate, pathname, redirectUrl, user]);
+    if (!["address", "password", "profile"].includes(slug as string)) {
+      navigate("/notfound/");
+    }
+  }, [navigate, pathname, redirectUrl, slug, user]);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -34,8 +37,11 @@ function ProfilePage() {
       case "password":
         return <ChangePassword></ChangePassword>;
 
-      default:
+      case "profile":
         return <ProfileInfo slug={slug}></ProfileInfo>;
+
+      default:
+        break;
     }
   };
 

@@ -11,7 +11,7 @@ function Option({
     <option
       onClick={() => onClick(optionData)}
       data-value={optionData.value}
-      className="h-10 px-2 leading-10 list-none cursor-pointer hover:bg-orange hover:text-white"
+      className="h-10 px-2 leading-10 list-none cursor-pointer border-b-1 border-grayCa hover:bg-orangeFe hover:text-white"
     >
       {optionData.label}
     </option>

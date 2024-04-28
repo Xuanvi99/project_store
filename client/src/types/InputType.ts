@@ -13,4 +13,5 @@ export interface IInputProps
   name: string;
   error?: boolean;
   children?: React.ReactNode;
+  ref?: React.LegacyRef<HTMLInputElement>;
 }

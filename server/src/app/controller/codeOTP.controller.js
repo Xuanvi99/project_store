@@ -1,21 +1,12 @@
-const nodemailer = require("nodemailer");
 const { codeOTPModel } = require("../model");
+const { sendMail } = require("../../utils/sendMail");
+
 exports.sendCodeEmail = async (req, res) => {
   try {
     const { user, codeOTP } = req;
     if (!user) {
       res.status(404).json({ errMessage: "Email not found!" });
     }
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
     const mailOptions = {
       from: { name: "XVStore", address: process.env.EMAIL_USERNAME },
       to: user.email,
@@ -146,8 +137,7 @@ exports.sendCodeEmail = async (req, res) => {
       </tbody>
     </table>`,
     };
-
-    transporter.sendMail(mailOptions);
+    sendMail(mailOptions);
     await codeOTPModel.saveCodeOTP(user.email, codeOTP);
     res.status(200).json({ message: "Email sent code successfully." });
   } catch (error) {
@@ -158,16 +148,7 @@ exports.sendCodeEmail = async (req, res) => {
 exports.sendOTPEmail = async (req, res) => {
   try {
     const { user, OTP } = req;
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
+
     const mailOptions = {
       from: { name: "XVStore", address: process.env.EMAIL_USERNAME },
       to: user.email,
@@ -268,8 +249,8 @@ exports.sendOTPEmail = async (req, res) => {
       </tbody>
     </table>`,
     };
+    sendMail(mailOptions);
 
-    transporter.sendMail(mailOptions);
     await codeOTPModel.saveCodeOTP(user.email, OTP);
     res.status(200).json({ message: "Email sent code successfully." });
   } catch (error) {

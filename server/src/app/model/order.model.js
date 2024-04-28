@@ -3,10 +3,14 @@ const Schema = mongoose.Schema;
 
 const OrderSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "user" },
+    userId: { type: Schema.Types.ObjectId, ref: "users", required: true },
     listProduct: [
       {
-        productId: { type: Schema.Types.ObjectId, ref: "product" },
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: "products",
+          required: true,
+        },
         size: { type: Number, required: true },
         quantity: {
           type: Number,
@@ -36,4 +40,4 @@ const OrderSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("order", OrderSchema);
+module.exports = mongoose.model("orders", OrderSchema);

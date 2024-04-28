@@ -10,9 +10,10 @@ class Cart {
         .findOne({ userId: userId })
         .populate({
           path: "listProduct",
-          populate: { path: "productId", model: "product" },
+          populate: { path: "productId", model: "products" },
         })
         .lean();
+
       if (!cart) {
         return res
           .status(404)

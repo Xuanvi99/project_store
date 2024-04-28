@@ -6,6 +6,8 @@ const productCtl = require("./product.controller");
 const commentCtl = require("./comment.controller");
 const cartCtl = require("./cart.controller");
 const addressCtl = require("./address.controller");
+const categoryCtl = require("./category.controller");
+const imageCtl = require("./image.controller");
 
 module.exports = {
   userCtl,
@@ -16,4 +18,6 @@ module.exports = {
   commentCtl,
   cartCtl,
   addressCtl,
+  categoryCtl,
+  imageCtl,
 };

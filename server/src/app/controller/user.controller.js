@@ -28,7 +28,7 @@ class userController {
             { email: { $regex: search, $options: "i" } },
           ],
         })
-        .populate("avatar")
+        .populate([{ path: "avatar", select: "_id public_id url folder" }])
         .skip(skip)
         .limit(limit);
 
@@ -62,7 +62,7 @@ class userController {
     try {
       const user = await userModel
         .findById(userId, { password: 0 })
-        .populate("avatar")
+        .populate([{ path: "avatar", select: "_id public_id url folder" }])
         .exec();
       if (!user) res.status(400).json({ errMessage: "Invalid user ID" });
       return res.status(200).json({ user });

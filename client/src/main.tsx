@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.scss";
 import "swiper/css";
+import "rc-slider/assets/index.css";
 import "react-toastify/dist/ReactToastify.css";
 import App from "./App.tsx";
 import { store } from "./stores/index.ts";

@@ -49,7 +49,7 @@ class Comment {
       }
       const _comment = new commentModel({ ...body });
       const result = await _comment.save();
-      product.commentIDs.push(result._id);
+      product.commentIds.push(result._id);
       await product.save();
       res.status(201).json({ message: "create comment success", result });
     } catch (error) {
@@ -76,7 +76,7 @@ class Comment {
           files,
           "comment"
         );
-        body = { ...body, imageIDs: imagesUpload };
+        body = { ...body, imageIds: imagesUpload };
       }
       const result = await commentModel
         .findByIdAndUpdate(commentId, { ...body }, { new: true })
@@ -103,10 +103,10 @@ class Comment {
           await imageModel.removeFile(imageIDs[i]);
         }
       }
-      const index = product.commentIDs.findIndex(
+      const index = product.commentIds.findIndex(
         (cmtId) => cmtId === commentId
       );
-      product.commentIDs.splice(index, 1);
+      product.commentIds.splice(index, 1);
       await product.save();
       res.status(200).json({ message: "Delete comment success" });
     } catch (error) {

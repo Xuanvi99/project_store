@@ -1,18 +1,28 @@
 import { Button } from "../../components/button";
 import { IconSearch } from "../../components/icon";
 import { Input } from "../../components/input";
+import { cn } from "../../utils";
 
 type TProps = {
   valueInput: string;
   onSubmitSearch: (event: React.FormEvent<HTMLFormElement>) => void;
   onChangeSearch: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
 };
 
-function Search({ valueInput, onSubmitSearch, onChangeSearch }: TProps) {
+function Search({
+  valueInput,
+  onSubmitSearch,
+  onChangeSearch,
+  className,
+}: TProps) {
   return (
     <form
       onSubmit={(event) => onSubmitSearch(event)}
-      className="w-[550px] p-[3px] flex rounded-[3px] bg-white border-[1px] border-orange items-center flex-shrink-1"
+      className={cn(
+        "w-[550px] p-[3px] flex rounded-[3px] bg-white border-[1px] border-orange items-center flex-shrink-1",
+        className
+      )}
     >
       <Input
         type="text"

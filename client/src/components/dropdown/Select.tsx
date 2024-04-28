@@ -18,7 +18,7 @@ const Select = forwardRef<TSelectRef, TSelectProps>(function Select(
       ref={ref}
       {...props}
       className={cn(
-        "flex items-center justify-between h-10 px-2 leading-10 cursor-pointer shadow-sm shadow-slate-500",
+        "flex items-center justify-between h-10 px-3  leading-10 cursor-pointer shadow-sm shadow-slate-500",
         className
       )}
     >

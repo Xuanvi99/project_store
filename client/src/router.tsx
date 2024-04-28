@@ -15,6 +15,7 @@ import {
 } from "./pages";
 import LayoutRoot from "./layout/LayoutRoot";
 import LayoutRequireAuth from "./layout/LayoutRequireAuth";
+import { Comment, Dashboard, Product } from "./module/dashboard";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
         path: "/category",
         element: <CategoryPage></CategoryPage>,
       },
+
       {
         path: "/productDetail/:slug",
         element: <ProductDetailPage></ProductDetailPage>,
@@ -71,12 +73,17 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/verify/:slug",
-    element: <VerifyPage></VerifyPage>,
+    path: "/dashboard",
+    element: <DashboardPage></DashboardPage>,
+    children: [
+      { path: "/dashboard/home", element: <Dashboard></Dashboard> },
+      { path: "/dashboard/product/", element: <Product></Product> },
+      { path: "/dashboard/comment", element: <Comment></Comment> },
+    ],
   },
   {
-    path: "/dashboard/:slug",
-    element: <DashboardPage></DashboardPage>,
+    path: "/verify/:slug",
+    element: <VerifyPage></VerifyPage>,
   },
 ]);
 

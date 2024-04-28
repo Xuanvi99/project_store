@@ -1,15 +1,15 @@
 import { IconNavBar } from "../components/icon";
 
-const size = 30;
+const size = 20;
 const listNavBarItem = [
   {
     icon: <IconNavBar.Dashboard size={size} />,
-    title: "Sản phẩm",
+    title: "Tổng Quát",
     path: "/dashboard/home",
   },
   {
     icon: <IconNavBar.product size={size} />,
-    title: "Sản phẩm",
+    title: "Sản Phẩm",
     path: "/dashboard/product",
   },
   {

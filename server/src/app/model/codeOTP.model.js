@@ -30,4 +30,4 @@ CodeOTPSchema.statics.saveCodeOTP = async function (email, codeOTP) {
   return _object;
 };
 
-module.exports = mongoose.model("codeOTP", CodeOTPSchema);
+module.exports = mongoose.model("codeOTPs", CodeOTPSchema);

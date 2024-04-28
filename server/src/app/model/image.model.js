@@ -44,4 +44,4 @@ ImageSchema.statics.removeFile = async function (id) {
   }
 };
 
-module.exports = mongoose.model("image", ImageSchema);
+module.exports = mongoose.model("images", ImageSchema);

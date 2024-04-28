@@ -3,7 +3,7 @@ import { cn } from "../utils";
 import "rc-slider/assets/index.css";
 import LayoutMain from "../layout/LayoutMain";
 import { BannerCommon } from "../components/banner";
-import { Content, Header, Sidebar } from "../module/category";
+import * as Category from "../module/category";
 
 function CategoryPage() {
   return (
@@ -13,10 +13,9 @@ function CategoryPage() {
         title="Sản phẩm tìm kiếm"
       ></BannerCommon>
       <LayoutMain>
-        <Header></Header>
         <section className={cn("w-full grid grid-cols-[280px_900px] gap-x-5")}>
-          <Sidebar></Sidebar>
-          <Content></Content>
+          <Category.Sidebar></Category.Sidebar>
+          <Category.Content></Category.Content>
         </section>
       </LayoutMain>
     </Fragment>

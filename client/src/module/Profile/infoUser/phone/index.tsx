@@ -2,23 +2,24 @@ import Heading from "../../common/Heading";
 import { useAppSelector } from "../../../../hook";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
-import { useCheckPhoneOrEmailMutation } from "../../../../stores/service/user.service";
 import { useEffect, useRef, useState } from "react";
-import { Label } from "../../../../components/label";
-import { InputForm } from "../../../../components/input";
-import { ErrorInput } from "../../../../components/error";
-import { Button } from "../../../../components/button";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { ModalNotification } from "../../../../components/modal";
-import LoadingSpinner from "../../../../components/loading";
-import { IconAlert, IconError, IconSuccess } from "../../../../components/icon";
 import { useLocation, useNavigate } from "react-router-dom";
+import { RootState } from "@/stores";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useCheckPhoneOrEmailMutation } from "@/stores/service/user.service";
+import { ModalNotification } from "@/components/modal";
+import { IconAlert, IconError, IconSuccess } from "@/components/icon";
+import { Label } from "@/components/label";
+import { InputForm } from "@/components/input";
+import { ErrorInput } from "@/components/error";
+import { Button } from "@/components/button";
+import LoadingSpinner from "@/components/loading";
 
 function FormPhone() {
   const navigate = useNavigate();
   const { pathname, state: statePath } = useLocation();
 
-  const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
 
   const validationSchema = Yup.object({
     phone: Yup.string()

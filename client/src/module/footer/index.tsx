@@ -36,8 +36,7 @@ function Footer() {
             trẻ trung, phong cách, bắt trend cho giới trẻ.
           </Link>
           <div className="text-sm">
-            <strong>Địa chỉ:</strong> nơi trao tặng các sản phẩm giày thời trang
-            trẻ trung, phong cách, bắt trend cho giới trẻ.
+            <strong>Địa chỉ:</strong> xxxxxxx,xxxxxx,xxxxx
           </div>
         </div>
         <div className="flex flex-col px-3 gap-y-5">

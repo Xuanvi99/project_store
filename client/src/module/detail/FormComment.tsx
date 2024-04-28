@@ -63,7 +63,7 @@ function FormComment({ handleCloseForm, className, type }: IFormComponent) {
   return (
     <form
       className={cn(
-        "w-full bg-grayF5 p-[10px] pb-8  relative z-50",
+        "w-full bg-grayF5 p-[10px] pb-8  relative z-40",
         type === "reviews" ? "" : "displayForm",
         className?.form
       )}

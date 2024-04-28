@@ -1,7 +1,9 @@
-import Product from "./product";
+import { lazy } from "react";
 import Navbar from "./navbar";
 import Header from "./header";
-import Comment from "./comment";
-import Dashboard from "./home";
+
+const Product = lazy(() => import("./product"));
+const Comment = lazy(() => import("./comment"));
+const Dashboard = lazy(() => import("./home"));
 
 export { Navbar, Product, Header, Comment, Dashboard };

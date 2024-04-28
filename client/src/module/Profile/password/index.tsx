@@ -1,19 +1,19 @@
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
-
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAppSelector, useToggle } from "../../../hook";
 import Heading from "../common/Heading";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ModalNotification } from "../../../components/modal";
-import { Label } from "../../../components/label";
-import { InputForm } from "../../../components/input";
-import { ErrorInput } from "../../../components/error";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Button } from "../../../components/button";
-import { IconError, IconEye, IconSuccess } from "../../../components/icon";
-import { useChangePasswordMutation } from "../../../stores/service/user.service";
-import LoadingSpinner from "../../../components/loading";
+import { useAppSelector, useToggle } from "@/hook";
+import { RootState } from "@/stores";
+import { useChangePasswordMutation } from "@/stores/service/user.service";
+import { IconError, IconEye, IconSuccess } from "@/components/icon";
+import { ModalNotification } from "@/components/modal";
+import { Label } from "@/components/label";
+import { InputForm } from "@/components/input";
+import { ErrorInput } from "@/components/error";
+import LoadingSpinner from "@/components/loading";
+import { Button } from "@/components/button";
 
 const validationSchema = Yup.object({
   password1: Yup.string()
@@ -38,7 +38,7 @@ type formValue = Yup.InferType<typeof validationSchema>;
 function ChangePassword() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
 
   const {
     control,

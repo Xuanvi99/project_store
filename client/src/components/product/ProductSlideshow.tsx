@@ -6,11 +6,11 @@ import CardItem from "../card";
 import SlideSwiper from "../slideshows";
 import { IconChevronRight } from "../icon";
 
-interface IProductProps {
+interface IProps {
   name: string;
 }
 
-export default function ProductSlideshow({ name }: IProductProps) {
+export default function ProductSlideshow({ name }: IProps) {
   return (
     <LayoutProduct>
       <div

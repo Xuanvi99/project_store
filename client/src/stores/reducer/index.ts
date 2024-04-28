@@ -6,6 +6,9 @@ import { otpApi } from "../service/otp.service";
 import cartSlice from "./cartReducer";
 import { cartApi } from "../service/cart.service";
 import { addressApi } from "../service/address.service";
+import { imageApi } from "../service/image.service";
+import { productApi } from "../service/product.service";
+import { categoryApi } from "../service/category.service";
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
@@ -13,6 +16,9 @@ const rootReducer = combineReducers({
   [otpApi.reducerPath]: otpApi.reducer,
   [cartApi.reducerPath]: cartApi.reducer,
   [addressApi.reducerPath]: addressApi.reducer,
+  [imageApi.reducerPath]: imageApi.reducer,
+  [productApi.reducerPath]: productApi.reducer,
+  [categoryApi.reducerPath]: categoryApi.reducer,
   authSlice: authSlice,
   cartSlice: cartSlice,
 });

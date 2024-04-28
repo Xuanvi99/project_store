@@ -1,6 +1,13 @@
-function IconDelete({ size }: { size: number }) {
+import { cn } from "../../utils";
+
+function IconDelete({ size, className }: { size: number; className?: string }) {
   return (
-    <div className="relative iconDelete cursor-pointer">
+    <div
+      className={cn(
+        `relative iconDelete cursor-pointer w-[${size}px]`,
+        className
+      )}
+    >
       <div className="absolute top-0 left-0 duration-300 delete-lid">
         <IconDeleteLid size={size}></IconDeleteLid>
       </div>

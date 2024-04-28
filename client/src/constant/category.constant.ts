@@ -1,14 +1,19 @@
 export const productCategory = [
-  "All",
   "Flash sale",
-  "Giày Nike",
-  "Giày Adidas",
-  "Giày Vans",
-  "Giày Converse",
+  "Nike",
+  "Adidas",
+  "Vans",
+  "Converse",
+  "Tổng",
+];
+
+export const OptionPrice = [
+  { id: "1", label: "Giá thấp đến cao", value: "lowToHigh" },
+  { id: "2", label: "Giá cao đến thấp", value: "HighToLow" },
 ];
 
 export const OptionSearch = [
-  { id: "1", label: "Độ liên quan", value: "" },
-  { id: "2", label: "Giá thấp đến cao", value: "lowToHigh" },
-  { id: "3", label: "Giá cao đến thấp", value: "HighToLow" },
+  { id: "1", label: "Liên Quan", value: "relevance" },
+  { id: "2", label: "Mới Nhất", value: "new" },
+  { id: "3", label: "Bán Chạy", value: "sell" },
 ];

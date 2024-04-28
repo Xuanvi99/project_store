@@ -8,9 +8,10 @@ import { IconLocation, IconPlus } from "../../../components/icon";
 import { useGetAddressQuery } from "../../../stores/service/address.service";
 import { IAddress } from "../../../types/commonType";
 import { useLayoutEffect, useState } from "react";
+import { RootState } from "../../../stores";
 
 function FormAddress() {
-  const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
   const { toggle: openShow, handleToggle: handleShow } = useToggle();
 
   const [address, setAddress] = useState<IAddress>();

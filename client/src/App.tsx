@@ -7,14 +7,16 @@ import { useRefreshTokenMutation } from "./stores/service/auth.service";
 import { logOut, updateAuth } from "./stores/reducer/authReducer";
 import { useGetCartQuery } from "./stores/service/cart.service";
 import { updateCart } from "./stores/reducer/cartReducer";
+import { RootState } from "./stores";
 
 function App() {
-  const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
   const [refreshToken] = useRefreshTokenMutation();
   const dispatch = useAppDispatch();
   const effectRun = useRef(false);
   const id = user ? user._id : "";
   const { data: cart, status } = useGetCartQuery(id, { skip: !id });
+
   useEffect(() => {
     if (!effectRun.current && !user) {
       refreshToken()

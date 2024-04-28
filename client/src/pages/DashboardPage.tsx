@@ -1,23 +1,15 @@
 import { useEffect } from "react";
-import {
-  Comment,
-  Dashboard,
-  Header,
-  Navbar,
-  Product,
-} from "../module/dashboard";
-import { useNavigate, useParams } from "react-router-dom";
+import { Header, Navbar } from "../module/dashboard";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../hook";
 
 function DashboardPage() {
-  const { slug } = useParams();
-
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.authSlice.user);
 
   useEffect(() => {
     if (!user) {
-      navigate("/auth/login", { replace: true });
+      navigate("/auth/login");
     } else {
       if (user.role !== "admin") {
         navigate("/", { replace: true });
@@ -25,25 +17,13 @@ function DashboardPage() {
     }
   }, [navigate, user]);
 
-  const Content = (slug: string | undefined) => {
-    switch (slug) {
-      case "product":
-        return <Product></Product>;
-
-      case "comment":
-        return <Comment></Comment>;
-
-      default:
-        return <Dashboard></Dashboard>;
-    }
-  };
   return (
-    <div className="w-full min-h-screen max-w-screen-2xl bg-stone-200 ">
+    <div className="w-full min-h-screen max-w-screen-2xl bg-light ">
       <Header></Header>
-      <div className="flex min-h-[calc(100vh-50px)]">
+      <main className="min-h-[calc(100vh-80px)] content-page">
         <Navbar></Navbar>
-        {Content(slug)}
-      </div>
+        <Outlet></Outlet>
+      </main>
     </div>
   );
 }

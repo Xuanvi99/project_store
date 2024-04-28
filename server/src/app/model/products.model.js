@@ -1,41 +1,65 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const slug = require("mongoose-slug-updater");
+const mongoose_delete = require("mongoose-delete");
+
 mongoose.plugin(slug);
 
 const ProductSchema = new Schema(
   {
-    name: { type: String, required: true, unique: true },
-    slug: { type: String, slug: "name", unique: true },
-    desc: { type: String, required: true },
-    brand: {
+    name: {
       type: String,
-      enum: ["Adidas", "LV", "Nike", "Vans"],
       required: true,
+      unique: true,
+      minLength: [3, "name must be at least 3 character"],
     },
-    banner: { type: Schema.Types.ObjectId, ref: "image" },
-    imageID: [{ type: Schema.Types.ObjectId, ref: "image", required: true }],
-    sizes: { type: Array, required: true },
-    quantity: { type: Number, require: true },
-    price: { type: Number, required: true },
-    discount: { type: Number, default: 0 },
-    flashSale: { type: Boolean, default: false },
-    commentID: [{ type: Schema.Types.ObjectId, ref: "comment" }],
-    sold: { type: Number, default: 0 },
-    is_Stock: {
-      type: Boolean,
-      default: false,
+    slug: { type: String, slug: "name", unique: true },
+    summary: { type: String, required: true, default: "" },
+    desc: { type: String, required: true, default: "" },
+    brand: { type: String, required: true },
+    thumbnail: { type: Schema.Types.ObjectId, ref: "images" },
+    price: { type: Number, required: true, default: 0 },
+    discount: { type: Number, default: 0, min: 0, max: 100 },
+    sale: { type: Boolean, default: false },
+    status: { type: String, enum: ["active", "deactive"], default: "deactive" },
+    imageIds: [{ type: Schema.Types.ObjectId, ref: "images", require: true }],
+    commentIds: [{ type: Schema.Types.ObjectId, ref: "comments" }],
+    categoryId: {
+      type: Schema.Types.ObjectId,
+      ref: "categories",
+      require: true,
+    },
+    inventoryId: {
+      type: Schema.Types.ObjectId,
+      ref: "inventories",
+      require: true,
     },
   },
   { timestamps: true }
 );
 
-ProductSchema.pre("save", function (next) {
-  const product = this;
-  if (product.quantity > 0) {
-    product.is_Stock = true;
-  }
-  return next();
+ProductSchema.plugin(mongoose_delete, {
+  deletedAt: true,
+  overrideMethods: "all",
 });
 
-module.exports = mongoose.model("product", ProductSchema);
+const productItemSchema = new Schema(
+  {
+    productId: {
+      type: Schema.Types.ObjectId,
+      ref: "products",
+      required: true,
+    },
+    size: { type: String, default: "" },
+    quantity: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+);
+
+const productModel = mongoose.model("products", ProductSchema);
+const productItemModel = mongoose.model("productItems", productItemSchema);
+
+module.exports = {
+  productModel,
+  productItemModel,
+};

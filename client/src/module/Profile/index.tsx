@@ -3,7 +3,7 @@ import ProfileInfo from "./infoUser";
 import FormEmail from "./infoUser/email";
 import FormInfoUser from "./infoUser/info";
 import ChangePassword from "./password";
-import SidebarProfile from "./sidebar/SidebarProfile";
+import SidebarProfile from "./sidebar";
 
 export {
   SidebarProfile,

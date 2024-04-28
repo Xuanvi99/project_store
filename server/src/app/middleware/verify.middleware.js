@@ -33,7 +33,7 @@ class verify {
 
   verifyRole = function (req, res, next) {
     const user = req.user;
-    if (user.role === "buyer") {
+    if (user.role === "admin") {
       next();
     } else {
       res.status(403).json({ ErrorMessage: "User not allowed" });
@@ -77,7 +77,6 @@ class verify {
     const password = req.body.password;
     try {
       const user = await userModel.findById(id).exec();
-      console.log("user: ", user);
       if (!user) {
         return res.status(404).json({ errMessage: "User not found!" });
       }

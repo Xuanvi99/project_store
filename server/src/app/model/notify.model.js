@@ -3,10 +3,10 @@ const Schema = mongoose.Schema;
 
 const NotifySchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "user" },
+    userId: { type: Schema.Types.ObjectId, ref: "users" },
     listNotify: [
       {
-        orderId: { type: Schema.Types.ObjectId, ref: "order" },
+        orderId: { type: Schema.Types.ObjectId, ref: "orders" },
         text: { type: String, require: true },
       },
     ],

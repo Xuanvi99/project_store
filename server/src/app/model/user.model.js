@@ -15,14 +15,15 @@ const UserSchema = new Schema(
     password: { type: String, default: "" },
     date: { type: String, default: new Date().toISOString().split("T")[0] },
     gender: { type: String, default: "other" },
-    avatar: { type: Schema.Types.ObjectId, ref: "image" },
+    avatar: { type: Schema.Types.ObjectId, ref: "images" },
     avatarDefault: {
       type: String,
       default:
         "https://res.cloudinary.com/damahknfx/image/upload/v1709063132/avatar/quz06h6htrcrlrm5furt.png",
     },
     blocked: { type: Boolean, default: false },
-    role: { type: String, enum: ["admin", "buyer"], default: "buyer" },
+    role: { type: String, enum: ["admin", "buyer", "staff"], default: "buyer" },
+    deleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
@@ -45,7 +46,9 @@ UserSchema.statics.findOneUser = async function (phoneOrEmail, password) {
   try {
     const user = await this.findOne({
       $or: [{ phone: phoneOrEmail }, { email: phoneOrEmail }],
-    }).exec();
+    })
+      .populate("avatar")
+      .exec();
     if (!user) return null;
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -77,4 +80,4 @@ UserSchema.methods.generateRefreshToken = function () {
   return refreshToken;
 };
 
-module.exports = mongoose.model("user", UserSchema);
+module.exports = mongoose.model("users", UserSchema);

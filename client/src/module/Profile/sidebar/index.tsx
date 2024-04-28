@@ -1,13 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import { IconWrite } from "../../../components/icon";
-import {
-  IconAddress,
-  IconProfile,
-  IconPassword,
-} from "../../../components/icon/SidebarProfile";
 import NavItem from "./NavItem";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "../../../hook";
+import {
+  IconAddress,
+  IconPassword,
+  IconProfile,
+} from "@/components/icon/SidebarProfile";
+import { useAppSelector } from "@/hook";
+import { RootState } from "@/stores";
+import { IconWrite } from "@/components/icon";
 
 const ListNavProfile = [
   {
@@ -36,7 +37,7 @@ function SidebarProfile() {
 
   const [checkPath, setCheckPath] = useState<boolean>(true);
 
-  const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
 
   const avatar = user?.avatar || null;
 
@@ -52,7 +53,7 @@ function SidebarProfile() {
       <div className="py-[15px] flex items-center gap-x-4 border-b-1 border-grayCa">
         <Link
           to={"/user/profile/info"}
-          className="w-12 h-12 basis-12 cursor-pointer rounded-full overflow-hidden"
+          className="w-12 h-12 overflow-hidden rounded-full cursor-pointer basis-12"
         >
           <img
             alt="error"

@@ -8,7 +8,7 @@ interface IButtonProps
   children?: React.ReactNode;
   className?: string;
   onClick?: () => void;
-  variant: "default" | "outLine" | "outLine-flex";
+  variant: "default" | "outLine" | "outLine-flex" | "outLine-border";
   href?: string;
 }
 
@@ -18,6 +18,8 @@ const styleVariant = (variant: string): string => {
       return "text-orange border-1 border-orange hover:text-white hover:bg-orangeLinear";
     case "outLine-flex":
       return "flex justify-center items-center duration-300 gap-x-1 border-1 text-orange border-orange hover:text-white hover:bg-orangeLinear";
+    case "outLine-border":
+      return "rounded-md cursor-pointer text-gray98 hover:text-orangeFe border-1 text-center";
     default:
       return "bg-orangeLinear text-white hover:opacity-80";
   }

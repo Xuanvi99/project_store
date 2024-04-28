@@ -3,5 +3,6 @@ const routes = express.Router();
 const { uploadFileMdw } = require("../middleware");
 const { fileCtl } = require("../controller");
 
-routes.route("/api/upload").post(uploadFileMdw.array("file", 10), fileCtl);
+routes.route("/api/uploadFile").post(uploadFileMdw.single("file", 1), fileCtl);
+
 module.exports = routes;

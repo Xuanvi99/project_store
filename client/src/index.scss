@@ -211,4 +211,20 @@
             transparent 82px
         );
     }
+
+    .navbar_Dashboard {
+        box-shadow: rgba(0, 0, 0, 0.2) 6px 0px 4px -4px;
+    }
+
+    .table_Ss {
+        border-collapse: collapse;
+        width: 100%;
+
+        th,
+        td {
+            padding: 8px 0px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+    }
 }

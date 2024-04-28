@@ -21,6 +21,10 @@ interface IDropdownFormProps<T> {
     select?: string;
     option?: string;
   };
+  add?: {
+    display: boolean;
+    onClick?: () => void;
+  };
   disable?: boolean;
   onClick: (option: T) => void;
 }
@@ -34,6 +38,7 @@ function DropdownForm<T extends FieldValues>({
   control,
   name,
   search,
+  add,
   onClick,
 }: IDropdownFormProps<options> & UseControllerProps<T>) {
   const selectValue = useWatch<T>({
@@ -100,10 +105,11 @@ function DropdownForm<T extends FieldValues>({
       {showOptions && (
         <div
           className={cn(
-            "w-full absolute left-0 top-[105%] rounded-b-md bg-white z-20 shadow-md shadow-black drop-shadow-dropdown"
+            "w-full absolute left-0 top-[105%] rounded-b-md bg-white z-20 shadow-md shadow-black drop-shadow-dropdown",
+            search?.place === "top" ? "flex flex-col" : "flex flex-col-reverse"
           )}
         >
-          {search?.display && search?.place === "top" && (
+          {search?.display && (
             <Input
               type="text"
               name="search"
@@ -112,7 +118,7 @@ function DropdownForm<T extends FieldValues>({
                 setTextSearch(event.target.value);
               }}
               className={{
-                input: "rounded-none text-sm border-b-2 border-b-gray",
+                input: "rounded-sm text-sm border-b-1 border-b-gray",
               }}
               placeholder="Tìm kiếm..."
             />
@@ -132,6 +138,11 @@ function DropdownForm<T extends FieldValues>({
             {listOptions.length === 0 && (
               <div className="px-1 py-2 font-semibold text-center text-red-600">
                 Không tìm thấy
+              </div>
+            )}
+            {add?.display && (
+              <div className="h-10 px-2 text-xs leading-10 text-center list-none cursor-pointer  border-grayCa hover:text-orange">
+                +Thêm thương hiệu
               </div>
             )}
           </div>

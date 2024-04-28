@@ -6,16 +6,25 @@ import { authApi } from "./service/auth.service";
 import { otpApi } from "./service/otp.service";
 import { cartApi } from "./service/cart.service";
 import { addressApi } from "./service/address.service";
+import { imageApi } from "./service/image.service";
+import { productApi } from "./service/product.service";
+import { categoryApi } from "./service/category.service";
 
 export const store = configureStore({
   reducer: rootReducer,
   middleware: (gDM) =>
-    gDM().concat([
+    gDM({
+      immutableCheck: false,
+      serializableCheck: false,
+    }).concat([
       userApi.middleware,
       authApi.middleware,
       otpApi.middleware,
       cartApi.middleware,
       addressApi.middleware,
+      imageApi.middleware,
+      productApi.middleware,
+      categoryApi.middleware,
     ]),
 });
 

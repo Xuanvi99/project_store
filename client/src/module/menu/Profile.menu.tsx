@@ -20,7 +20,6 @@ function Profile({
   handleLogOut,
   displayName,
 }: TProps) {
-  const avatar = user?.avatar || null;
   return (
     <>
       {!isLogin ? (
@@ -33,16 +32,21 @@ function Profile({
         <HoverDropdown
           select={
             <div className="flex items-center h-10 tex-sm gap-x-3">
-              {displayName && (
-                <span className="font-semibold ">{user?.userName}</span>
-              )}
               <span className="overflow-hidden rounded-full w-9 h-9">
                 <img
-                  alt=""
-                  srcSet={avatar?.url || user?.avatarDefault}
+                  alt="err"
+                  srcSet={user?.avatar?.url || user?.avatarDefault}
                   className="w-full h-full bg-cover"
                 />
               </span>
+              {displayName && (
+                <div className="flex flex-col items-center justify-center text-sm">
+                  <span className="font-semibold">{user?.userName}</span>
+                  <span className="text-xs text-slate-600">
+                    {user?.role === "admin" ? "Quản lí" : ""}
+                  </span>
+                </div>
+              )}
             </div>
           }
         >

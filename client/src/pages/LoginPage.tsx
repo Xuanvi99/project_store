@@ -33,10 +33,7 @@ function LoginPage() {
 
   const { state: location } = useLocation();
 
-  let pathname = "/";
-  if (location && location["path"]) {
-    pathname = location.path;
-  }
+  const pathname = location ? location.path : "/";
 
   const navigate = useNavigate();
 
@@ -51,7 +48,8 @@ function LoginPage() {
     handleSubmit,
     setFocus,
     reset,
-    formState: { errors, dirtyFields },
+    watch,
+    formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
       phoneOrEmail: "",
@@ -60,6 +58,7 @@ function LoginPage() {
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
+  // console.log(errors, !Object.keys(errors).length);
 
   const [openModal, setOpenModal] = useState<boolean>(false);
 
@@ -70,18 +69,18 @@ function LoginPage() {
   };
 
   const onSubmit = async (data: FormValues) => {
-    const res = await login(data)
+    await login(data)
       .unwrap()
+      .then((data) => {
+        dispatch(updateAuth({ ...data, isLogin: true }));
+      })
       .catch((error) => {
         if (error.status === 403) {
           setOpenModal(true);
           reset({ phoneOrEmail: "", password: "" });
         }
       });
-    if (res) {
-      dispatch(updateAuth({ ...res, isLogin: true }));
-      navigate(pathname, { replace: true });
-    }
+    navigate(pathname, { replace: true });
   };
 
   return (
@@ -109,12 +108,6 @@ function LoginPage() {
               id="phoneOrEmail"
               placeholder="Nhập email/số điện thoại..."
               error={errors["phoneOrEmail"] ? true : false}
-              className={{
-                input:
-                  dirtyFields.phoneOrEmail && !errors["phoneOrEmail"]
-                    ? "border-green text-green"
-                    : "",
-              }}
             />
             <ErrorInput text={errors["phoneOrEmail"]?.message} />
           </Field>
@@ -127,12 +120,6 @@ function LoginPage() {
               id="password"
               placeholder="xxxxxx"
               error={errors["password"] ? true : false}
-              className={{
-                input:
-                  dirtyFields.password && !errors["password"]
-                    ? "border-green "
-                    : "",
-              }}
             >
               <IconEye
                 size={20}
@@ -152,7 +139,13 @@ function LoginPage() {
 
           <div className="text-center">
             <Button
-              disabled={errors.valueOf() === true ? true : false}
+              disabled={
+                !Object.keys(errors).length &&
+                !!watch("phoneOrEmail") &&
+                !!watch("password")
+                  ? false
+                  : true
+              }
               type="submit"
               variant="default"
             >

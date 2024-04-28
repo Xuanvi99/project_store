@@ -3,6 +3,8 @@ import { useAppDispatch, useAppSelector } from "../../../hook";
 import Profile from "../../menu/Profile.menu";
 import { logOut } from "../../../stores/reducer/authReducer";
 import { useLogOutAuthMutation } from "../../../stores/service/auth.service";
+import Search from "../../menu/Search.menu";
+import { useState } from "react";
 
 function Header() {
   const { user, isLogin } = useAppSelector((state) => state.authSlice);
@@ -10,13 +12,20 @@ function Header() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  // if (user && user.role === "buyer") {
-  //   navigate("/", { replace: true });
-  // }
-
   const redirectUrl = import.meta.env.VITE_DOMAIN_CLIENT + pathname;
 
+  const [textSearch, setTextSearch] = useState<string>("");
+
   const [logOutAuth] = useLogOutAuthMutation();
+
+  const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTextSearch(event.target.value);
+  };
+
+  const handleSubmitSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    navigate(`/category/?search=${textSearch}`);
+  };
 
   const handleLogin = async () => {
     const query = encodeURIComponent(redirectUrl);
@@ -32,20 +41,30 @@ function Header() {
     navigate("/auth/login?next=" + query);
   };
   return (
-    <header className="w-full h-[50px] px-10 leading-10 py-2 bg-white flex justify-between">
-      <Link to={"/"} className="flex items-center cursor-pointer gap-x-2">
+    <header className="w-full h-[80px] fixed top-0 left-0 bg-white z-50  flex justify-between items-center border-b-1 border-orange">
+      <Link
+        to={"/"}
+        className="flex items-center justify-center cursor-pointer gap-x-2 basis-1/6"
+      >
         <img alt="" srcSet="/logo.png" loading="lazy" width={30} />
         <span className="text-2xl font-bold whitespace-nowrap text-orange">
           XVStore
         </span>
       </Link>
-      <Profile
-        isLogin={isLogin}
-        user={user}
-        handleLogin={handleLogin}
-        handleLogOut={handleLogOut}
-        displayName={true}
-      ></Profile>
+      <Search
+        valueInput={textSearch}
+        onChangeSearch={handleChangeSearch}
+        onSubmitSearch={handleSubmitSearch}
+      ></Search>
+      <div className="flex items-center justify-center w-[20%] ">
+        <Profile
+          isLogin={isLogin}
+          user={user}
+          handleLogin={handleLogin}
+          handleLogOut={handleLogOut}
+          displayName={true}
+        ></Profile>
+      </div>
     </header>
   );
 }
