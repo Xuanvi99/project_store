@@ -1,7 +1,7 @@
+import { Dropdown } from "@/components/dropdown";
+import { OptionPrice, OptionSearch } from "@/constant/category.constant";
+import { cn } from "@/utils";
 import { useState } from "react";
-import { Dropdown } from "../../../components/dropdown";
-import { OptionPrice, OptionSearch } from "../../../constant/category.constant";
-import { cn } from "../../../utils";
 
 function Header() {
   const [active, setActive] = useState<string>("1");
@@ -11,22 +11,22 @@ function Header() {
   };
 
   return (
-    <div className="flex flex-col items-start gap-y-5 w-full mb-2">
-      <div className="flex items-center font-bold justify-between  w-full">
-        <div className="basis-5/6 flex gap-x-2">
+    <div className="flex flex-col items-start w-full mb-2 gap-y-5">
+      <div className="flex items-center justify-between w-full font-bold">
+        <div className="flex basis-5/6 gap-x-2">
           <span className="text-orange">Từ khóa tìm kiếm:</span>
           <span className="max-w-[400px] line-clamp-1 whitespace-nowrap">
             'abc'
           </span>
         </div>
-        <div className="basis-1/6 flex gap-x-2">
+        <div className="flex basis-1/6 gap-x-2">
           <span className="text-orange">Kết Quả:</span>
           <span className="line-clamp-1">1000</span>
         </div>
       </div>
-      <div className="flex items-center gap-x-2 w-full mb-3">
+      <div className="flex items-center w-full mb-3 gap-x-2">
         <span className="text-sm">Sắp xếp theo:</span>
-        <div className="flex items-center gap-x-4 mr-3 text-sm">
+        <div className="flex items-center mr-3 text-sm gap-x-4">
           {OptionSearch.map((item, index) => {
             return (
               <button

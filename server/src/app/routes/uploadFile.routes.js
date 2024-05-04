@@ -1,8 +1,8 @@
 const express = require("express");
 const routes = express.Router();
 const { uploadFileMdw } = require("../middleware");
-const { fileCtl } = require("../controller");
+const { fileCtrl } = require("../controller");
 
-routes.route("/api/uploadFile").post(uploadFileMdw.single("file", 1), fileCtl);
+routes.route("/api/uploadFile").post(uploadFileMdw.single("file", 1), fileCtrl);
 
 module.exports = routes;

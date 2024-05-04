@@ -1,8 +1,8 @@
-import { IconStar } from "../../../components/icon";
 import ReviewsComment from "./ReviewsComment";
-import Modal from "../../../components/modal/index";
-import { useToggle } from "../../../hook";
-import FormComment from "../FormComment";
+import { IconStar } from "@/components/icon";
+import { useToggle } from "@/hook";
+import Modal from "@/components/modal";
+import FormComment from "./comment";
 
 const listStar = ["Tất cả", "5 sao", "4 sao", "3 sao", "2 sao", "1 sao"];
 

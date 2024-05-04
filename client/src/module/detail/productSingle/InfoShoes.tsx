@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { Button } from "@/components/button";
 import {
   IconClock,
   IconShoppingCart,
   IconStar,
   IconTag,
   IconTick,
-} from "../../../components/icon";
-import { cn } from "../../../utils";
-import { Button } from "../../../components/button";
+} from "@/components/icon";
+import { cn } from "@/utils";
+import { useState } from "react";
 
 type sizeShoes = "" | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44;
 

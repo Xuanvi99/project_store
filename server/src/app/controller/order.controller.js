@@ -55,4 +55,4 @@ class Order {
   };
 }
 
-model.exports = new Order();
+module.exports = new Order();

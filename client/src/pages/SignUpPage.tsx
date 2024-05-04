@@ -87,11 +87,16 @@ function SignUpPage() {
   return (
     <LayoutAuth>
       <ModalNotification isOpen={openModal} onClick={handleOpenModal}>
-        <IconAlert size={50}></IconAlert>
-        <span className="text-center">
-          <p>Số điện thoại bạn nhập đã đăng ký !</p>
-          <p> Bạn có thể đăng nhập</p>
-        </span>
+        <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
+          <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
+          <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
+            <IconAlert size={50}></IconAlert>
+            <span className="text-center">
+              <p>Số điện thoại bạn nhập đã đăng ký !</p>
+              <p> Bạn có thể đăng nhập</p>
+            </span>
+          </div>
+        </div>
       </ModalNotification>
       <div className="flex flex-col justify-center w-full px-10 pt-16">
         <div className="flex flex-col items-center gap-y-2">

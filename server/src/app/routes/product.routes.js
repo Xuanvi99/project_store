@@ -1,10 +1,10 @@
 const express = require("express");
-const { productCtl } = require("../controller");
+const { productCtrl } = require("../controller");
 const { uploadFileMdw } = require("../middleware");
 const { verifyMdw } = require("../middleware");
 const routes = express.Router();
 
-routes.route("/api/product/").get(productCtl.getListProduct);
+routes.route("/api/product/").get(productCtrl.getListProduct);
 routes.route("/api/product/").post(
   uploadFileMdw.fields([
     { name: "thumbnail", maxCount: 1 },
@@ -12,12 +12,27 @@ routes.route("/api/product/").post(
   ]),
   verifyMdw.verifyToken,
   verifyMdw.verifyRole,
-  productCtl.addProduct
+  productCtrl.addProduct
 );
 
 routes
+  .route("/api/product/checkName")
+  .post(
+    verifyMdw.verifyToken,
+    verifyMdw.verifyRole,
+    productCtrl.checkNameProduct
+  );
+
+routes.route("/api/product/listSale").get(productCtrl.getListProductSale);
+
+// routes.route("/api/product/abc").post(productCtrl.updateAbc);
+
+routes
+  .route("/api/product/:slugOrId")
+  .get(verifyMdw.verifyToken, productCtrl.getOneProduct);
+
+routes
   .route("/api/product/:productId")
-  .get(verifyMdw.verifyToken, productCtl.getOneProduct)
   .put(
     uploadFileMdw.fields([
       { name: "thumbnail", maxCount: 1 },
@@ -25,21 +40,17 @@ routes
     ]),
     verifyMdw.verifyToken,
     verifyMdw.verifyRole,
-    productCtl.updateProduct
+    productCtrl.updateProduct
   )
-  .delete(verifyMdw.verifyToken, verifyMdw.verifyRole, productCtl.deleteProduct)
+  .delete(
+    verifyMdw.verifyToken,
+    verifyMdw.verifyRole,
+    productCtrl.deleteProduct
+  )
   .patch(
     verifyMdw.verifyToken,
     verifyMdw.verifyRole,
-    productCtl.restoreProduct
-  );
-
-routes
-  .route("/api/product/checkName")
-  .post(
-    verifyMdw.verifyToken,
-    verifyMdw.verifyRole,
-    productCtl.checkNameProduct
+    productCtrl.restoreProduct
   );
 
 module.exports = routes;

@@ -1,24 +1,24 @@
 const express = require("express");
-const { commentCtl } = require("../controller");
+const { commentCtrl } = require("../controller");
 const { uploadFileMdw } = require("../middleware");
 const { verifyMdw } = require("../middleware");
 const routes = express.Router();
 
-routes.route("/api/comment/getAll").get(commentCtl.getAllComment);
+routes.route("/api/comment/getAll").get(commentCtrl.getAllComment);
 routes
   .route("/api/comment")
   .post(
     uploadFileMdw.array("images", 10),
     verifyMdw.verifyToken,
-    commentCtl.addComment
+    commentCtrl.addComment
   );
 routes
   .route("/api/comment/:commentId")
-  .get(verifyMdw.verifyToken, commentCtl.getOneComment)
+  .get(verifyMdw.verifyToken, commentCtrl.getOneComment)
   .post(
     uploadFileMdw.array("images", 10),
     verifyMdw.verifyToken,
-    commentCtl.updateComment
+    commentCtrl.updateComment
   )
-  .put(verifyMdw.verifyToken, verifyMdw.verifyRole, commentCtl.deleteComment);
+  .put(verifyMdw.verifyToken, verifyMdw.verifyRole, commentCtrl.deleteComment);
 module.exports = routes;

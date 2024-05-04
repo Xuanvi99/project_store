@@ -86,10 +86,15 @@ function LoginPage() {
   return (
     <LayoutAuth>
       <ModalNotification isOpen={openModal} onClick={handleOpenModal}>
-        <IconAlert size={50}></IconAlert>
-        <span className="text-center">
-          <p>Tài Khoản hoặc mật khẩu không đúng</p>
-        </span>
+        <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
+          <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
+          <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
+            <IconAlert size={50}></IconAlert>
+            <span className="text-center">
+              <p>Tài Khoản hoặc mật khẩu không đúng</p>
+            </span>
+          </div>
+        </div>
       </ModalNotification>
       <div className="w-full h-full px-10 pt-5 bg-white text-grayDark">
         <div className="flex flex-col items-center mt-5 gap-y-2">

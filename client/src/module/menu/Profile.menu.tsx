@@ -1,25 +1,46 @@
-import { Link } from "react-router-dom";
-import { Button } from "../../components/button";
-import { IconUser } from "../../components/icon";
-import { cn } from "../../utils";
+import { Button } from "@/components/button";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import HoverDropdown from "./HoverDropdown";
-import { IUser } from "../../types/commonType";
+import { IconUser } from "@/components/icon";
+import { cn } from "@/utils";
+import { useLogOutAuthMutation } from "@/stores/service/auth.service";
+import { useAppDispatch, useAppSelector } from "@/hook";
+import { RootState } from "@/stores";
+import { logOut } from "@/stores/reducer/authReducer";
+import { updateCart } from "@/stores/reducer/cartReducer";
 
 type TProps = {
-  isLogin: boolean | undefined;
-  user: IUser | null;
-  handleLogin?: () => void;
-  handleLogOut?: () => void;
   displayName?: boolean;
 };
 
-function Profile({
-  isLogin,
-  user,
-  handleLogin,
-  handleLogOut,
-  displayName,
-}: TProps) {
+function Profile({ displayName }: TProps) {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const redirectUrl = import.meta.env.VITE_DOMAIN_CLIENT + pathname;
+
+  const { user, isLogin } = useAppSelector(
+    (state: RootState) => state.authSlice
+  );
+
+  const [logOutAuth] = useLogOutAuthMutation();
+
+  const handleLogin = async () => {
+    const query = encodeURIComponent(redirectUrl);
+    navigate("/auth/login?next=" + query, { state: { path: pathname } });
+  };
+
+  const handleLogOut = async () => {
+    dispatch(logOut());
+    dispatch(updateCart({ cart: null }));
+    await logOutAuth()
+      .unwrap()
+      .then((res) => console.log("logout", res.message));
+    const query = encodeURIComponent(redirectUrl);
+    navigate("/auth/login?next=" + query, { state: { path: pathname } });
+  };
+
   return (
     <>
       {!isLogin ? (

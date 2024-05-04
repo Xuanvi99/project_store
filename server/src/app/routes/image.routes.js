@@ -1,27 +1,29 @@
 const express = require("express");
-const { imageCtl } = require("../controller");
+const { imageCtrl } = require("../controller");
 const { verifyMdw } = require("../middleware");
 const { uploadFileMdw } = require("../middleware");
 
 const routes = express.Router();
 
-routes.route("/api/image/createSingle").post(
-  uploadFileMdw.single("image", 1),
-  // verifyMdw.verifyToken,
-  imageCtl.createSingle
-);
+routes
+  .route("/api/image/createSingle")
+  .post(
+    uploadFileMdw.single("image", 1),
+    verifyMdw.verifyToken,
+    imageCtrl.createSingle
+  );
 routes
   .route("/api/image/createMultiple")
   .post(
     uploadFileMdw.array("image", 10),
     verifyMdw.verifyToken,
-    imageCtl.createMultiple
+    imageCtrl.createMultiple
   );
 
 routes
   .route("/api/image/remove")
-  .delete(verifyMdw.verifyToken, imageCtl.remove);
+  .delete(verifyMdw.verifyToken, imageCtrl.remove);
 
-routes.route("/api/image/removeWithUrl").delete(imageCtl.removeWithUrl);
+routes.route("/api/image/removeWithUrl").delete(imageCtrl.removeWithUrl);
 
 module.exports = routes;

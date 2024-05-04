@@ -1,15 +1,15 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { IconBack, IconEye } from "../../../components/icon";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import LoadingSpinner from "../../../components/loading";
-import { Button } from "../../../components/button";
-import { InputForm } from "../../../components/input";
-import Field from "../../../components/fields";
-import { useToggle } from "../../../hook";
-import { ErrorInput } from "../../../components/error";
-import { useVerifyPasswordMutation } from "../../../stores/service/user.service";
+import { useToggle } from "@/hook";
+import { useVerifyPasswordMutation } from "@/stores/service/user.service";
+import { IconBack, IconEye } from "@/components/icon";
+import Field from "@/components/fields";
+import { InputForm } from "@/components/input";
+import { ErrorInput } from "@/components/error";
+import { Button } from "@/components/button";
+import LoadingSpinner from "@/components/loading";
 
 const validatingSchema = Yup.object({
   password: Yup.string().required("Vui lòng điền vào mục này"),

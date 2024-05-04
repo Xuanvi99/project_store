@@ -1,6 +1,6 @@
-import { Button } from "../../../../components/button";
-import useTestContext from "../../../../hook/useTestContext";
+import useTestContext from "@/hook/useTestContext";
 import { CreatePdContext, ICreatePdProvide } from "./CreatePdContext";
+import { Button } from "@/components/button";
 
 function Header() {
   const { activeStep, handleActiveStep } = useTestContext<ICreatePdProvide>(

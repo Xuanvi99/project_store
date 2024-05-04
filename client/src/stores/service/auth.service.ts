@@ -1,5 +1,5 @@
+import { IUser } from "@/types/user.type";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { IUser } from "../../types/commonType";
 
 type TArg = { phoneOrEmail: string; password: string; code?: string };
 

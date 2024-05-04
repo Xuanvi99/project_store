@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { IUser } from "../../types/commonType";
 import { baseQueryWithAuth } from "../baseQueryToken";
+import { IUser } from "@/types/user.type";
 
 type TArg = {
   [Property in keyof Omit<

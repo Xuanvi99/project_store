@@ -1,5 +1,6 @@
 import ProductSingle from "./productSingle";
-import ProductDesc from "./productDesc/ProductDesc.detail";
+import ProductDesc from "./productDesc";
 import ProductReviews from "./productReviews";
+import ProductSummary from "./productSummary";
 
-export { ProductSingle, ProductReviews, ProductDesc };
+export { ProductSingle, ProductReviews, ProductDesc, ProductSummary };

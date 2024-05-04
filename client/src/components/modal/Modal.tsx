@@ -41,7 +41,7 @@ function Modal({ children, onClick, isOpenModal, className }: IModalBaseProps) {
             className?.overlay
           )}
         ></div>
-        <div className={className?.content}>{children}</div>
+        <div className={cn("z-[60]", className?.content)}>{children}</div>
       </div>
     </Portal>
   );

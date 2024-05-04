@@ -1,23 +1,25 @@
-const userCtl = require("./user.controller");
-const authCtl = require("./auth.controller");
-const fileCtl = require("./file.controller");
-const codeOTPCtl = require("./codeOTP.controller");
-const productCtl = require("./product.controller");
-const commentCtl = require("./comment.controller");
-const cartCtl = require("./cart.controller");
-const addressCtl = require("./address.controller");
-const categoryCtl = require("./category.controller");
-const imageCtl = require("./image.controller");
+const userCtrl = require("./user.controller");
+const authCtrl = require("./auth.controller");
+const fileCtrl = require("./file.controller");
+const codeOTPCtrl = require("./codeOTP.controller");
+const productCtrl = require("./product.controller");
+const commentCtrl = require("./comment.controller");
+const cartCtrl = require("./cart.controller");
+const addressCtrl = require("./address.controller");
+const categoryCtrl = require("./category.controller");
+const imageCtrl = require("./image.controller");
+const saleCtrl = require("./sale.controller");
 
 module.exports = {
-  userCtl,
-  authCtl,
-  fileCtl,
-  codeOTPCtl,
-  productCtl,
-  commentCtl,
-  cartCtl,
-  addressCtl,
-  categoryCtl,
-  imageCtl,
+  userCtrl,
+  authCtrl,
+  fileCtrl,
+  codeOTPCtrl,
+  productCtrl,
+  commentCtrl,
+  cartCtrl,
+  addressCtrl,
+  categoryCtrl,
+  imageCtrl,
+  saleCtrl,
 };

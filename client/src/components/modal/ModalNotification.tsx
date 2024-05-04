@@ -1,35 +1,41 @@
+import { useEffect } from "react";
 import Modal from ".";
+import { cn } from "@/utils";
 
 type TProps = {
   isOpen: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  className?: {
+    overlay?: string;
+    content?: string;
+  };
 };
 
-function ModalNotification({ isOpen, onClick, children }: TProps) {
-  if (isOpen) {
-    let countDown = 5;
-    const timer = setInterval(function () {
-      countDown--;
-      if (countDown === 0) {
-        onClick();
-        clearInterval(timer);
-      }
-    }, 800);
-  }
+function ModalNotification({ isOpen, onClick, children, className }: TProps) {
+  useEffect(() => {
+    if (isOpen) {
+      let countDown = 5;
+      const timer = setInterval(function () {
+        countDown--;
+        if (countDown === 0) {
+          onClick();
+          clearInterval(timer);
+        }
+      }, 800);
+    }
+  }, [isOpen, onClick]);
 
   return (
     <Modal
       isOpenModal={isOpen}
       onClick={onClick}
-      className={{ overlay: "opacity-0" }}
+      className={{
+        overlay: cn("opacity-0", className?.overlay),
+        content: className?.content,
+      }}
     >
-      <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
-        <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
-        <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
-          {children}
-        </div>
-      </div>
+      {children}
     </Modal>
   );
 }

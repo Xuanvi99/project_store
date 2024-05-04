@@ -1,9 +1,13 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ImageListType } from "react-images-uploading";
-import { IconCLose, IconCamera, IconRemoveBtn } from "../../components/icon";
 import ImageUploading from "react-images-uploading";
-import { cn } from "../../utils";
-import IconStar from "../../components/icon/IconStar";
+import { cn } from "@/utils";
+import {
+  IconCLose,
+  IconCamera,
+  IconRemoveBtn,
+  IconStar,
+} from "@/components/icon";
 
 type IFormComponent = {
   handleCloseForm: () => void;

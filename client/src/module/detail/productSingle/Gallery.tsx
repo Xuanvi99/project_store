@@ -1,11 +1,11 @@
+import CardSales from "@/components/card/Sale.card";
+import { IconCLose, IconExpand } from "@/components/icon";
+import Modal from "@/components/modal";
+import SlideSwiper from "@/components/slideshows";
+import { useToggle } from "@/hook";
+import { cn } from "@/utils";
 import { useState } from "react";
-import SlideSwiper from "../../../components/slideshows";
 import { SwiperSlide } from "swiper/react";
-import CardSales from "../../../components/card/CardSales";
-import { IconCLose, IconExpand } from "../../../components/icon";
-import { cn } from "../../../utils";
-import { useToggle } from "../../../hook";
-import Modal from "../../../components/modal";
 
 const listImage = [
   "/shoes.jpg",
@@ -103,7 +103,7 @@ const Gallery = () => {
         <Modal
           isOpenModal={showModal}
           onClick={handleShowModal}
-          className="absolute inset-0 z-50 w-full h-screen"
+          className={{ content: "absolute inset-0 z-50 w-full h-screen" }}
         >
           <div className="flex flex-col justify-between w-full h-full">
             <div className="h-[50px] flex justify-between items-center text-white px-5">

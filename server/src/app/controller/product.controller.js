@@ -9,10 +9,12 @@ const {
 
 class Product {
   getListProduct = async (req, res) => {
-    const page = +req.query.page || 1;
+    const activePage = +req.query.activePage;
     const search = req.query.search || "";
-    const limit = req.query.limit || 10;
-    const skip = (page - 1) * limit;
+    const limit = req.query.limit;
+    const productId = req.query.productId || null;
+    const skip = (activePage - 1) * limit;
+
     try {
       const listProduct = await productModel
         .find({
@@ -22,8 +24,10 @@ class Product {
                 { name: { $regex: search, $options: "i" } },
                 { brand: { $regex: search, $options: "i" } },
                 { slug: { $regex: search, $options: "i" } },
+                { is_sale: { $regex: search, $options: "i" } },
               ],
             },
+            { _id: { $ne: productId } },
           ],
         })
         .populate([
@@ -31,26 +35,63 @@ class Product {
           { path: "imageIds", select: "url" },
           { path: "commentIds" },
           { path: "inventoryId", select: "_id sold total stocked" },
+          { path: "saleId" },
         ])
+        .sort({ $natural: -1 })
         .skip(skip)
         .limit(limit);
 
       let totalPage = 0;
       if (search) {
         const countProduct = await productModel.find({
-          $or: [
-            { name: { $regex: search, $options: "i" } },
-            { brand: { $regex: search, $options: "i" } },
+          $and: [
+            {
+              $or: [
+                { name: { $regex: search, $options: "i" } },
+                { brand: { $regex: search, $options: "i" } },
+                { slug: { $regex: search, $options: "i" } },
+                { is_sale: { $regex: search, $options: "i" } },
+              ],
+            },
+            { _id: { $ne: productId } },
           ],
         });
-
         totalPage = Math.ceil(countProduct.length / limit);
       } else {
         const countProduct = await productModel.countDocuments();
         totalPage = Math.ceil(countProduct / limit);
       }
 
-      res.status(200).json({ listProduct, totalPage });
+      res.status(200).json({ data: listProduct, totalPage });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  getListProductSale = async (req, res) => {
+    const activePage = +req.query.activePage;
+    const is_sale = req.query.is_sale;
+    const limit = req.query.limit;
+    const skip = (activePage - 1) * limit;
+
+    try {
+      const listProduct = await productModel
+        .find({ is_sale })
+        .populate([
+          { path: "thumbnail", select: "url" },
+          { path: "imageIds", select: "url" },
+          { path: "commentIds" },
+          { path: "inventoryId", select: "_id sold total stocked" },
+          { path: "saleId" },
+        ])
+        .sort({ $natural: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      const countProduct = await productModel.find({ is_sale });
+      const totalPage = Math.ceil(countProduct.length / limit);
+
+      res.status(200).json({ data: listProduct, totalPage });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
@@ -58,16 +99,17 @@ class Product {
 
   getOneProduct = async (req, res) => {
     try {
-      const productId = req.params.productId;
-      if (!productId)
-        return res.status(403).json({ message: "Invalid productId " });
+      const slugOrId = req.params.slugOrId;
+      if (!slugOrId)
+        return res.status(403).json({ errorMessage: "Invalid slug or íd" });
       const product = await productModel
-        .findOne({ _id: productId })
+        .findOne({ $or: [{ _id: slugOrId }, { slug: slugOrId }] })
         .populate([
           { path: "thumbnail", select: "url" },
           { path: "imageIds", select: "url" },
           { path: "commentIds" },
           { path: "inventoryId", select: "_id sold total stocked" },
+          { path: "saleId" },
         ])
         .lean();
       if (!product) {
@@ -75,7 +117,7 @@ class Product {
           .status(404)
           .json({ message: "ProductId not exit in product" });
       }
-      res.status(200).json({ product });
+      res.status(200).json({ data: product });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
@@ -272,6 +314,19 @@ class Product {
       res.status(500).json({ errMessage: "server error" });
     }
   };
+
+  // updateAbc = async (req, res) => {
+  //   const name = req.body.name;
+  //   try {
+  //     const ids = await productModel.updateMany(
+  //       {},
+  //       { $set: { is_sale: "normal" } }
+  //     );
+  //     res.status(200).json({ message: "Tên sản phẩm hợp lệ" });
+  //   } catch (error) {
+  //     res.status(500).json({ errMessage: "server error" });
+  //   }
+  // };
 }
 
 module.exports = new Product();

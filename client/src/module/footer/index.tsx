@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { IconChevronLeft } from "../../components/icon";
-import { cn } from "../../utils";
 import { useEffect, useState } from "react";
+import { IconChevronLeft } from "@/components/icon";
+import { cn } from "@/utils";
 
 function Footer() {
   const [scroll, setScroll] = useState<boolean>(false);

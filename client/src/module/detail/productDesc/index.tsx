@@ -1,5 +1,5 @@
-import { cn } from "../../../utils";
-import IconChevronRight from "../../../components/icon/IconChevronRight";
+import { IconChevronRight } from "@/components/icon";
+import { cn } from "@/utils";
 import { useState } from "react";
 
 function ProductDesc() {
@@ -56,10 +56,10 @@ function ProductDesc() {
             )}
           >
             <button className="text-lg relative text-gray w-[100px] h-full flex items-end justify-center">
-              <span className="rotate-90 arrow-top absolute  left-1/2 -translate-x-1/2">
+              <span className="absolute rotate-90 -translate-x-1/2 arrow-top left-1/2">
                 <IconChevronRight size={25}></IconChevronRight>
               </span>
-              <span className="rotate-90 arrow-bottom absolute  left-1/2 -translate-x-1/2">
+              <span className="absolute rotate-90 -translate-x-1/2 arrow-bottom left-1/2">
                 <IconChevronRight size={25}></IconChevronRight>
               </span>
               <span className="hover:text-orange">Xem tiếp</span>

@@ -1,10 +1,10 @@
 import { createContext, useState } from "react";
-import { IProductReq } from "../../../../types/product.type";
 import React from "react";
 import { ImageListType } from "react-images-uploading";
-import { useAddProductMutation } from "../../../../stores/service/product.service";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { SerializedError } from "@reduxjs/toolkit";
+import { IProductReq } from "@/types/product.type";
+import { useAddProductMutation } from "@/stores/service/product.service";
 
 export interface ICreatePdProvide {
   data: IProductReq;
@@ -117,6 +117,7 @@ function CreatePdProvide({ children }: { children: React.ReactNode }) {
       images: null,
       specs: "",
     });
+
     setActiveStep("1");
 
     setUploadImages({
@@ -125,6 +126,8 @@ function CreatePdProvide({ children }: { children: React.ReactNode }) {
     });
 
     setSpecs([{ size: 0, quantity: 0 }]);
+
+    setModifyTable(false);
   };
 
   const handleSubmitProduct = async () => {
@@ -138,15 +141,9 @@ function CreatePdProvide({ children }: { children: React.ReactNode }) {
         formData.append(keys, value);
       }
     }
-    await addProduct(formData)
-      .unwrap()
-      .then(() => {
-        if (!isLoading && isSuccess) {
-          setActiveStep("1");
-          handleReset();
-        }
-      })
-      .catch(() => {});
+    await addProduct(formData).unwrap();
+    setActiveStep("1");
+    handleReset();
   };
 
   return (

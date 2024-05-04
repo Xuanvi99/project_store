@@ -42,20 +42,20 @@ class verify {
 
   verifyLoginGoogle = async function (req, res, next) {
     const { name: userName, email, email_verified } = req.body;
+    if (!email_verified) {
+      return res.status(403).json({
+        errorMessage: "Google email not verified",
+      });
+    }
     try {
-      if (!email_verified) {
-        return res.status(403).json({
-          errorMessage: "Google email not verified",
-        });
-      }
       const user = await userModel
         .findOne({ email: email })
         .populate("avatar")
         .exec();
       if (!user) {
         const newUser = new userModel({
-          userName,
-          email,
+          phone: "022121",
+          password: "aaaaaaaaa",
         });
         const result = await newUser.save();
         req.user = result;
@@ -66,9 +66,9 @@ class verify {
       } else {
         req.user = user;
       }
-      next();
+      return next();
     } catch (error) {
-      res.status(500).json({ errMessage: "server error" });
+      res.status(500).json({ errMessage: "server error1" });
     }
   };
 

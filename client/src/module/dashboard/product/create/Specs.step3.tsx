@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import { Button } from "../../../../components/button";
-import { IconChevronLeft, IconDelete } from "../../../../components/icon";
-import useTestContext from "../../../../hook/useTestContext";
+import { Fragment, useEffect, useState } from "react";
 import { CreatePdContext, ICreatePdProvide } from "./CreatePdContext";
 import { useFieldArray, useForm } from "react-hook-form";
 import * as Yup from "yup";
-import { InputForm } from "../../../../components/input";
 import { yupResolver } from "@hookform/resolvers/yup";
-import LoadingSpinner from "../../../../components/loading";
+import { InputForm } from "@/components/input";
+import { IconChevronLeft, IconDelete } from "@/components/icon";
+import { Button } from "@/components/button";
+
+import useTestContext from "@/hook/useTestContext";
+import Modal from "@/components/modal";
+import LoadingSpinner from "../../../../components/loading/index";
 
 function Specs() {
   const {
@@ -81,6 +83,8 @@ function Specs() {
     control,
     name: "data",
   });
+
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -156,6 +160,18 @@ function Specs() {
     trigger();
   };
 
+  const handleOpenModal = () => {
+    if (!isLoading) {
+      setOpenModal(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoading) {
+      setOpenModal(false);
+    }
+  }, [isLoading]);
+
   const onSubmit = async (data: FormValues) => {
     if (modifyTable) {
       handleModifyTable(false);
@@ -168,179 +184,190 @@ function Specs() {
   };
 
   return (
-    <div className="mt-7">
-      <div className="flex flex-col items-start gap-y-2">
-        <h1 className="font-semibold">Thông số sản phẩm</h1>
-        <p className="text-sm text-gray98">Điền đầy đủ thông tin bên dưới</p>
-      </div>
-      <div className="flex justify-center mt-10">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col p-5 gap-y-5 border-1 border-grayCa"
-        >
-          <h1 className="text-xl font-semibold text-center">
-            Bảng Size - Số lượng
-          </h1>
-          <table className="w-[500px] table_Ss text-center">
-            <tbody>
-              <tr className="text-base font-semibold">
-                <th>Stt</th>
-                <th>Size</th>
-                <th>Số lượng</th>
-                {!modifyTable && <th>Công cụ</th>}
-              </tr>
-            </tbody>
-            {fields.map((field, index) => {
-              return (
-                <tbody key={field.id}>
-                  <tr>
-                    <td>{index + 1}</td>
-                    <td>
-                      <InputForm
-                        control={control}
-                        type="number"
-                        name={`data.${index}.size` as const}
-                        id={`data.${index}.size` as const}
-                        min={35}
-                        max={44}
-                        disabled={modifyTable}
-                        onBlur={() => handleBLurInput(index)}
-                        onFocus={() => handleFocusInput(index, "size")}
-                        onChange={(event) => handleChangeInput(event, "size")}
-                        className={{
-                          input: `w-[50px] text-base text-center font-medium border-transparent border-b-2 border-b-gray rounded-none ${
-                            errors &&
-                            errors.data &&
-                            errors.data.length &&
-                            errors.data.length > 0 &&
-                            errors.data[index]?.size &&
-                            "border-b-danger text-danger"
-                          }  ${modifyTable && "border-none bg-white"}`,
-                        }}
-                      />
-                    </td>
-                    <td>
-                      <InputForm
-                        control={control}
-                        type="number"
-                        name={`data.${index}.quantity` as const}
-                        id={`data.${index}.quantity` as const}
-                        min={0}
-                        disabled={modifyTable}
-                        onBlur={() => handleBLurInput(index)}
-                        onFocus={() => handleFocusInput(index, "quantity")}
-                        onChange={(event) =>
-                          handleChangeInput(event, "quantity")
-                        }
-                        className={{
-                          input: `w-[150px] text-base text-center border-transparent border-b-2 border-b-gray rounded-none transition-all ${
-                            errors &&
-                            errors.data &&
-                            errors.data.length &&
-                            errors.data.length > 0 &&
-                            errors.data[index]?.quantity &&
-                            "border-b-danger text-danger"
-                          } ${modifyTable && "border-none bg-white"}`,
-                        }}
-                      />
-                    </td>
-                    {!modifyTable && (
-                      <td className="leading-[30px] flex justify-center">
-                        <span
-                          className="py-2 mb-[3.5px]"
-                          onClick={() => {
-                            remove(index);
-                            setWatchData(watch().data);
-                            handleSaveStep3(watch().data);
-                          }}
-                        >
-                          <IconDelete size={20}></IconDelete>
-                        </span>
-                      </td>
-                    )}
-                  </tr>
-                </tbody>
-              );
-            })}
-          </table>
-          {fields.length > 0 && (
-            <div className="w-[500px] flex gap-x-5 text-sm font-semibold">
-              <span>Tổng số lượng:</span>
-              <span>{total}</span>
-            </div>
-          )}
-          <div
-            className={`flex items-center  ${
-              !modifyTable ? "justify-between" : "justify-center"
-            }`}
+    <Fragment>
+      <Modal
+        isOpenModal={openModal}
+        onClick={handleOpenModal}
+        className={{
+          overlay: "opacity-50 bg-white a",
+          content:
+            "bg-black w-[350px] h-[200px] rounded-md opacity-75 flex justify-center items-center gap-x-5 text-white font-semibold",
+        }}
+      >
+        <LoadingSpinner className="w-10 h-10 border-4"></LoadingSpinner>
+        <span>Đang tạo sản phẩm...</span>
+      </Modal>
+      <div className="mt-7">
+        <div className="flex flex-col items-start gap-y-2">
+          <h1 className="font-semibold">Thông số sản phẩm</h1>
+          <p className="text-sm text-gray98">Điền đầy đủ thông tin bên dưới</p>
+        </div>
+        <div className="flex justify-center mt-10">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col p-5 gap-y-5 border-1 border-grayCa"
           >
-            {!modifyTable && (
-              <Button
-                variant="outLine-border"
-                className="inline p-2 text-xs"
-                onClick={() => {
-                  append({
-                    size: 0,
-                    quantity: 0,
-                  });
-                  setWatchData(watch().data);
-                  handleSaveStep3(watch().data);
-                }}
-              >
-                +Thêm Size-Số lượng
-              </Button>
-            )}
+            <h1 className="text-xl font-semibold text-center">
+              Bảng Size - Số lượng
+            </h1>
+            <table className="w-[500px] table_Ss text-center">
+              <tbody>
+                <tr className="text-base font-semibold">
+                  <th>Stt</th>
+                  <th>Size</th>
+                  <th>Số lượng</th>
+                  {!modifyTable && <th>Công cụ</th>}
+                </tr>
+              </tbody>
+              {fields.map((field, index) => {
+                return (
+                  <tbody key={field.id}>
+                    <tr>
+                      <td>{index + 1}</td>
+                      <td>
+                        <InputForm
+                          control={control}
+                          type="number"
+                          name={`data.${index}.size` as const}
+                          id={`data.${index}.size` as const}
+                          min={35}
+                          max={44}
+                          disabled={modifyTable}
+                          onBlur={() => handleBLurInput(index)}
+                          onFocus={() => handleFocusInput(index, "size")}
+                          onChange={(event) => handleChangeInput(event, "size")}
+                          className={{
+                            input: `w-[50px] text-base text-center font-medium border-transparent border-b-2 border-b-gray rounded-none ${
+                              errors &&
+                              errors.data &&
+                              errors.data.length &&
+                              errors.data.length > 0 &&
+                              errors.data[index]?.size &&
+                              "border-b-danger text-danger"
+                            }  ${modifyTable && "border-none bg-white"}`,
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <InputForm
+                          control={control}
+                          type="number"
+                          name={`data.${index}.quantity` as const}
+                          id={`data.${index}.quantity` as const}
+                          min={0}
+                          disabled={modifyTable}
+                          onBlur={() => handleBLurInput(index)}
+                          onFocus={() => handleFocusInput(index, "quantity")}
+                          onChange={(event) =>
+                            handleChangeInput(event, "quantity")
+                          }
+                          className={{
+                            input: `w-[150px] text-base text-center border-transparent border-b-2 border-b-gray rounded-none transition-all ${
+                              errors &&
+                              errors.data &&
+                              errors.data.length &&
+                              errors.data.length > 0 &&
+                              errors.data[index]?.quantity &&
+                              "border-b-danger text-danger"
+                            } ${modifyTable && "border-none bg-white"}`,
+                          }}
+                        />
+                      </td>
+                      {!modifyTable && (
+                        <td className="leading-[30px] flex justify-center">
+                          <span
+                            className="py-2 mb-[3.5px]"
+                            onClick={() => {
+                              remove(index);
+                              setWatchData(watch().data);
+                              handleSaveStep3(watch().data);
+                            }}
+                          >
+                            <IconDelete size={20}></IconDelete>
+                          </span>
+                        </td>
+                      )}
+                    </tr>
+                  </tbody>
+                );
+              })}
+            </table>
             {fields.length > 0 && (
-              <div className="flex justify-end">
-                <Button
-                  variant="default"
-                  type="submit"
-                  className="max-w-[120px] flex items-center text-xs"
-                  disabled={Object.keys(errors).length === 0 ? false : true}
-                >
-                  {!modifyTable ? "Lưu" : "Thay đổi"}
-                </Button>
+              <div className="w-[500px] flex gap-x-5 text-sm font-semibold">
+                <span>Tổng số lượng:</span>
+                <span>{total}</span>
               </div>
             )}
-          </div>
-          {!modifyTable && fields.length > 0 && (
-            <div className="w-[500px] flex justify-start text-sm gap-x-5 items-start text-gray">
-              <span className="font-semibold text-gray">Chú ý:</span>
-              <ul className="flex flex-col text-xs gap-y-1">
-                <li> - Size giày giới hạn từ 35 {"=>"} 44</li>
-                <li> - Không được nhập trùng lặp size </li>
-                <li> - Giá trị nhập phải {">="}0 </li>
-              </ul>
+            <div
+              className={`flex items-center  ${
+                !modifyTable ? "justify-between" : "justify-center"
+              }`}
+            >
+              {!modifyTable && (
+                <Button
+                  variant="outLine-border"
+                  className="inline p-2 text-xs"
+                  onClick={() => {
+                    append({
+                      size: 0,
+                      quantity: 0,
+                    });
+                    setWatchData(watch().data);
+                    handleSaveStep3(watch().data);
+                  }}
+                >
+                  +Thêm Size-Số lượng
+                </Button>
+              )}
+              {fields.length > 0 && (
+                <div className="flex justify-end">
+                  <Button
+                    variant="default"
+                    type="submit"
+                    className="max-w-[120px] flex items-center text-xs"
+                    disabled={Object.keys(errors).length === 0 ? false : true}
+                  >
+                    {!modifyTable ? "Lưu" : "Thay đổi"}
+                  </Button>
+                </div>
+              )}
             </div>
-          )}
-        </form>
+            {!modifyTable && fields.length > 0 && (
+              <div className="w-[500px] flex justify-start text-sm gap-x-5 items-start text-gray">
+                <span className="font-semibold text-gray">Chú ý:</span>
+                <ul className="flex flex-col text-xs gap-y-1">
+                  <li> - Size giày giới hạn từ 35 {"=>"} 44</li>
+                  <li> - Không được nhập trùng lặp size </li>
+                  <li> - Giá trị nhập phải {">="}0 </li>
+                </ul>
+              </div>
+            )}
+          </form>
+        </div>
+        <div className="flex justify-end w-full mt-10 gap-x-3">
+          <Button
+            variant="default"
+            onClick={() => handleActiveStep("2")}
+            disabled={isLoading}
+            className="max-w-[120px] flex items-center text-sm"
+          >
+            <IconChevronLeft size={20}></IconChevronLeft>
+            <span>Quay lại</span>
+          </Button>
+          <Button
+            variant="default"
+            disabled={!modifyTable || isLoading ? true : false}
+            onClick={() => {
+              setOpenModal(true);
+              handleSubmitProduct();
+            }}
+            className="max-w-[150px] flex items-center text-sm"
+          >
+            <span>Tạo sản phẩm</span>
+          </Button>
+        </div>
       </div>
-      <div className="flex justify-end w-full mt-10 gap-x-3">
-        {isLoading ? (
-          <LoadingSpinner className="w-10 h-10 border-4 border-orangeFe border-r-transparent"></LoadingSpinner>
-        ) : (
-          <>
-            <Button
-              variant="default"
-              onClick={() => handleActiveStep("2")}
-              disabled={isLoading}
-              className="max-w-[120px] flex items-center text-sm"
-            >
-              <IconChevronLeft size={20}></IconChevronLeft>
-              <span>Quay lại</span>
-            </Button>
-            <Button
-              variant="default"
-              disabled={!modifyTable || isLoading ? true : false}
-              onClick={handleSubmitProduct}
-              className="max-w-[150px] flex items-center text-sm"
-            >
-              <span>Tạo sản phẩm</span>
-            </Button>
-          </>
-        )}
-      </div>
-    </div>
+    </Fragment>
   );
 }
 

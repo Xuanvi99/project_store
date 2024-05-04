@@ -1,5 +1,5 @@
+import { IUser } from "@/types/user.type";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { IUser } from "../../types/commonType";
 
 interface IPayload {
   user: IUser | null;

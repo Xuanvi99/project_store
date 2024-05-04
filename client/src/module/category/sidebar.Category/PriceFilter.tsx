@@ -1,6 +1,6 @@
+import { cn } from "@/utils";
 import Slider from "rc-slider";
 import { useState } from "react";
-import { cn } from "../../../utils";
 
 interface IPriceFilterProps {
   price: {
@@ -32,7 +32,7 @@ function PriceFilter({ price }: IPriceFilterProps) {
         onSubmit={() => {
           console.log("a");
         }}
-        className="flex flex-col gap-y-5 bg-white px-3 py-5 rounded-b-md"
+        className="flex flex-col px-3 py-5 bg-white gap-y-5 rounded-b-md"
       >
         <Slider
           range
@@ -45,12 +45,12 @@ function PriceFilter({ price }: IPriceFilterProps) {
             const [start, end] = value as number[];
             setPriceFilter({ start, end });
           }}
-          className="slider w-full"
+          className="w-full slider"
         />
-        <div className="flex flex-col justify-start items-start gap-y-3">
+        <div className="flex flex-col items-start justify-start gap-y-3">
           <div className="flex items-center gap-x-1">
             <span>Giá:</span>
-            <div className="flex items-center gap-x-1 font-bold">
+            <div className="flex items-center font-bold gap-x-1">
               <span>{currency(priceFilter.start)}₫</span>
               <span className="w-3 h-[1px] bg-black"></span>
               <span>{currency(priceFilter.end)}₫</span>
@@ -58,7 +58,7 @@ function PriceFilter({ price }: IPriceFilterProps) {
           </div>
           <button
             type="submit"
-            className="py-1 px-3 bg-orangeLinear rounded-lg text-white font-bold"
+            className="px-3 py-1 font-bold text-white rounded-lg bg-orangeLinear"
           >
             Lọc
           </button>

@@ -1,7 +1,6 @@
-import { Fragment, useLayoutEffect, useState } from "react";
+import { Fragment, useEffect } from "react";
 import FormUpdateInfo from "./FormUpdateInfo";
 import { useAppDispatch, useAppSelector } from "@/hook";
-import { IUser } from "@/types/commonType";
 import { useGetProfileQuery } from "@/stores/service/user.service";
 import { updateAuth } from "@/stores/reducer/authReducer";
 import Heading from "../../common/Heading";
@@ -12,14 +11,11 @@ function FormInfoUser() {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
   const dispatch = useAppDispatch();
 
-  const [profile, setProfile] = useState<IUser>();
-
   const id = user ? user._id : "";
   const { data, status } = useGetProfileQuery(id, { skip: !id });
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (data && status === "fulfilled") {
-      setProfile(data.user);
       dispatch(updateAuth({ user: data.user }));
     }
   }, [data, dispatch, status]);
@@ -34,8 +30,8 @@ function FormInfoUser() {
           </p>
         </Heading>
         <div className="flex py-[30px]">
-          <FormUpdateInfo profile={profile}></FormUpdateInfo>
-          <EditAvatar profile={profile}></EditAvatar>
+          <FormUpdateInfo></FormUpdateInfo>
+          <EditAvatar></EditAvatar>
         </div>
       </section>
     </Fragment>

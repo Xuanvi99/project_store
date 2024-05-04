@@ -1,14 +1,15 @@
-import { IconBag } from "../../components/icon";
-import { ICart } from "../../types/commonType";
-import { cn } from "../../utils";
+import { RootState } from "@/stores";
 import HoverDropdown from "./HoverDropdown";
+import { IconBag } from "@/components/icon";
+import { cn } from "@/utils";
+import { useLocation } from "react-router-dom";
+import { useAppSelector } from "@/hook";
 
-type TProps = {
-  pathname: string;
-  cart: ICart | null;
-};
+function LogoCart() {
+  const { pathname } = useLocation();
 
-function LogoCart({ pathname, cart }: TProps) {
+  const cart = useAppSelector((state: RootState) => state.cartSlice.cart);
+
   return (
     <>
       {!pathname.includes("cart") && (

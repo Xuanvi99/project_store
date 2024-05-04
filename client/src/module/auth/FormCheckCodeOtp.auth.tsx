@@ -5,18 +5,16 @@ import {
   useState,
   useLayoutEffect,
 } from "react";
-import { cn } from "../../utils";
-import { IconBack, IconError } from "../../components/icon";
-import Button from "../../components/button/Button";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import { authFireBase } from "../../fireBase/config";
-import {
-  useSendOTPEmailMutation,
-  useVerifyEmailMutation,
-} from "../../stores/service/otp.service";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../hook";
-import { useUpdateUserMutation } from "../../stores/service/user.service";
+import { RootState } from "@/stores";
+import { useSendOTPEmailMutation, useVerifyEmailMutation } from "@/stores/service/otp.service";
+import { useUpdateUserMutation } from "@/stores/service/user.service";
+import { useAppSelector } from "@/hook";
+import { IconBack, IconError } from "@/components/icon";
+import { cn } from "@/utils";
+import { Button } from "@/components/button";
+import { authFireBase } from "@/fireBase/config";
 
 type TFormProps = {
   account: string;
@@ -44,7 +42,7 @@ function FormCheckCodeOtp({
   const timeRef = useRef<HTMLParagraphElement>(null);
   const effectRun = useRef<boolean>(false);
 
-  const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state:RootState) => state.authSlice.user);
 
   const navigate = useNavigate();
   const { state } = useLocation();

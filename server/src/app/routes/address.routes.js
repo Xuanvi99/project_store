@@ -1,14 +1,14 @@
 const express = require("express");
-const { addressCtl } = require("../controller");
+const { addressCtrl } = require("../controller");
 const { verifyMdw } = require("../middleware");
 
 const routes = express.Router();
 
 routes
   .route("/api/address/:userId")
-  .get(verifyMdw.verifyToken, addressCtl.get)
-  .put(verifyMdw.verifyToken, addressCtl.update);
+  .get(verifyMdw.verifyToken, addressCtrl.get)
+  .put(verifyMdw.verifyToken, addressCtrl.update);
 
-routes.route("/api/address").post(addressCtl.add);
+routes.route("/api/address").post(addressCtrl.add);
 
 module.exports = routes;

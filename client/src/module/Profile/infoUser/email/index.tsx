@@ -93,29 +93,34 @@ function FormEmail() {
       </Heading>
       <div className="pt-10">
         <ModalNotification isOpen={openModal} onClick={handleOpenModal.current}>
-          {!statePath && (
-            <>
-              <span className="text-danger">
-                <IconAlert size={50}></IconAlert>
-              </span>
-              <span className="text-center">
-                <p>Email bạn nhập đã đăng ký !</p>
-                <p>Vui lòng nhập Email mới</p>
-              </span>
-            </>
-          )}
-          {statePath && (
-            <>
-              <span className="text-success">
-                {statePath.isUpdate ? (
-                  <IconSuccess size={50}></IconSuccess>
-                ) : (
-                  <IconError size={50}></IconError>
-                )}
-              </span>
-              <span className="text-center">{statePath.message}</span>
-            </>
-          )}
+          <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
+            <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
+            <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
+              {!statePath && (
+                <>
+                  <span className="text-danger">
+                    <IconAlert size={50}></IconAlert>
+                  </span>
+                  <span className="text-center">
+                    <p>Email bạn nhập đã đăng ký !</p>
+                    <p>Vui lòng nhập Email mới</p>
+                  </span>
+                </>
+              )}
+              {statePath && (
+                <>
+                  <span className="text-success">
+                    {statePath.isUpdate ? (
+                      <IconSuccess size={50}></IconSuccess>
+                    ) : (
+                      <IconError size={50}></IconError>
+                    )}
+                  </span>
+                  <span className="text-center">{statePath.message}</span>
+                </>
+              )}
+            </div>
+          </div>
         </ModalNotification>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-[150px_500px] gap-x-5 gap-y-3">

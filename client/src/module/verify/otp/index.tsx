@@ -1,13 +1,13 @@
 import { useLocation, useNavigate } from "react-router-dom";
-
 import { useEffect, useLayoutEffect } from "react";
-import { useAppSelector } from "../../../hook";
-import { FormCheckCodeOtp } from "../../auth";
+import { useAppSelector } from "@/hook";
+import { RootState } from "@/stores";
+import { FormCheckCodeOtp } from "@/module/auth";
 
 function VerifyOtp() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
 
   const query = useLocation().search;
   const params = new URLSearchParams(query);

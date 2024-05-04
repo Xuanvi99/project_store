@@ -1,18 +1,16 @@
 import { useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import Slider from "rc-slider";
-import { IUser } from "@/types/commonType";
 import { useUpdateUserMutation } from "@/stores/service/user.service";
 import LoadingSpinner from "@/components/loading";
 import { Button } from "@/components/button";
 import { Input } from "@/components/input";
 import { cn } from "@/utils";
+import { RootState } from "@/stores";
+import { useAppSelector } from "@/hook";
 
-type IProps = {
-  profile: IUser | undefined;
-};
-
-function EditAvatar({ profile }: IProps) {
+function EditAvatar() {
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
   const cropRef = useRef<AvatarEditor>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -46,8 +44,8 @@ function EditAvatar({ profile }: IProps) {
             setModalOpen(false);
             const formData = new FormData();
             formData.append("avatar", file);
-            if (profile) {
-              await updateUser({ id: profile._id, body: formData }).unwrap();
+            if (user) {
+              await updateUser({ id: user._id, body: formData }).unwrap();
             }
           }
         },
@@ -69,7 +67,7 @@ function EditAvatar({ profile }: IProps) {
         >
           <img
             alt=""
-            srcSet={src ? src : profile?.avatar?.url || profile?.avatarDefault}
+            srcSet={src ? src : user?.avatar?.url || user?.avatarDefault}
             className={"w-full h-full bg-cover absolute inset-0 z-10"}
           />
           {isLoading && (

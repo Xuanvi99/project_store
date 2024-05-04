@@ -1,36 +1,28 @@
 const express = require("express");
-const { categoryCtl } = require("../controller");
+const { categoryCtrl } = require("../controller");
 const { verifyMdw } = require("../middleware");
 const { uploadFileMdw } = require("../middleware");
 const routes = express.Router();
 
 routes
   .route("/api/category")
-  .get(verifyMdw.verifyToken, verifyMdw.verifyRole, categoryCtl.getAll)
+  .get(verifyMdw.verifyToken, verifyMdw.verifyRole, categoryCtrl.getAll)
   .post(
     uploadFileMdw.single("image"),
-    // verifyMdw.verifyToken,
-    // verifyMdw.verifyRole,
-    categoryCtl.create
+    verifyMdw.verifyToken,
+    verifyMdw.verifyRole,
+    categoryCtrl.create
   );
 
 routes
   .route("/api/category/:id")
-  .get(
-    // verifyMdw.verifyToken,
-    // verifyMdw.verifyRole,
-    categoryCtl.getSingle
-  )
+  .get(verifyMdw.verifyToken, verifyMdw.verifyRole, categoryCtrl.getSingle)
   .put(
     uploadFileMdw.single("image"),
-    // verifyMdw.verifyToken,
-    // verifyMdw.verifyRole,
-    categoryCtl.update
+    verifyMdw.verifyToken,
+    verifyMdw.verifyRole,
+    categoryCtrl.update
   )
-  .delete(
-    // verifyMdw.verifyToken,
-    // verifyMdw.verifyRole,
-    categoryCtl.delete
-  );
+  .delete(verifyMdw.verifyToken, verifyMdw.verifyRole, categoryCtrl.delete);
 
 module.exports = routes;

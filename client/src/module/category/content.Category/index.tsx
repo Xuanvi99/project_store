@@ -1,5 +1,5 @@
+import { ProductLoadMore } from "@/components/product";
 import { Header } from "..";
-import { ProductLoadMore } from "../../../components/product";
 
 function Content() {
   return (

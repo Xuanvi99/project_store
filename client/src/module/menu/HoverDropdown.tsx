@@ -1,6 +1,6 @@
+import { useHover } from "@/hook";
+import { cn } from "@/utils";
 import { useRef } from "react";
-import { useHover } from "../../hook";
-import { cn } from "../../utils";
 
 type THoverDropdownProps = {
   select: React.ReactNode;

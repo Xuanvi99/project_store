@@ -1,47 +1,47 @@
 const express = require("express");
-const { userCtl } = require("../controller");
+const { userCtrl } = require("../controller");
 const { verifyMdw } = require("../middleware");
 const { uploadFileMdw } = require("../middleware");
 const routes = express.Router();
 
-routes.route("/api/user/checkUser").post(userCtl.checkUser);
+routes.route("/api/user/checkUser").post(userCtrl.checkUser);
 
 routes
   .route("/api/user/getListUser")
-  .get(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtl.getListUser);
+  .get(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtrl.getListUser);
 
 routes
   .route("/api/user/:userId")
-  .get(verifyMdw.verifyToken, userCtl.getProfile)
+  .get(verifyMdw.verifyToken, userCtrl.getProfile)
   .put(
     uploadFileMdw.single("avatar"),
     verifyMdw.verifyToken,
-    userCtl.updateUser
+    userCtrl.updateUser
   )
-  .delete(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtl.deleteUser);
+  .delete(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtrl.deleteUser);
 
 routes
   .route("/api/user/")
-  .post(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtl.addUser);
+  .post(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtrl.addUser);
 
 routes
   .route("/api/user/admin/:userId")
-  .put(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtl.isAdmin);
+  .put(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtrl.isAdmin);
 
 routes
   .route("/api/user/blocked/:userId")
-  .put(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtl.blockedUser);
+  .put(verifyMdw.verifyToken, verifyMdw.verifyRole, userCtrl.blockedUser);
 
 routes
   .route("/api/user/verifyPw")
-  .post(verifyMdw.verifyToken, userCtl.verifyPassword);
+  .post(verifyMdw.verifyToken, userCtrl.verifyPassword);
 
 routes
   .route("/api/user/changePw/:id")
   .post(
     verifyMdw.verifyToken,
     verifyMdw.verifyCheckPassword,
-    userCtl.changePassword
+    userCtrl.changePassword
   );
 
 module.exports = routes;

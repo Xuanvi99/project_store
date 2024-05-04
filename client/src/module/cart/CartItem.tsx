@@ -1,6 +1,6 @@
+import { IconDelete } from "@/components/icon";
+import { Input } from "@/components/input";
 import { useState } from "react";
-import { Input } from "../../components/input";
-import { IconDelete } from "../../components/icon";
 
 type TCartItemProps = {
   data: {
@@ -55,15 +55,15 @@ function CartItem({ data, handleCheckCart, isChecked }: TCartItemProps) {
           <img alt="" srcSet={image} className="w-[80px]" />
           <div className="flex flex-col">
             <span className="font-semibold">{name}</span>
-            <span className="text-sm text-gray mt-auto">Size: {size}</span>
+            <span className="mt-auto text-sm text-gray">Size: {size}</span>
           </div>
         </div>
       </div>
       <div className="grid w-[560px] grid-cols-3 gap-x-2">
-        <span className="flex items-center justify-center  gap-x-2">
+        <span className="flex items-center justify-center gap-x-2">
           {price.sale ? (
             <>
-              <p className="line-through text-gray text-sm">
+              <p className="text-sm line-through text-gray">
                 ₫{new Intl.NumberFormat().format(parseInt(price.main))}
               </p>
               <p className="text-red-600 ">

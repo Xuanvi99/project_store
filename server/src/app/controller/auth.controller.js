@@ -1,4 +1,4 @@
-const { userModel, tokenModel } = require("../model");
+const { userModel, tokenModel, cartModel } = require("../model");
 
 const jwt = require("jsonwebtoken");
 const codeOTPModel = require("../model/codeOTP.model");
@@ -7,17 +7,22 @@ class authController {
     try {
       const { phone, password } = req.body;
       const newUser = new userModel({ phone, password });
-      await newUser.save();
+      const result = await newUser.save();
+      const newCart = new cartModel({
+        userId: result._id,
+      });
+      await newCart.save();
       const accessToken = newUser.generateAccessToken();
       const refreshToken = newUser.generateRefreshToken();
       await tokenModel.saveToken(newUser, refreshToken);
-      const { password: password1, __v, ...others } = newUser;
+      const { password: password1, __v, ...others } = newUser._doc;
       res
         .status(201)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: false,
           sameSite: "strict",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
         })
         .json({
           user: others,
@@ -46,6 +51,7 @@ class authController {
           httpOnly: true,
           secure: false,
           sameSite: "strict",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
         })
         .json({
           user: others,
@@ -69,11 +75,13 @@ class authController {
           httpOnly: true,
           secure: false,
           sameSite: "strict",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
         })
         .json({
           user: others,
           accessToken,
         });
+      res.status(200);
     } catch (error) {
       res.status(403).json({ errMessage: "error auth google" });
     }
@@ -153,6 +161,7 @@ class authController {
               httpOnly: true,
               secure: false,
               sameSite: "strict",
+              maxAge: 7 * 24 * 60 * 60 * 1000,
             })
             .json({ user: user._doc, accessToken: newAccessToken });
         }

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function CardImage({
+export default function Thumbnails({
   src,
   path,
 }: {

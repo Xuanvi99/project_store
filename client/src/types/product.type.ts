@@ -1,9 +1,5 @@
-interface imageUrl {
-  _id: string;
-  public_id: string;
-  url: string;
-  folder: string;
-}
+import { IComment } from "./comment.type";
+import { IImage } from "./commonType";
 
 export interface IProductReq {
   name: string;
@@ -17,20 +13,37 @@ export interface IProductReq {
   specs: string;
 }
 
+export interface IInventory {
+  productId: string;
+  sold: number;
+  total: number;
+  stocked: boolean;
+}
+
+export interface ISale {
+  productId: string | IProductRes;
+  status: string;
+  quantity: number;
+  sold: number;
+  discount: number;
+}
+
 export interface IProductRes {
+  _id: string;
   name: string;
   slug: string;
   summary: string;
   desc: string;
   brand: string;
-  thumbnail: imageUrl;
+  thumbnail: IImage;
   price: number;
-  discount: number;
-  flashSale: boolean;
   sold: number;
   status: string;
-  imageIds: [imageUrl];
-  commentIds: unknown[];
+  imageIds: [IImage];
+  commentIds: IComment[];
   categoryId: { _id: string; name: string };
+  inventoryId: IInventory;
+  is_sale: "flashSale" | "sale" | "normal";
+  saleId?: ISale;
   is_delete: boolean;
 }

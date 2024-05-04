@@ -156,6 +156,11 @@ class Category {
       if (image) {
         await imageModel.removeFile(image);
       }
+
+      if (category.name === "Flash sale") {
+        return res.status(200).json({ message: "Delete category success" });
+      }
+
       const productIds = category.productIds;
       if (productIds.length > 0) {
         for (let i = 0; i < productIds.length; i++) {

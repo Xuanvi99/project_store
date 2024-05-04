@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { IAddress } from "../../types/commonType";
 import { baseQueryWithAuth } from "../baseQueryToken";
+import { IAddress } from "@/types/address.type";
 
 export const addressApi = createApi({
   reducerPath: "address",

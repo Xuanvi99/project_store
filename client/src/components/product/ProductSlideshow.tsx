@@ -2,32 +2,65 @@ import { SwiperSlide } from "swiper/react";
 import { cn } from "../../utils";
 import LayoutProduct from "../../layout/LayoutProduct";
 import { Link } from "react-router-dom";
-import CardItem from "../card";
+import Card from "../card";
 import SlideSwiper from "../slideshows";
 import { IconChevronRight } from "../icon";
+import {
+  useGetLisSaleQuery,
+  useGetListProductQuery,
+} from "@/stores/service/product.service";
+import { useEffect, useState } from "react";
+import { IProductRes } from "@/types/product.type";
 
 interface IProps {
   name: string;
 }
 
 export default function ProductSlideshow({ name }: IProps) {
+  const { data: resProduct } = useGetListProductQuery(
+    {
+      search: name,
+      activePage: 1,
+      limit: 10,
+    },
+    { skip: name === "flashSale" ? true : false }
+  );
+
+  const { data: resSale } = useGetLisSaleQuery({
+    is_sale: "flashSale",
+    activePage: 1,
+    limit: 10,
+  });
+
+  const [listProduct, setListProduct] = useState<{
+    data: IProductRes[];
+    totalPage: number;
+  }>();
+
+  useEffect(() => {
+    if (resProduct || resSale) {
+      const data = name === "flashSale" ? resSale : resProduct;
+      setListProduct(data);
+    }
+  }, [name, resProduct, resSale]);
+
   return (
     <LayoutProduct>
       <div
         className={cn(
-          "w-full flex justify-between items-center min-h-[50px] rounded-md p-[10px] font-bold",
-          name === "sale"
+          "w-full flex justify-between items-center min-h-[50px] rounded-md p-[10px] font-bold border-b-1 border-orange",
+          name === "flashSale"
             ? "text-red-800 bg-orangeLinear"
             : "bg-white text-orange"
         )}
       >
         <div className="relative flex items-center text-2xl gap-x-2">
-          <i>
-            {name == "sale"
+          <span>
+            {name === "flashSale"
               ? "Giá Sốc hôm nay"
-              : name.charAt(0).toUpperCase() + name.slice(1)}
-          </i>
-          {name == "sale" && (
+              : "Giày " + name.charAt(0).toUpperCase() + name.slice(1)}
+          </span>
+          {name === "flashSale" && (
             <img
               src=""
               alt=""
@@ -40,7 +73,7 @@ export default function ProductSlideshow({ name }: IProps) {
           to={"#"}
           className={cn(
             "flex items-center text-base duration-500 gap-x-1 ",
-            name === "sale" ? "hover:text-white" : "hover:text-black"
+            name === "flashSale" ? "hover:text-white" : "hover:text-black"
           )}
         >
           <span>Xem thêm</span>
@@ -49,27 +82,30 @@ export default function ProductSlideshow({ name }: IProps) {
       </div>
       <SlideSwiper
         optionSwiper={{
-          quantitySlide: 10,
+          quantitySlide: listProduct?.data.length || 10,
           slidesPerView: 5,
           spaceBetween: 10,
-          slidesPerGroup: 5,
-          lazyPreloadPrevNext: 5,
+          slidesPerGroup: 1,
+          lazyPreloadPrevNext: 1,
           grabCursor: true,
           loop: true,
           speed: 100,
         }}
-        slideHover={true}
+        slideHover={
+          listProduct?.data && listProduct?.data.length > 5 ? true : false
+        }
         className={{ container: "mt-5" }}
       >
-        {Array(10)
-          .fill(null)
-          .map((_, index) => {
-            return (
-              <SwiperSlide key={index}>
-                <CardItem type={name === "sale" ? "sale" : "normal"}></CardItem>
-              </SwiperSlide>
-            );
-          })}
+        {listProduct?.data.map((product, index) => {
+          return (
+            <SwiperSlide key={index}>
+              <Card
+                type={name === "flashSale" ? "flashSale" : "normal"}
+                product={product}
+              ></Card>
+            </SwiperSlide>
+          );
+        })}
       </SlideSwiper>
     </LayoutProduct>
   );

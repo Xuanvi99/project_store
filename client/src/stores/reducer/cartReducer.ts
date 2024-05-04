@@ -1,5 +1,6 @@
+import { ICart } from "@/types/cart.type";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { ICart } from "../../types/commonType";
+
 
 interface IPayload {
   cart: ICart | null;

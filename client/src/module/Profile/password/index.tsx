@@ -149,7 +149,12 @@ function ChangePassword() {
       </Heading>
       <div className="pt-10">
         <ModalNotification isOpen={openModal} onClick={handleOpenModal.current}>
-          {title}
+          <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
+            <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
+            <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
+              {title}
+            </div>
+          </div>
         </ModalNotification>
         <form
           onSubmit={handleSubmit(onSubmit)}

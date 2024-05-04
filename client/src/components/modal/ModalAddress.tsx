@@ -11,7 +11,7 @@ import axios from "axios";
 import { DropdownForm } from "../dropdown";
 import ErrorInput from "../error/ErrorInput";
 import IconCLose from "../icon/IconCLose";
-import { IAddress } from "../../types/commonType";
+
 import {
   useAddAddressMutation,
   useGetAddressQuery,
@@ -19,6 +19,7 @@ import {
 } from "../../stores/service/address.service";
 import LoadingSpinner from "../loading";
 import { useAppSelector } from "../../hook";
+import { IAddress } from "@/types/address.type";
 
 const validatingSchema = Yup.object({
   name: Yup.string()

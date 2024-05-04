@@ -1,18 +1,17 @@
-import { useNavigate } from "react-router-dom";
-import { IconBack } from "../../components/icon";
-import { Button } from "../../components/button";
-import Field from "../../components/fields";
-import { Label } from "../../components/label";
-import { InputForm } from "../../components/input";
-import { ErrorInput } from "../../components/error";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
-import IconError from "../../components/icon/IconError";
-import { useCheckPhoneOrEmailMutation } from "../../stores/service/user.service";
-import LoadingSpinner from "../../components/loading";
-import { cn } from "../../utils";
+import { useNavigate } from "react-router-dom";
+import { useCheckPhoneOrEmailMutation } from "@/stores/service/user.service";
+import { IconBack, IconError } from "@/components/icon";
+import Field from "@/components/fields";
+import { cn } from "@/utils";
+import { Button } from "@/components/button";
+import LoadingSpinner from "@/components/loading";
+import { ErrorInput } from "@/components/error";
+import { Label } from "@/components/label";
+import { InputForm } from "@/components/input";
 
 type TFormCheckAccountProps = {
   className?: string;

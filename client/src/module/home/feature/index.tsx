@@ -1,6 +1,6 @@
+import { listFeature } from "@/constant/home.constant";
+import { cn } from "@/utils";
 import { Link } from "react-router-dom";
-import { listFeature } from "../../../constant/home.constant";
-import { cn } from "../../../utils";
 
 function Feature() {
   return (

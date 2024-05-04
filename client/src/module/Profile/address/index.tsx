@@ -6,9 +6,9 @@ import { ModalAddress } from "../../../components/modal/index";
 import { useAppSelector, useToggle } from "../../../hook";
 import { IconLocation, IconPlus } from "../../../components/icon";
 import { useGetAddressQuery } from "../../../stores/service/address.service";
-import { IAddress } from "../../../types/commonType";
 import { useLayoutEffect, useState } from "react";
 import { RootState } from "../../../stores";
+import { IAddress } from "@/types/address.type";
 
 function FormAddress() {
   const user = useAppSelector((state: RootState) => state.authSlice.user);

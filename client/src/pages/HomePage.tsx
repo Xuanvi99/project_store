@@ -13,11 +13,11 @@ function HomePage() {
       <BannerHome></BannerHome>
       <LayoutMain>
         <Feature></Feature>
-        <ProductSlideshow name="sale"></ProductSlideshow>
+        <ProductSlideshow name="flashSale"></ProductSlideshow>
         <ProductSlideshow name="adidas"></ProductSlideshow>
-        <ProductSlideshow name="adidas"></ProductSlideshow>
-        <ProductSlideshow name="adidas"></ProductSlideshow>
-        <ProductSlideshow name="adidas"></ProductSlideshow>
+        <ProductSlideshow name="nike"></ProductSlideshow>
+        <ProductSlideshow name="vans"></ProductSlideshow>
+        <ProductSlideshow name="converse"></ProductSlideshow>
       </LayoutMain>
     </Fragment>
   );

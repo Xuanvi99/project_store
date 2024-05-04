@@ -1,21 +1,21 @@
-import { Button } from "../../../../components/button";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
-import InputForm from "../../../../components/input/InputForm";
-import Field from "../../../../components/fields";
-import { Label } from "../../../../components/label";
-import { ErrorInput } from "../../../../components/error";
 import { Editor } from "@tinymce/tinymce-react";
-import DropdownForm from "../../../../components/dropdown/DropdownForm";
-import InputRadio from "../../../../components/input/InputRadio";
 import { yupResolver } from "@hookform/resolvers/yup";
-import useTestContext from "../../../../hook/useTestContext";
 import { CreatePdContext, ICreatePdProvide } from "./CreatePdContext";
-import { IconChevronRight } from "../../../../components/icon";
-import { useRemoveWithUrlMutation } from "../../../../stores/service/image.service";
 import { useEffect, useState } from "react";
-import { useGetAllCategoryQuery } from "../../../../stores/service/category.service";
-import { useCheckNameMutation } from "../../../../stores/service/product.service";
+import useTestContext from "@/hook/useTestContext";
+import { useRemoveWithUrlMutation } from "@/stores/service/image.service";
+import { useCheckNameMutation } from "@/stores/service/product.service";
+import { useGetAllCategoryQuery } from "@/stores/service/category.service";
+import Field from "@/components/fields";
+import { Label } from "@/components/label";
+import { InputForm } from "@/components/input";
+import { ErrorInput } from "@/components/error";
+import InputRadio from "@/components/input/InputRadio";
+import { Button } from "@/components/button";
+import { IconChevronRight } from "@/components/icon";
+import { DropdownForm } from "@/components/dropdown";
 
 interface BlobInfo {
   id: () => string;
@@ -37,9 +37,9 @@ const validationSchema = Yup.object({
   desc: Yup.string().required("Vui lòng điền vào mục này."),
   summary: Yup.string().required("Vui lòng điền vào mục này."),
   price: Yup.number()
-    .required("Vui lòng chọn trạng thái.")
-    .typeError("Giá không hợp lệ")
-    .min(0, "Giá không hợp lệ"),
+    .required("Vui lòng điền thông tin")
+    .typeError("Giá sản phẩm không hợp lệ")
+    .min(0, "Giá sản phẩm không hợp lệ"),
   status: Yup.string()
     .required("Vui lòng điền vào mục này.")
     .oneOf(["active", "deActive"]),
@@ -183,15 +183,17 @@ function General() {
   const handleChangeName = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    await checkName({ name: event.currentTarget.value })
-      .unwrap()
-      .then(() => {
-        clearErrors("name");
-      })
-      .catch((error) => {
-        const data = error.data as { errorMessage: string };
-        setError("name", { message: data.errorMessage });
-      });
+    if (event.currentTarget.value.length > 8) {
+      await checkName({ name: event.currentTarget.value })
+        .unwrap()
+        .then(() => {
+          clearErrors("name");
+        })
+        .catch((error) => {
+          const data = error.data as { errorMessage: string };
+          setError("name", { message: data.errorMessage });
+        });
+    }
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -287,7 +289,6 @@ function General() {
                 "image",
                 "link",
                 "lists",
-                "media",
                 "preview",
                 "searchreplace",
                 "table",
@@ -311,7 +312,6 @@ function General() {
                     mutation.removedNodes.forEach(function (removed_node) {
                       if (removed_node.nodeName == "IMG") {
                         const node = removed_node as HTMLElement;
-
                         removeWithUrl({
                           imageUrl: node.getAttribute("src") as string,
                         });
@@ -347,7 +347,7 @@ function General() {
               }}
               initialValue={data.summary || ""}
               init={{
-                height: 200,
+                height: 300,
                 width: "100%",
                 menubar: false,
                 plugins: [
@@ -361,7 +361,6 @@ function General() {
                   "lists",
                   "media",
                   "preview",
-                  "searchreplace",
                   "table",
                   "visualblocks",
                   "accordion",
@@ -374,7 +373,7 @@ function General() {
             />
             <ErrorInput text={errors["summary"]?.message} />
           </Field>
-          <div className="flex flex-col basis-1/2 h-[230px] justify-between">
+          <div className="flex flex-col gap-y-3 basis-1/2 max-h-[300px] ">
             <Field variant="flex-col" className="basis-1/2 gap-y-2">
               <Label htmlFor="price" className="font-semibold text-secondary">
                 Giá sản phẩm (vnđ)<strong className="text-danger">*</strong>

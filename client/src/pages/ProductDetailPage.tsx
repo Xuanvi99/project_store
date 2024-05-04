@@ -2,7 +2,12 @@ import { Fragment, useEffect } from "react";
 import { ProductSlideshow } from "../components/product";
 import { BannerCommon } from "../components/banner";
 import LayoutMain from "../layout/LayoutMain";
-import { ProductSingle, ProductDesc, ProductReviews } from "../module/detail";
+import {
+  ProductDesc,
+  ProductReviews,
+  ProductSingle,
+  ProductSummary,
+} from "@/module/detail";
 
 function ProductDetailPage() {
   useEffect(() => {
@@ -16,6 +21,7 @@ function ProductDetailPage() {
       ></BannerCommon>
       <LayoutMain>
         <ProductSingle></ProductSingle>
+        <ProductSummary></ProductSummary>
         <ProductDesc></ProductDesc>
         <ProductReviews></ProductReviews>
         <ProductSlideshow name="Khám phá thêm"></ProductSlideshow>

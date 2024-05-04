@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function CardHeading({
+export default function Heading({
   title,
   path,
 }: {

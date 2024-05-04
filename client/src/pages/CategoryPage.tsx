@@ -1,11 +1,13 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { cn } from "../utils";
-import "rc-slider/assets/index.css";
 import LayoutMain from "../layout/LayoutMain";
 import { BannerCommon } from "../components/banner";
 import * as Category from "../module/category";
 
 function CategoryPage() {
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
   return (
     <Fragment>
       <BannerCommon

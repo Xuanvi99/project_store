@@ -4,7 +4,6 @@ import Profile from "../../menu/Profile.menu";
 import { logOut } from "../../../stores/reducer/authReducer";
 import { useLogOutAuthMutation } from "../../../stores/service/auth.service";
 import Search from "../../menu/Search.menu";
-import { useState } from "react";
 
 function Header() {
   const { user, isLogin } = useAppSelector((state) => state.authSlice);
@@ -14,18 +13,7 @@ function Header() {
 
   const redirectUrl = import.meta.env.VITE_DOMAIN_CLIENT + pathname;
 
-  const [textSearch, setTextSearch] = useState<string>("");
-
   const [logOutAuth] = useLogOutAuthMutation();
-
-  const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTextSearch(event.target.value);
-  };
-
-  const handleSubmitSearch = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    navigate(`/category/?search=${textSearch}`);
-  };
 
   const handleLogin = async () => {
     const query = encodeURIComponent(redirectUrl);
@@ -51,11 +39,7 @@ function Header() {
           XVStore
         </span>
       </Link>
-      <Search
-        valueInput={textSearch}
-        onChangeSearch={handleChangeSearch}
-        onSubmitSearch={handleSubmitSearch}
-      ></Search>
+      <Search></Search>
       <div className="flex items-center justify-center w-[20%] ">
         <Profile
           isLogin={isLogin}

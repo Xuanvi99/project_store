@@ -1,10 +1,9 @@
-interface imageUrl {
-  url: string;
-  folder: string;
-}
+import { IImage } from "./commonType";
+import { IProductRes } from "./product.type";
 
 export interface ICategory {
   _id: string;
   name: string;
-  image: imageUrl;
+  image: Omit<IImage, "_id" | "public_id">;
+  productIds: IProductRes[];
 }

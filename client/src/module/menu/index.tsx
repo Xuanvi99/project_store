@@ -1,53 +1,12 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { cn } from "../../utils";
-import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../hook";
-import { logOut } from "../../stores/reducer/authReducer";
-import { updateCart } from "../../stores/reducer/cartReducer";
-import { useLogOutAuthMutation } from "../../stores/service/auth.service";
+import { useEffect, useState } from "react";
 import LogoCart from "./LogoCart.menu";
 import Profile from "./Profile.menu";
 import Logo from "./Logo.menu";
 import Search from "./Search.menu";
+import { cn } from "@/utils";
 
 function Menu() {
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-
-  const redirectUrl = import.meta.env.VITE_DOMAIN_CLIENT + pathname;
-
-  const { user, isLogin } = useAppSelector((state) => state.authSlice);
-  const cart = useAppSelector((state) => state.cartSlice.cart);
-
-  const [logOutAuth] = useLogOutAuthMutation();
-
   const [scroll, setScroll] = useState<boolean>(false);
-  const [textSearch, setTextSearch] = useState<string>("");
-
-  const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTextSearch(event.target.value);
-  };
-
-  const handleSubmitSearch = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    navigate(`/category/?search=${textSearch}`);
-  };
-
-  const handleLogin = async () => {
-    const query = encodeURIComponent(redirectUrl);
-    navigate("/auth/login?next=" + query, { state: { path: pathname } });
-  };
-
-  const handleLogOut = async () => {
-    dispatch(logOut());
-    dispatch(updateCart({ cart: null }));
-    await logOutAuth()
-      .unwrap()
-      .then((res) => console.log("logout", res.message));
-    const query = encodeURIComponent(redirectUrl);
-    navigate("/auth/login?next=" + query, { state: { path: pathname } });
-  };
 
   useEffect(() => {
     const handleFixedMenu = () => {
@@ -76,19 +35,10 @@ function Menu() {
         >
           <div className="flex items-center justify-between w-full menu">
             <Logo />
-            <Search
-              valueInput={textSearch}
-              onChangeSearch={handleChangeSearch}
-              onSubmitSearch={handleSubmitSearch}
-            ></Search>
+            <Search></Search>
             <div className="flex items-center gap-x-3">
-              <LogoCart pathname={pathname} cart={cart}></LogoCart>
-              <Profile
-                isLogin={isLogin}
-                user={user}
-                handleLogin={handleLogin}
-                handleLogOut={handleLogOut}
-              ></Profile>
+              <LogoCart></LogoCart>
+              <Profile></Profile>
             </div>
           </div>
         </div>

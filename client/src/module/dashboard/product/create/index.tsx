@@ -1,4 +1,4 @@
-import { Button } from "../../../../components/button";
+import { Button } from "@/components/button";
 import Content from "./Content.create";
 import { CreatePdProvide } from "./CreatePdContext";
 import Header from "./Header.create";

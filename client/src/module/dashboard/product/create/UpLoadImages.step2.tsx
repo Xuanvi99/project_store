@@ -9,7 +9,7 @@ import { IconRemoveBtn } from "../../../../components/icon";
 import IconChevronRight from "./../../../../components/icon/IconChevronRight";
 import IconChevronLeft from "../../../../components/icon/IconChevronLeft";
 
-function Images() {
+function UpLoadImages() {
   const { handleActiveStep, handleSetData, uploadImage, handleSaveStep2 } =
     useTestContext<ICreatePdProvide>(
       CreatePdContext as React.Context<ICreatePdProvide>
@@ -18,8 +18,6 @@ function Images() {
   const [thumbnail, setThumbnail] = useState<ImageListType>(
     uploadImage.thumbnail || []
   );
-
-  // const [dimensions] = useImageSize(thumbnail[0]?.data_url || "");
 
   const [listImages, setListImages] = useState(uploadImage.listImages || []);
 
@@ -217,4 +215,4 @@ function Images() {
   );
 }
 
-export default Images;
+export default UpLoadImages;

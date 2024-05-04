@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { IconStar } from "../../../components/icon";
-import FormComment from "../FormComment";
+import { IconStar } from "@/components/icon";
+import FormComment from "./comment";
 
 function ReviewsComment() {
   const [showFormReply, setShowFormReply] = useState<boolean>(false);

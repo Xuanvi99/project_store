@@ -2,7 +2,6 @@ import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { IUser } from "@/types/commonType";
 import Field from "@/components/fields";
 import { Label } from "@/components/label";
 import { InputForm } from "@/components/input";
@@ -14,6 +13,8 @@ import { useUpdateUserMutation } from "@/stores/service/user.service";
 import { Fragment, useEffect, useState } from "react";
 import { ModalNotification } from "@/components/modal";
 import { IconError, IconSuccess } from "@/components/icon";
+import { useAppSelector } from "@/hook";
+import { RootState } from "@/stores";
 
 const validatingSchema = Yup.object({
   userName: Yup.string()
@@ -26,11 +27,8 @@ const validatingSchema = Yup.object({
 
 type formValues = Yup.InferType<typeof validatingSchema>;
 
-type IProps = {
-  profile: IUser | undefined;
-};
-
-function FormUpdateInfo({ profile }: IProps) {
+function FormUpdateInfo() {
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
   const {
     control,
     handleSubmit,
@@ -39,9 +37,9 @@ function FormUpdateInfo({ profile }: IProps) {
     formState: { errors },
   } = useForm<formValues>({
     defaultValues: {
-      userName: profile?.userName,
-      gender: profile?.gender,
-      date: profile?.date,
+      userName: user?.userName,
+      gender: user?.gender,
+      date: user?.date,
     },
     resolver: yupResolver(validatingSchema),
     mode: "onChange",
@@ -109,24 +107,33 @@ function FormUpdateInfo({ profile }: IProps) {
     for (const [keys, value] of Object.entries(data)) {
       formData.append(keys, value);
     }
-    if (profile) await updateUser({ id: profile._id, body: formData }).unwrap();
+    if (user) await updateUser({ id: user._id, body: formData }).unwrap();
   };
 
   return (
     <Fragment>
       <ModalNotification isOpen={openModal} onClick={handleOpenModal}>
-        {isSuccess && (
-          <span className={`${isSuccess ? "text-green" : "text-danger"}`}>
-            {isSuccess ? (
-              <IconSuccess size={50}></IconSuccess>
-            ) : (
-              <IconError size={50}></IconError>
+        <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
+          <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
+          <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
+            {isSuccess && (
+              <span className={`${isSuccess ? "text-green" : "text-danger"}`}>
+                {isSuccess ? (
+                  <IconSuccess size={50}></IconSuccess>
+                ) : (
+                  <IconError size={50}></IconError>
+                )}
+              </span>
             )}
-          </span>
-        )}
-        <span className="text-center">
-          {isSuccess ? <p>Cập nhật thành công</p> : <p>Cập nhật thất bại</p>}
-        </span>
+            <span className="text-center">
+              {isSuccess ? (
+                <p>Cập nhật thành công</p>
+              ) : (
+                <p>Cập nhật thất bại</p>
+              )}
+            </span>
+          </div>
+        </div>
       </ModalNotification>
       <form onSubmit={handleSubmit(onSubmit)} className="basis-3/5">
         <div className="flex justify-between gap-x-5">
@@ -146,24 +153,24 @@ function FormUpdateInfo({ profile }: IProps) {
             <Field variant="flex-row" className="gap-x-5">
               <Label className="w-[150px] text-end">Số điện thoại</Label>
               <div className="flex gap-x-3">
-                <span>{enCodePhone(profile?.phone)}</span>
+                <span>{enCodePhone(user?.phone)}</span>
                 <Link
                   to="/user/account/phone"
                   className="underline cursor-pointer text-blue hover:text-orange"
                 >
-                  {profile?.phone ? "Thay Đổi" : "Thêm"}
+                  {user?.phone ? "Thay Đổi" : "Thêm"}
                 </Link>
               </div>
             </Field>
             <Field variant="flex-row" className="gap-x-5">
               <Label className="w-[150px] text-end">Email</Label>
               <div className="flex gap-x-3">
-                <span>{enCodeEmail(profile?.email)}</span>
+                <span>{enCodeEmail(user?.email)}</span>
                 <Link
                   to="/user/account/email"
                   className="underline cursor-pointer text-blue hover:text-orange"
                 >
-                  {profile?.email ? "Thay Đổi" : "Thêm"}
+                  {user?.email ? "Thay Đổi" : "Thêm"}
                 </Link>
               </div>
             </Field>

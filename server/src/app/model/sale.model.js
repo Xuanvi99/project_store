@@ -1,14 +1,19 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const SaleSchema = new Schema(
+const saleSchema = new Schema(
   {
-    productId: { type: Schema.Types.ObjectId, ref: "product" },
-    time: { type: Date, require: true },
-    quantity: { type: Number, require: true },
-    sold: { type: Number, require: true, default: 0 },
+    productId: { type: Schema.Types.ObjectId, ref: "products" },
+    status: {
+      type: String,
+      enum: ["flashSale", "sale"],
+      default: "sale",
+    },
+    quantity: { type: Number, default: 0 },
+    sold: { type: Number, default: 0 },
+    discount: { type: Number, require: true, default: 0 },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("sale", SaleSchema);
+module.exports = mongoose.model("sale", saleSchema);

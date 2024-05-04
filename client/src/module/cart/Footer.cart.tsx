@@ -1,6 +1,6 @@
-import { Button } from "../../components/button";
-import { Input } from "../../components/input";
-import { TCartItem } from "../../pages/CartPage";
+import { Button } from "@/components/button";
+import { Input } from "@/components/input";
+import { TCartItem } from "@/pages/CartPage";
 
 type TFooterProps<T> = {
   listCheckCart: T[];
@@ -43,9 +43,9 @@ function Footer({
         <div className="cursor-pointer hover:text-red-600">
           Chọn Tất Cả ({listCart.length})
         </div>
-        <div className="cursor-pointer  hover:text-red-600">Xóa</div>
+        <div className="cursor-pointer hover:text-red-600">Xóa</div>
       </div>
-      <div className="w-2/3 flex justify-end items-center gap-x-5">
+      <div className="flex items-center justify-end w-2/3 gap-x-5">
         <div className="flex items-center gap-x-1">
           <span>Tổng thanh toán</span>
           <span>({listCheckCart.length} sản phẩm):</span>
