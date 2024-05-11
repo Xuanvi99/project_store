@@ -10,7 +10,7 @@ const cartRoutes = require("./cart.routes");
 const addressRoutes = require("./address.routes");
 const categoryRoutes = require("./category.routes");
 const imageRoutes = require("./image.routes");
-const saleRoutes = require("./sale.routes");
+const saleRoutes = require("./flashSale.routes");
 
 routes.use(uploadFile);
 routes.use(authRoutes);

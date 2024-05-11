@@ -20,7 +20,7 @@ function Search({ className }: TProps) {
 
   const handleSubmitSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    navigate(`/category?search=${textSearch}`);
+    navigate(`/search?s=${textSearch}`);
   };
 
   return (

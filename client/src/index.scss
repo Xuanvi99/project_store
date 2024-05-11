@@ -37,6 +37,16 @@
     ::-webkit-scrollbar-thumb:hover {
         background: linear-gradient(to left, #b0b0b3, #dadbdc);
     }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:focus {
+        transition:
+            background-color 600000s 0s,
+            color 600000s 0s;
+    }
+    input[data-autocompleted] {
+        background-color: transparent !important;
+    }
 }
 
 @layer components {
@@ -103,13 +113,6 @@
             border-color: #fd7e14 !important;
             box-shadow: 0 0 0 5px orange !important;
         }
-    }
-
-    .skeleton {
-        background-color: #eee;
-        background-image: linear-gradient(110deg, #222222 8%, #362f29 18%, #222222 33%);
-        background-size: 200% 100%;
-        animation: 1.5s shine linear infinite;
     }
 
     @keyframes shine {

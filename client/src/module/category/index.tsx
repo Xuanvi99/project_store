@@ -1,5 +1,4 @@
-import Content from "./content.Category";
-import Header from "./header.Category";
-import Sidebar from "./sidebar.Category";
+import Content from "./content";
+import Sidebar from "./sidebar";
 
-export { Header, Content, Sidebar };
+export { Content, Sidebar };

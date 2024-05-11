@@ -14,9 +14,17 @@ interface IDropdownProps<T> {
     select?: string;
     option?: string;
   };
+  active: boolean;
+  handleSelect?: (value: string) => void;
 }
 
-function Dropdown({ title, options, className }: IDropdownProps<option>) {
+function Dropdown({
+  title,
+  options,
+  className,
+  handleSelect,
+  active,
+}: IDropdownProps<option>) {
   const {
     show: showOptions,
     handleShow,
@@ -25,12 +33,21 @@ function Dropdown({ title, options, className }: IDropdownProps<option>) {
   const [label, setLabel] = useState<string>(title as string);
 
   const handleClickOptions = (options: option) => {
-    setLabel(options.label);
+    if (!active) {
+      setLabel(title);
+    } else {
+      setLabel(options.label);
+    }
+    if (handleSelect) handleSelect(options.value);
   };
 
   return (
     <div className={cn("min-w-[150px] bg-white relative rounded-md text-sm")}>
-      <Select ref={nodeRef} onClick={handleShow} className={className?.select}>
+      <Select
+        ref={nodeRef}
+        onClick={handleShow}
+        className={"" + className?.select}
+      >
         <h3>{label}</h3>
         <span className={showOptions ? "rotate-180" : "rotate-0"}>
           <IconDown></IconDown>

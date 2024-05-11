@@ -7,16 +7,17 @@ import OutOfStock from "./OutOfStock.card";
 import ProgressBar from "./ProgressBar.card";
 
 interface ICardItemProps {
-  type?: "flashSale" | "normal";
+  type?: "flashSale" | "sale" | "normal";
+  name?: string;
   product: IProductRes;
 }
 
-function Card({ type, product }: ICardItemProps) {
+function Card({ type, product, name }: ICardItemProps) {
   return (
-    <div className="relative card-item shadow-shadow77 shadow-grayCa rounded-sm bg-grayF5">
-      {product.saleId?.discount && (
+    <div className="relative rounded-sm card-item shadow-shadow77 shadow-grayCa bg-grayF5">
+      {product.flashSaleId?.discount && (
         <CardSales
-          discount={product.saleId?.discount.toString()}
+          discount={product.flashSaleId?.discount.toString()}
           type={product.is_sale}
         ></CardSales>
       )}
@@ -34,18 +35,18 @@ function Card({ type, product }: ICardItemProps) {
             <Card.Info title="Giá">
               <span
                 className={
-                  product.saleId?.discount
+                  product.flashSaleId?.discount
                     ? "line-through text-xs"
                     : "text-red-600 text-lg"
                 }
               >
                 {new Intl.NumberFormat().format(product.price)}₫
               </span>
-              {product.saleId?.discount && (
-                <span className="text-red-600 text-lg">
+              {product.flashSaleId?.discount && (
+                <span className="text-lg text-red-600">
                   {new Intl.NumberFormat().format(
                     product.price -
-                      (product.price * product.saleId?.discount) / 100
+                      (product.price * product.flashSaleId?.discount) / 100
                   )}
                   ₫
                 </span>
@@ -53,12 +54,12 @@ function Card({ type, product }: ICardItemProps) {
             </Card.Info>
           )}
           <Card.Info title="Đã bán">
-            <span>{product.inventoryId.sold}</span>
+            <span>{product.sold}</span>
           </Card.Info>
-          {type === "flashSale" && (
+          {name === "flashSale" && type === "flashSale" && (
             <Card.ProgressBar
-              sold={product.saleId?.sold as number}
-              quantity={product.saleId?.quantity as number}
+              sold={product.flashSaleId?.sold as number}
+              quantity={product.flashSaleId?.quantity as number}
             ></Card.ProgressBar>
           )}
         </div>

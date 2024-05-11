@@ -1,11 +1,11 @@
 import { ProductLoadMore } from "@/components/product";
-import { Header } from "..";
+import Filter from "./Filter";
 
 function Content() {
   return (
     <main className="product-search">
-      <Header></Header>
-      <ProductLoadMore name="sale"></ProductLoadMore>;
+      <Filter></Filter>
+      <ProductLoadMore></ProductLoadMore>;
     </main>
   );
 }

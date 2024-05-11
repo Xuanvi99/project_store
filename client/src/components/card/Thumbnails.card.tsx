@@ -8,7 +8,10 @@ export default function Thumbnails({
   path: string;
 }) {
   return (
-    <Link to={path} className="w-full overflow-hidden cursor-pointer">
+    <Link
+      to={path}
+      className="w-full  min-h-[200px] overflow-hidden cursor-pointer"
+    >
       <img
         alt=""
         srcSet={src}

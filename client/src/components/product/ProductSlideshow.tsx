@@ -5,10 +5,7 @@ import { Link } from "react-router-dom";
 import Card from "../card";
 import SlideSwiper from "../slideshows";
 import { IconChevronRight } from "../icon";
-import {
-  useGetLisSaleQuery,
-  useGetListProductQuery,
-} from "@/stores/service/product.service";
+import { useGetListProductQuery } from "@/stores/service/product.service";
 import { useEffect, useState } from "react";
 import { IProductRes } from "@/types/product.type";
 
@@ -17,17 +14,8 @@ interface IProps {
 }
 
 export default function ProductSlideshow({ name }: IProps) {
-  const { data: resProduct } = useGetListProductQuery(
-    {
-      search: name,
-      activePage: 1,
-      limit: 10,
-    },
-    { skip: name === "flashSale" ? true : false }
-  );
-
-  const { data: resSale } = useGetLisSaleQuery({
-    is_sale: "flashSale",
+  const { data: resProduct } = useGetListProductQuery({
+    search: name,
     activePage: 1,
     limit: 10,
   });
@@ -38,11 +26,10 @@ export default function ProductSlideshow({ name }: IProps) {
   }>();
 
   useEffect(() => {
-    if (resProduct || resSale) {
-      const data = name === "flashSale" ? resSale : resProduct;
-      setListProduct(data);
+    if (resProduct) {
+      setListProduct(resProduct);
     }
-  }, [name, resProduct, resSale]);
+  }, [name, resProduct]);
 
   return (
     <LayoutProduct>
@@ -99,10 +86,7 @@ export default function ProductSlideshow({ name }: IProps) {
         {listProduct?.data.map((product, index) => {
           return (
             <SwiperSlide key={index}>
-              <Card
-                type={name === "flashSale" ? "flashSale" : "normal"}
-                product={product}
-              ></Card>
+              <Card name={name} type={product.is_sale} product={product}></Card>
             </SwiperSlide>
           );
         })}

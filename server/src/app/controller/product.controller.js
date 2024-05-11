@@ -11,11 +11,48 @@ class Product {
   getListProduct = async (req, res) => {
     const activePage = +req.query.activePage;
     const search = req.query.search || "";
-    const limit = req.query.limit;
+    const limit = +req.query.limit;
     const productId = req.query.productId || null;
+    const { sortBy, order, min_price, max_price } = req.query;
     const skip = (activePage - 1) * limit;
-
+    console.log(order);
     try {
+      const customSort = () => {
+        switch (sortBy) {
+          case "news":
+            return { createdAt: -1 };
+
+          case "sales":
+            return { sold: -1 };
+
+          case "price":
+            return { price: order ? order : "asc" };
+
+          case "relevancy":
+            return {};
+
+          default:
+            return { $natural: -1 };
+        }
+      };
+
+      const customPrice = () => {
+        if (
+          min_price &&
+          Number(max_price) > 0 &&
+          Number(max_price) >= Number(min_price)
+        ) {
+          return {
+            $and: [
+              { price: { $gte: min_price } },
+              { price: { $lte: max_price } },
+            ],
+          };
+        } else {
+          return {};
+        }
+      };
+
       const listProduct = await productModel
         .find({
           $and: [
@@ -28,6 +65,7 @@ class Product {
               ],
             },
             { _id: { $ne: productId } },
+            customPrice(),
           ],
         })
         .populate([
@@ -35,15 +73,16 @@ class Product {
           { path: "imageIds", select: "url" },
           { path: "commentIds" },
           { path: "inventoryId", select: "_id sold total stocked" },
-          { path: "saleId" },
+          { path: "flashSaleId" },
         ])
-        .sort({ $natural: -1 })
+        .sort(customSort())
         .skip(skip)
         .limit(limit);
 
       let totalPage = 0;
+      let countProduct = 0;
       if (search) {
-        const countProduct = await productModel.find({
+        const findProduct = await productModel.find({
           $and: [
             {
               $or: [
@@ -56,13 +95,16 @@ class Product {
             { _id: { $ne: productId } },
           ],
         });
-        totalPage = Math.ceil(countProduct.length / limit);
+        countProduct = findProduct.length;
+        totalPage = Math.ceil(findProduct.length / limit);
       } else {
-        const countProduct = await productModel.countDocuments();
+        countProduct = await productModel.countDocuments();
         totalPage = Math.ceil(countProduct / limit);
       }
 
-      res.status(200).json({ data: listProduct, totalPage });
+      res
+        .status(200)
+        .json({ data: listProduct, totalPage, result: countProduct });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
@@ -82,7 +124,7 @@ class Product {
           { path: "imageIds", select: "url" },
           { path: "commentIds" },
           { path: "inventoryId", select: "_id sold total stocked" },
-          { path: "saleId" },
+          { path: "flashSaleId" },
         ])
         .sort({ $natural: -1 })
         .skip(skip)
@@ -315,18 +357,16 @@ class Product {
     }
   };
 
-  // updateAbc = async (req, res) => {
-  //   const name = req.body.name;
-  //   try {
-  //     const ids = await productModel.updateMany(
-  //       {},
-  //       { $set: { is_sale: "normal" } }
-  //     );
-  //     res.status(200).json({ message: "Tên sản phẩm hợp lệ" });
-  //   } catch (error) {
-  //     res.status(500).json({ errMessage: "server error" });
-  //   }
-  // };
+  updateAbc = async (req, res) => {
+    try {
+      await productModel
+        .updateMany({}, { is_sale: "normal" })
+        .catch((error) => console.log(error));
+      res.status(200).json({ message: "update success" });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
 }
 
 module.exports = new Product();

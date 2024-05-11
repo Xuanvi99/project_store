@@ -15,14 +15,12 @@ export interface IProductReq {
 
 export interface IInventory {
   productId: string;
-  sold: number;
   total: number;
   stocked: boolean;
 }
 
-export interface ISale {
+export interface IFlashSale {
   productId: string | IProductRes;
-  status: string;
   quantity: number;
   sold: number;
   discount: number;
@@ -37,6 +35,7 @@ export interface IProductRes {
   brand: string;
   thumbnail: IImage;
   price: number;
+  discount: number;
   sold: number;
   status: string;
   imageIds: [IImage];
@@ -44,6 +43,25 @@ export interface IProductRes {
   categoryId: { _id: string; name: string };
   inventoryId: IInventory;
   is_sale: "flashSale" | "sale" | "normal";
-  saleId?: ISale;
+  flashSaleId?: IFlashSale;
   is_delete: boolean;
 }
+
+export type paramsListProduct = {
+  activePage: number | 1;
+  limit: number | 10;
+  search: string;
+};
+
+export interface paramsFilterProduct extends paramsListProduct {
+  sortBy: "news" | "sales" | "price" | "relevancy" | "";
+  order: "asc" | "desc" | "";
+  min_price: number;
+  max_price: number;
+}
+
+export type paramsListSale = {
+  activePage: number | 1;
+  limit: number | 10;
+  is_sale: "flashSale" | "sale";
+};

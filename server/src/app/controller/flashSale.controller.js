@@ -1,14 +1,14 @@
-const { productModel, saleModel, categoryModel } = require("../model");
+const { productModel, flashSaleModel, categoryModel } = require("../model");
 
-class Sale {
+class FlashSale {
   getListSaleProduct = async (req, res) => {
     const activePage = +req.query.activePage || 1;
     const status = req.query.status || "";
     const limit = req.query.limit || 10;
     const skip = (activePage - 1) * limit;
     try {
-      const listSaleProduct = await saleModel
-        .find({ status: { $regex: status, $options: "i" } })
+      const listSaleProduct = await flashSaleModel
+        .find()
         .populate([{ path: "productId" }])
         .sort({ $natural: -1 })
         .skip(skip)
@@ -16,12 +16,12 @@ class Sale {
 
       let totalPage = 0;
       if (status) {
-        const countSale = await saleModel.find({
+        const countSale = await flashSaleModel.find({
           status: { $regex: status, $options: "i" },
         });
         totalPage = Math.ceil(countSale.length / limit);
       } else {
-        const countSale = await saleModel.countDocuments();
+        const countSale = await flashSaleModel.countDocuments();
         totalPage = Math.ceil(countSale / limit);
       }
       res.status(200).json({ data: listSaleProduct, totalPage });
@@ -36,7 +36,7 @@ class Sale {
     if (!saleId)
       return res.status(403).json({ errorMessage: "Invalid id sale" });
     try {
-      const saleProduct = await saleModel
+      const saleProduct = await flashSaleModel
         .findById(saleId)
         .populate([{ path: "productId" }])
         .lean();
@@ -63,7 +63,7 @@ class Sale {
           .json({ errorMessage: "Không tim thấy sản phẩm" });
       }
 
-      const checkSale = await saleModel.findOneAndDelete({ productId });
+      const checkSale = await flashSaleModel.findOneAndDelete({ productId });
       const category = await categoryModel.findOne({ name: "Flash sale" });
 
       if (checkSale && category.productIds.length > 0) {
@@ -72,13 +72,13 @@ class Sale {
         });
       }
 
-      const _sale = new saleModel({
+      const _sale = new flashSaleModel({
         ...body,
       });
 
       await product.updateOne({
-        saleId: _sale._id,
-        is_sale: _sale.status,
+        flashSaleId: _sale._id,
+        is_sale: "flashSale",
       });
 
       await category.updateOne({
@@ -90,11 +90,11 @@ class Sale {
       if (!resultSale) {
         await product.updateOne({
           is_sale: "normal",
-          $unset: { saleId: "" },
+          $unset: { flashSaleId: "" },
         });
 
         await category.updateOne({
-          $pull: { productIds: { $in: product._id } },
+          $pull: { productIds: { $in: [product._id] } },
         });
 
         return res.status(400).json({ errMessage: "Lỗi thêm sản phẩm sale" });
@@ -109,16 +109,24 @@ class Sale {
   updateSaleProduct = async (req, res) => {
     const saleId = req.params.saleId;
     const body = req.body;
+
     if (!saleId)
       return res.status(403).json({ errorMessage: "Invalid id sale" });
     try {
-      const result = await saleModel.updateOne({ _id: saleId }, { ...body });
+      await flashSaleModel.deleteOne({ _id: saleId });
 
+      const result = await flashSaleModel.insertOne({ ...body });
       if (!result) {
         return res
           .status(400)
           .json({ errMessage: "Lỗi cập nhật sản phẩm sale" });
       }
+
+      // await product.updateOne({
+      //   saleId: _sale._id,
+      //   is_sale: _sale.status,
+      // });
+
       res.status(200).json({ message: "Cập nhật  sale thành công" });
     } catch (error) {
       console.log("error: ", error);
@@ -129,10 +137,11 @@ class Sale {
   deleteSaleProduct = async (req, res) => {
     const saleId = req.params.saleId;
     try {
-      const result = await saleModel.findByIdAndDelete(saleId);
+      const result = await flashSaleModel.findByIdAndDelete(saleId);
       if (!result) {
         return res.status(400).json({ errMessage: "Lỗi xóa sản phẩm sale" });
       }
+
       await productModel.updateOne(
         { _id: result.productId },
         { is_sale: "normal", $unset: { saleId: "" } }
@@ -153,4 +162,4 @@ class Sale {
   };
 }
 
-module.exports = new Sale();
+module.exports = new FlashSale();

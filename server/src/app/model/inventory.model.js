@@ -8,7 +8,6 @@ const inventorySchema = new Schema(
       ref: "products",
       required: true,
     },
-    sold: { type: Number, default: 0 },
     total: { type: Number, default: 0 },
     stocked: {
       type: Boolean,

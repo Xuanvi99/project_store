@@ -1,28 +1,22 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "../baseQueryToken";
-import { IProductRes } from "@/types/product.type";
+import {
+  IProductRes,
+  paramsFilterProduct,
+  paramsListProduct,
+  paramsListSale,
+} from "@/types/product.type";
 
-type paramsListProduct = {
-  activePage: number | 1;
-  limit: number | 10;
-  search: string;
-};
+type responsive = { data: IProductRes[]; totalPage: number; result: number };
 
-type paramsListSale = {
-  activePage: number | 1;
-  limit: number | 10;
-  is_sale: "flashSale" | "sale";
-};
+type request<T> = T;
 
 export const productApi = createApi({
   reducerPath: "product",
-  tagTypes: ["Product", "ProductSale"],
+  tagTypes: ["Product"],
   baseQuery: baseQueryWithAuth,
   endpoints: (build) => ({
-    getListProduct: build.query<
-      { data: IProductRes[]; totalPage: number },
-      paramsListProduct
-    >({
+    getListProduct: build.query<responsive, request<paramsListProduct>>({
       query: (params) => ({
         url: "product",
         method: "GET",
@@ -39,10 +33,7 @@ export const productApi = createApi({
             ]
           : [{ type: "Product", id: "LIST" }],
     }),
-    getLisSale: build.query<
-      { data: IProductRes[]; totalPage: number },
-      paramsListSale
-    >({
+    getListSale: build.query<responsive, request<paramsListSale>>({
       query: (params) => ({
         url: "product/listSale",
         method: "GET",
@@ -52,12 +43,41 @@ export const productApi = createApi({
         result
           ? [
               ...result.data.map(({ _id }) => ({
-                type: "ProductSale" as const,
+                type: "Product" as const,
                 id: _id,
               })),
-              { type: "ProductSale", id: "LIST" },
+              { type: "Product", id: "LIST_SALE" },
             ]
-          : [{ type: "ProductSale", id: "LIST" }],
+          : [{ type: "Product", id: "LIST_SALE" }],
+    }),
+    getLoadMoreData: build.query<responsive, request<paramsFilterProduct>>({
+      query: (params) => ({
+        url: "product",
+        method: "GET",
+        params: { ...params },
+      }),
+      serializeQueryArgs: ({ queryArgs }) => {
+        const { search, sortBy, order, min_price, max_price } = queryArgs;
+        return { search, sortBy, order, min_price, max_price };
+      },
+      // Always merge incoming data to the cache entry
+      merge: (currentCache, newItems) => {
+        currentCache.data.push(...newItems.data);
+      },
+      // Refetch when the page arg changes
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg !== previousArg;
+      },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ _id }) => ({
+                type: "Product" as const,
+                id: _id,
+              })),
+              { type: "Product", id: "LOAD_MORE" },
+            ]
+          : [{ type: "Product", id: "LOAD_MORE" }],
     }),
     getOneProduct: build.query<{ data: IProductRes }, string>({
       query: (slugOrId) => ({ url: "product/" + slugOrId }),
@@ -85,5 +105,6 @@ export const {
   useCheckNameMutation,
   useGetListProductQuery,
   useGetOneProductQuery,
-  useGetLisSaleQuery,
+  useGetListSaleQuery,
+  useGetLoadMoreDataQuery,
 } = productApi;
