@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import {
-  CategoryPage,
+  CategoryOrSearchPage,
   HomePage,
   NotFoundPage,
   ProductDetailPage,
@@ -43,12 +43,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/category/:slug",
-
-        element: <CategoryPage></CategoryPage>,
+        element: <CategoryOrSearchPage></CategoryOrSearchPage>,
       },
       {
         path: "/search",
-        element: <CategoryPage></CategoryPage>,
+        element: <CategoryOrSearchPage></CategoryOrSearchPage>,
       },
       {
         path: "/productDetail/:slug",

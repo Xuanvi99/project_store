@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useClickOutSide } from "../../hook";
 import { cn } from "../../utils";
 import { IconDown } from "../icon";
@@ -14,7 +14,7 @@ interface IDropdownProps<T> {
     select?: string;
     option?: string;
   };
-  active: boolean;
+  active?: string;
   handleSelect?: (value: string) => void;
 }
 
@@ -33,13 +33,15 @@ function Dropdown({
   const [label, setLabel] = useState<string>(title as string);
 
   const handleClickOptions = (options: option) => {
-    if (!active) {
-      setLabel(title);
-    } else {
-      setLabel(options.label);
-    }
+    setLabel(options.label);
     if (handleSelect) handleSelect(options.value);
   };
+
+  useEffect(() => {
+    if (active !== "4") {
+      setLabel(title);
+    }
+  }, [active, title]);
 
   return (
     <div className={cn("min-w-[150px] bg-white relative rounded-md text-sm")}>

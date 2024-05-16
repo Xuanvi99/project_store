@@ -1,7 +1,7 @@
 import { lazy } from "react";
 
 const HomePage = lazy(() => import("./HomePage"));
-const CategoryPage = lazy(() => import("./CategoryPage"));
+const CategoryOrSearchPage = lazy(() => import("./CategoryOrSearchPage"));
 const ProductDetailPage = lazy(() => import("./ProductDetailPage"));
 const NotFoundPage = lazy(() => import("./NotFoundPage"));
 const LoginPage = lazy(() => import("./LoginPage"));
@@ -16,7 +16,7 @@ const VerifyPage = lazy(() => import("./VerifyPage"));
 export {
   HomePage,
   NotFoundPage,
-  CategoryPage,
+  CategoryOrSearchPage,
   ProductDetailPage,
   LoginPage,
   SignUpPage,

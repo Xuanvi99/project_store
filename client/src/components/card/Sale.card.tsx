@@ -6,8 +6,8 @@ export default function CardSales({
   type,
   className,
 }: {
-  discount: string;
-  type: "flashSale" | "sale" | "normal";
+  discount: number;
+  type: "sale" | "normal";
   className?: string;
 }) {
   return (
@@ -23,7 +23,7 @@ export default function CardSales({
           - {discount}%
         </span>
       </div>
-      {type === "flashSale" && (
+      {type === "sale" && (
         <div className="absolute top-0 right-0 z-20 inline-block px-2 py-1 text-xs font-normal bg-orangeLinear rounded-xl">
           Deal giá sốc
         </div>

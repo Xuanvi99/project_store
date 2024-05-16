@@ -13,7 +13,7 @@ function HomePage() {
       <BannerHome></BannerHome>
       <LayoutMain>
         <Feature></Feature>
-        <ProductSlideshow name="flashSale"></ProductSlideshow>
+        <ProductSlideshow name="sale"></ProductSlideshow>
         <ProductSlideshow name="adidas"></ProductSlideshow>
         <ProductSlideshow name="nike"></ProductSlideshow>
         <ProductSlideshow name="vans"></ProductSlideshow>

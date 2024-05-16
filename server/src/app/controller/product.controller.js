@@ -5,6 +5,7 @@ const {
   categoryModel,
   productItemModel,
   inventoryModel,
+  flashSaleModel,
 } = require("../model");
 
 class Product {
@@ -13,46 +14,9 @@ class Product {
     const search = req.query.search || "";
     const limit = +req.query.limit;
     const productId = req.query.productId || null;
-    const { sortBy, order, min_price, max_price } = req.query;
     const skip = (activePage - 1) * limit;
-    console.log(order);
+
     try {
-      const customSort = () => {
-        switch (sortBy) {
-          case "news":
-            return { createdAt: -1 };
-
-          case "sales":
-            return { sold: -1 };
-
-          case "price":
-            return { price: order ? order : "asc" };
-
-          case "relevancy":
-            return {};
-
-          default:
-            return { $natural: -1 };
-        }
-      };
-
-      const customPrice = () => {
-        if (
-          min_price &&
-          Number(max_price) > 0 &&
-          Number(max_price) >= Number(min_price)
-        ) {
-          return {
-            $and: [
-              { price: { $gte: min_price } },
-              { price: { $lte: max_price } },
-            ],
-          };
-        } else {
-          return {};
-        }
-      };
-
       const listProduct = await productModel
         .find({
           $and: [
@@ -65,7 +29,6 @@ class Product {
               ],
             },
             { _id: { $ne: productId } },
-            customPrice(),
           ],
         })
         .populate([
@@ -73,9 +36,8 @@ class Product {
           { path: "imageIds", select: "url" },
           { path: "commentIds" },
           { path: "inventoryId", select: "_id sold total stocked" },
-          { path: "flashSaleId" },
         ])
-        .sort(customSort())
+        .sort({ $natural: -1 })
         .skip(skip)
         .limit(limit);
 
@@ -101,39 +63,117 @@ class Product {
         countProduct = await productModel.countDocuments();
         totalPage = Math.ceil(countProduct / limit);
       }
-
-      res
-        .status(200)
-        .json({ data: listProduct, totalPage, result: countProduct });
+      res.status(200).json({ data: listProduct, totalPage });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
   };
 
-  getListProductSale = async (req, res) => {
+  getListProductFilter = async (req, res) => {
     const activePage = +req.query.activePage;
-    const is_sale = req.query.is_sale;
-    const limit = req.query.limit;
+    const search = req.query.search || "";
+    const limit = +req.query.limit;
+    const { sortBy, order } = req.query;
+    const min_price = +req.query.min_price;
+    const max_price = +req.query.max_price;
     const skip = (activePage - 1) * limit;
-
     try {
-      const listProduct = await productModel
-        .find({ is_sale })
+      const customSort = () => {
+        switch (sortBy) {
+          case "news":
+            return { createdAt: -1 };
+
+          case "sales":
+            return { sold: -1 };
+
+          default:
+            return {};
+        }
+      };
+
+      let listFindProduct = await productModel
+        .find({
+          $and: [
+            {
+              $or: [
+                { name: { $regex: search, $options: "i" } },
+                { brand: { $regex: search, $options: "i" } },
+                { slug: { $regex: search, $options: "i" } },
+                { is_sale: { $regex: search, $options: "i" } },
+              ],
+            },
+          ],
+        })
         .populate([
           { path: "thumbnail", select: "url" },
-          { path: "imageIds", select: "url" },
-          { path: "commentIds" },
           { path: "inventoryId", select: "_id sold total stocked" },
-          { path: "flashSaleId" },
         ])
-        .sort({ $natural: -1 })
-        .skip(skip)
-        .limit(limit);
+        .sort(customSort());
 
-      const countProduct = await productModel.find({ is_sale });
-      const totalPage = Math.ceil(countProduct.length / limit);
+      let listProductFilter = [...listFindProduct];
+      if (min_price >= 0 && max_price > 0 && min_price <= max_price) {
+        listProductFilter = listFindProduct.filter((product) => {
+          const { is_sale, price, priceSale } = product;
+          let priceProduct = 0;
+          if (is_sale === "sale") {
+            priceProduct = priceSale;
+          } else {
+            priceProduct = price;
+          }
+          return priceProduct >= min_price && priceProduct <= max_price;
+        });
+      }
 
-      res.status(200).json({ data: listProduct, totalPage });
+      if (min_price > max_price) {
+        return res.status(200).json({
+          data: [],
+          totalPage: 0,
+          result_filter: 0,
+          result_search: listFindProduct,
+        });
+      }
+
+      if (order) {
+        listProductFilter = listProductFilter.sort((a, b) => {
+          let a_price = 0,
+            b_price = 0;
+          if (a.is_sale === "sale") {
+            a_price = a.priceSale;
+          } else {
+            a_price = a.price;
+          }
+
+          if (b.is_sale === "sale") {
+            b_price = b.priceSale;
+          } else {
+            b_price = b.price;
+          }
+
+          if (order === "asc") {
+            return a_price - b_price;
+          } else {
+            return b_price - a_price;
+          }
+        });
+      }
+
+      const listResultProduct = [];
+      let i = 0;
+      for (const item of listProductFilter) {
+        if (i >= skip && i < skip + limit) {
+          listResultProduct.push(item);
+        }
+        i++;
+      }
+
+      const totalPage = Math.ceil(listFindProduct.length / limit);
+
+      res.status(200).json({
+        data: listResultProduct,
+        totalPage,
+        result_filter: listProductFilter.length,
+        result_search: listFindProduct,
+      });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
@@ -151,7 +191,6 @@ class Product {
           { path: "imageIds", select: "url" },
           { path: "commentIds" },
           { path: "inventoryId", select: "_id sold total stocked" },
-          { path: "saleId" },
         ])
         .lean();
       if (!product) {
@@ -360,7 +399,7 @@ class Product {
   updateAbc = async (req, res) => {
     try {
       await productModel
-        .updateMany({}, { is_sale: "normal" })
+        .updateMany({}, { $set: { is_sale: "normal" } })
         .catch((error) => console.log(error));
       res.status(200).json({ message: "update success" });
     } catch (error) {

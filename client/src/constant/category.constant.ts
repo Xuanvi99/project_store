@@ -1,7 +1,7 @@
 import { paramsFilterProduct } from "@/types/product.type";
 
 export const productCategory = [
-  { id: "1", label: "Flash sale", value: "Flash sale" },
+  { id: "1", label: "Sale", value: "sale" },
   { id: "2", label: "Nike", value: "Nike" },
   { id: "3", label: "Adidas", value: "Adidas" },
   { id: "4", label: "Vans", value: "Vans" },

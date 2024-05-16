@@ -6,7 +6,7 @@ const routes = express.Router();
 
 routes
   .route("/api/category")
-  .get(verifyMdw.verifyToken, verifyMdw.verifyRole, categoryCtrl.getAll)
+  .get(categoryCtrl.getAll)
   .post(
     uploadFileMdw.single("image"),
     verifyMdw.verifyToken,

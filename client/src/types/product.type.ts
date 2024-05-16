@@ -19,13 +19,6 @@ export interface IInventory {
   stocked: boolean;
 }
 
-export interface IFlashSale {
-  productId: string | IProductRes;
-  quantity: number;
-  sold: number;
-  discount: number;
-}
-
 export interface IProductRes {
   _id: string;
   name: string;
@@ -35,15 +28,14 @@ export interface IProductRes {
   brand: string;
   thumbnail: IImage;
   price: number;
-  discount: number;
+  priceSale: number;
   sold: number;
   status: string;
   imageIds: [IImage];
   commentIds: IComment[];
   categoryId: { _id: string; name: string };
   inventoryId: IInventory;
-  is_sale: "flashSale" | "sale" | "normal";
-  flashSaleId?: IFlashSale;
+  is_sale: "sale" | "normal";
   is_delete: boolean;
 }
 

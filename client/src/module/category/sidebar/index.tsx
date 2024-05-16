@@ -1,18 +1,16 @@
 import PriceFilter from "./PriceFilter";
-import ProductFilter from "./ProductFilter";
+import ListCategory from "./ListCategory";
 
 function Sidebar() {
   return (
     <aside className="w-full">
-      <Sidebar.ProductFilter></Sidebar.ProductFilter>
-      <Sidebar.PriceFilter
-        price={{ start: 10, end: 1000 }}
-      ></Sidebar.PriceFilter>
+      <Sidebar.ListCategory></Sidebar.ListCategory>
+      <Sidebar.PriceFilter></Sidebar.PriceFilter>
     </aside>
   );
 }
 
-Sidebar.ProductFilter = ProductFilter;
+Sidebar.ListCategory = ListCategory;
 Sidebar.PriceFilter = PriceFilter;
 
 export default Sidebar;

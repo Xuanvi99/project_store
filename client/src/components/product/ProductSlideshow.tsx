@@ -36,18 +36,18 @@ export default function ProductSlideshow({ name }: IProps) {
       <div
         className={cn(
           "w-full flex justify-between items-center min-h-[50px] rounded-md p-[10px] font-bold border-b-1 border-orange",
-          name === "flashSale"
+          name === "sale"
             ? "text-red-800 bg-orangeLinear"
             : "bg-white text-orange"
         )}
       >
         <div className="relative flex items-center text-2xl gap-x-2">
           <span>
-            {name === "flashSale"
-              ? "Giá Sốc hôm nay"
+            {name === "sale"
+              ? "Giảm Giá Sốc"
               : "Giày " + name.charAt(0).toUpperCase() + name.slice(1)}
           </span>
-          {name === "flashSale" && (
+          {name === "sale" && (
             <img
               src=""
               alt=""
@@ -86,7 +86,7 @@ export default function ProductSlideshow({ name }: IProps) {
         {listProduct?.data.map((product, index) => {
           return (
             <SwiperSlide key={index}>
-              <Card name={name} type={product.is_sale} product={product}></Card>
+              <Card product={product}></Card>
             </SwiperSlide>
           );
         })}

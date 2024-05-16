@@ -3,7 +3,7 @@ import { IconSearch } from "@/components/icon";
 import { Input } from "@/components/input";
 import { cn } from "@/utils";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 type TProps = {
   className?: string;
@@ -11,8 +11,11 @@ type TProps = {
 
 function Search({ className }: TProps) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [textSearch, setTextSearch] = useState<string>("");
+  const [textSearch, setTextSearch] = useState<string>(
+    searchParams.get("s") || ""
+  );
 
   const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTextSearch(event.target.value);
@@ -20,7 +23,9 @@ function Search({ className }: TProps) {
 
   const handleSubmitSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    navigate(`/search?s=${textSearch}`);
+    navigate(`/search?s=${textSearch}&page=1`, {
+      state: { s: textSearch },
+    });
   };
 
   return (

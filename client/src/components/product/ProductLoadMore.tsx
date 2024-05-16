@@ -5,13 +5,15 @@ import { CategoryContext, ICategoryProvide } from "@/module/category/context";
 import { Fragment, useEffect, useRef } from "react";
 import LoadingSpinner from "../loading";
 import CartSkeleton from "../card/cart-skeleton";
+import { useSearchParams } from "react-router-dom";
+import { Button } from "../button";
 
 function ProductLoadMore() {
   const { filter, handleSetData, handleSetFilter, data } =
     useTestContext<ICategoryProvide>(
       CategoryContext as React.Context<ICategoryProvide>
     );
-
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     data: resProduct,
     status,
@@ -31,8 +33,10 @@ function ProductLoadMore() {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           if (data && filter.activePage + 1 <= data?.totalPage && !isFetching) {
-            console.log("Fetching more data...");
-            handleSetFilter({ activePage: filter.activePage + 1 });
+            const page = filter.activePage + 1;
+            handleSetFilter({ activePage: page });
+            searchParams.set("page", "" + page);
+            setSearchParams(searchParams);
           }
         }
       });
@@ -50,7 +54,7 @@ function ProductLoadMore() {
     };
   }, [data, filter.activePage, handleSetFilter, isFetching]);
 
-  if (isFetching) {
+  if (isFetching && filter.activePage === 1) {
     return (
       <div className="grid w-full grid-cols-4 gap-5">
         {Array(8)
@@ -62,13 +66,51 @@ function ProductLoadMore() {
     );
   }
 
+  const handleRemoveFilter = () => {
+    searchParams.delete("sortBy");
+    searchParams.delete("order");
+    searchParams.delete("min_price");
+    searchParams.delete("max_price");
+    setSearchParams(searchParams);
+    handleSetFilter({
+      activePage: 1,
+      sortBy: "relevancy",
+      order: "",
+      min_price: 0,
+      max_price: 0,
+    });
+  };
+
+  if (data?.data.length === 0 && !isFetching) {
+    return (
+      <div className="flex flex-col justify-center items-center mt-10">
+        <img alt="" srcSet="/search_notfound.png" className="w-40" />
+        {searchParams.size > 1 && searchParams.has("s") ? (
+          <>
+            <span>
+              Hix. Không có sản phẩm nào. Bạn thử tắt điều kiện lọc và tìm lại
+              nhé?
+            </span>
+            <Button
+              variant="default"
+              className="mt-5"
+              onClick={handleRemoveFilter}
+            >
+              Xóa bộ lọc
+            </Button>
+          </>
+        ) : (
+          <span>Không tìm thấy kết quả nào</span>
+        )}
+      </div>
+    );
+  }
+
   return (
     <Fragment>
       <div className="grid w-full grid-cols-4 gap-5">
         {data?.data.map((product, index) => {
-          return (
-            <Card key={index} type={product.is_sale} product={product}></Card>
-          );
+          return <Card key={index} product={product}></Card>;
         })}
       </div>
       <div className="w-full mt-5 text-center" ref={LoadRef}>

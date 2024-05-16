@@ -21,10 +21,10 @@ const ProductSchema = new Schema(
     price: { type: Number, required: true, default: 0 },
     is_sale: {
       type: String,
-      enum: ["flashSale", "sale", "normal"],
+      enum: ["sale", "normal"],
       default: "normal",
     },
-    discount: { type: Number, require: true, default: 0 },
+    priceSale: { type: Number, require: true, default: 0 },
     sold: { type: Number, default: 0 },
     status: { type: String, enum: ["active", "deactive"], default: "deactive" },
     imageIds: [{ type: Schema.Types.ObjectId, ref: "images", require: true }],
@@ -38,10 +38,6 @@ const ProductSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "inventories",
       require: true,
-    },
-    flashSaleId: {
-      type: Schema.Types.ObjectId,
-      ref: "flashSale",
     },
   },
   { timestamps: true }

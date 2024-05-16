@@ -1,19 +1,31 @@
+import useTestContext from "@/hook/useTestContext";
 import { cn } from "@/utils";
 import Slider from "rc-slider";
-import { useState } from "react";
+import { CategoryContext, ICategoryProvide } from "../context";
+import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/button";
 
-interface IPriceFilterProps {
-  price: {
-    start: number;
-    end: number;
-  };
-}
+function PriceFilter() {
+  const { handleSetFilter, maxPrice, minPrice, filter, data } =
+    useTestContext<ICategoryProvide>(
+      CategoryContext as React.Context<ICategoryProvide>
+    );
+  const [searchParams, setSearchParams] = useSearchParams();
 
-function PriceFilter({ price }: IPriceFilterProps) {
   const [priceFilter, setPriceFilter] = useState<{
     start: number;
     end: number;
-  }>(price);
+  }>({
+    start: 0,
+    end: 0,
+  });
+
+  useEffect(() => {
+    const start = filter.min_price == 0 ? minPrice : filter.min_price;
+    const end = filter.max_price === 0 ? maxPrice : filter.max_price;
+    setPriceFilter({ start, end });
+  }, [filter.max_price, filter.min_price, maxPrice, minPrice]);
 
   const currency = (value: number) => {
     return new Intl.NumberFormat().format(value);
@@ -29,17 +41,26 @@ function PriceFilter({ price }: IPriceFilterProps) {
         Lọc sản phẩm
       </h3>
       <form
-        onSubmit={() => {
-          console.log("a");
+        onSubmit={(event) => {
+          event.preventDefault();
+          searchParams.set("min_price", "" + priceFilter.start);
+          searchParams.set("max_price", "" + priceFilter.end);
+          setSearchParams(searchParams);
+          handleSetFilter({
+            activePage: 1,
+            min_price: priceFilter.start,
+            max_price: priceFilter.end,
+          });
         }}
         className="flex flex-col px-3 py-5 bg-white gap-y-5 rounded-b-md"
       >
         <Slider
           range
           allowCross={false}
-          defaultValue={[0, 1000]}
-          min={price.start}
-          max={price.end}
+          defaultValue={[priceFilter.start, priceFilter.end]}
+          value={[priceFilter.start, priceFilter.end]}
+          min={minPrice}
+          max={maxPrice}
           step={50}
           onChange={(value) => {
             const [start, end] = value as number[];
@@ -47,22 +68,26 @@ function PriceFilter({ price }: IPriceFilterProps) {
           }}
           className="w-full slider"
         />
-        <div className="flex flex-col items-start justify-start gap-y-3">
-          <div className="flex items-center gap-x-1">
-            <span>Giá:</span>
-            <div className="flex items-center font-bold gap-x-1">
-              <span>{currency(priceFilter.start)}₫</span>
-              <span className="w-3 h-[1px] bg-black"></span>
-              <span>{currency(priceFilter.end)}₫</span>
-            </div>
+
+        <div className="flex items-center gap-x-1">
+          <span>Giá:</span>
+          <div className="flex items-center font-bold gap-x-1">
+            <span>{currency(priceFilter.start)}₫</span>
+            <span className="w-3 h-[1px] bg-black"></span>
+            <span>{currency(priceFilter.end)}₫</span>
           </div>
-          <button
-            type="submit"
-            className="px-3 py-1 font-bold text-white rounded-lg bg-orangeLinear"
-          >
-            Lọc
-          </button>
         </div>
+
+        <Button
+          variant="default"
+          type="submit"
+          disabled={
+            data?.result_search && data?.result_search.length > 0 ? false : true
+          }
+          className="px-3 py-1 font-bold max-w-[100px] text-sm text-white rounded-lg bg-orangeLinear"
+        >
+          Áp Dụng
+        </Button>
       </form>
     </div>
   );

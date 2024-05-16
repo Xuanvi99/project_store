@@ -23,9 +23,9 @@ routes
     productCtrl.checkNameProduct
   );
 
-routes.route("/api/product/listSale").get(productCtrl.getListProductSale);
+routes.route("/api/product/filter").get(productCtrl.getListProductFilter);
 
-routes.route("/api/product/abc").post(productCtrl.updateAbc);
+routes.route("/api/product/test").post(productCtrl.updateAbc);
 
 routes
   .route("/api/product/:slugOrId")

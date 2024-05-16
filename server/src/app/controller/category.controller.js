@@ -84,7 +84,6 @@ class Category {
   update = async (req, res) => {
     const id = req.params.id;
     const { file, body } = req;
-    console.log("file: ", file);
     let categoryUpdate = {};
     try {
       if (!id) return res.status(400).json({ errMessage: "Invalid Id" });
@@ -129,7 +128,6 @@ class Category {
         }
 
         categoryUpdate = { ...categoryUpdate, productIds: newProductIds };
-        console.log("categoryUpdate: ", categoryUpdate);
       }
 
       const result = await category.updateOne(categoryUpdate);

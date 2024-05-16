@@ -4,16 +4,20 @@ import LayoutMain from "../layout/LayoutMain";
 import { BannerCommon } from "../components/banner";
 import * as Category from "../module/category";
 import { CategoryProvide } from "@/module/category/context";
+import { useParams } from "react-router-dom";
 
-function CategoryPage() {
+function CategoryOrSearchPage() {
+  const { slug } = useParams();
+
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
+
   return (
     <Fragment>
       <BannerCommon
-        heading="Danh mục sản phẩm"
-        title="Sản phẩm tìm kiếm"
+        heading={slug ? "Danh mục sản phẩm" : "Tìm kiếm sản phẩm"}
+        title={slug ? "Giày " + slug : "Tìm kiếm sản phẩm"}
       ></BannerCommon>
       <LayoutMain>
         <section className={cn("w-full grid grid-cols-[280px_900px] gap-x-5")}>
@@ -27,4 +31,4 @@ function CategoryPage() {
   );
 }
 
-export default CategoryPage;
+export default CategoryOrSearchPage;

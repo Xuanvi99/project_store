@@ -7,7 +7,15 @@ import {
   paramsListSale,
 } from "@/types/product.type";
 
-type responsive = { data: IProductRes[]; totalPage: number; result: number };
+interface IResponsive {
+  data: IProductRes[];
+  totalPage: number;
+}
+
+interface IResponsiveFilter extends IResponsive {
+  result_filter: number;
+  result_search: IProductRes[];
+}
 
 type request<T> = T;
 
@@ -16,7 +24,7 @@ export const productApi = createApi({
   tagTypes: ["Product"],
   baseQuery: baseQueryWithAuth,
   endpoints: (build) => ({
-    getListProduct: build.query<responsive, request<paramsListProduct>>({
+    getListProduct: build.query<IResponsive, request<paramsListProduct>>({
       query: (params) => ({
         url: "product",
         method: "GET",
@@ -33,7 +41,7 @@ export const productApi = createApi({
             ]
           : [{ type: "Product", id: "LIST" }],
     }),
-    getListSale: build.query<responsive, request<paramsListSale>>({
+    getListSale: build.query<IResponsive, request<paramsListSale>>({
       query: (params) => ({
         url: "product/listSale",
         method: "GET",
@@ -50,9 +58,12 @@ export const productApi = createApi({
             ]
           : [{ type: "Product", id: "LIST_SALE" }],
     }),
-    getLoadMoreData: build.query<responsive, request<paramsFilterProduct>>({
+    getLoadMoreData: build.query<
+      IResponsiveFilter,
+      request<paramsFilterProduct>
+    >({
       query: (params) => ({
-        url: "product",
+        url: "product/filter",
         method: "GET",
         params: { ...params },
       }),
@@ -64,9 +75,9 @@ export const productApi = createApi({
       merge: (currentCache, newItems) => {
         currentCache.data.push(...newItems.data);
       },
-      // Refetch when the page arg changes
+      //Refetch when the page arg changes
       forceRefetch({ currentArg, previousArg }) {
-        return currentArg !== previousArg;
+        return currentArg?.activePage !== previousArg?.activePage;
       },
       providesTags: (result) =>
         result

@@ -37,7 +37,6 @@ function App() {
     if (cart && status === "fulfilled") {
       dispatch(updateCart(cart));
     }
-    return () => {};
   }, [cart, dispatch, status]);
 
   return (

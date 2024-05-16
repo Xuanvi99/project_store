@@ -8,7 +8,6 @@ const cartCtrl = require("./cart.controller");
 const addressCtrl = require("./address.controller");
 const categoryCtrl = require("./category.controller");
 const imageCtrl = require("./image.controller");
-const flashSaleCtrl = require("./flashSale.controller");
 
 module.exports = {
   userCtrl,
@@ -21,5 +20,4 @@ module.exports = {
   addressCtrl,
   categoryCtrl,
   imageCtrl,
-  flashSaleCtrl,
 };
