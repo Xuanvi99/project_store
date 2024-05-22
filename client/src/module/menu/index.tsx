@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import LogoCart from "./LogoCart.menu";
+import Cart from "./Cart.menu";
 import Profile from "./Profile.menu";
 import Logo from "./Logo.menu";
 import Search from "./Search.menu";
 import { cn } from "@/utils";
+import Notification from "./Notification.menu";
+import { useAppSelector } from "@/hook";
+import { RootState } from "@/stores";
 
 function Menu() {
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
   const [scroll, setScroll] = useState<boolean>(false);
 
   useEffect(() => {
@@ -37,7 +41,8 @@ function Menu() {
             <Logo />
             <Search></Search>
             <div className="flex items-center gap-x-3">
-              <LogoCart></LogoCart>
+              <Cart></Cart>
+              {user && <Notification></Notification>}
               <Profile></Profile>
             </div>
           </div>

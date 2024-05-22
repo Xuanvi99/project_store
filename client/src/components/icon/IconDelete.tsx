@@ -1,8 +1,17 @@
 import { cn } from "../../utils";
 
-function IconDelete({ size, className }: { size: number; className?: string }) {
+function IconDelete({
+  size,
+  className,
+  onClick,
+}: {
+  size: number;
+  className?: string;
+  onClick?: () => void;
+}) {
   return (
     <div
+      onClick={onClick}
       className={cn(
         `relative iconDelete cursor-pointer w-[${size}px]`,
         className

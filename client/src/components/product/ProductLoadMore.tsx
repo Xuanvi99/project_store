@@ -1,4 +1,3 @@
-import { useGetLoadMoreDataQuery } from "@/stores/service/product.service";
 import Card from "../card";
 import useTestContext from "@/hook/useTestContext";
 import { CategoryContext, ICategoryProvide } from "@/module/category/context";
@@ -9,24 +8,13 @@ import { useSearchParams } from "react-router-dom";
 import { Button } from "../button";
 
 function ProductLoadMore() {
-  const { filter, handleSetData, handleSetFilter, data } =
+  const { filter, handleSetFilter, data, isFetching, status } =
     useTestContext<ICategoryProvide>(
       CategoryContext as React.Context<ICategoryProvide>
     );
   const [searchParams, setSearchParams] = useSearchParams();
-  const {
-    data: resProduct,
-    status,
-    isFetching,
-  } = useGetLoadMoreDataQuery(filter);
 
   const LoadRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (resProduct && status === "fulfilled") {
-      handleSetData(resProduct);
-    }
-  }, [resProduct, handleSetData, status]);
 
   useEffect(() => {
     const callback = (entries: IntersectionObserverEntry[]) => {
@@ -52,9 +40,16 @@ function ProductLoadMore() {
     return () => {
       observer.disconnect();
     };
-  }, [data, filter.activePage, handleSetFilter, isFetching]);
+  }, [
+    data,
+    filter.activePage,
+    handleSetFilter,
+    isFetching,
+    searchParams,
+    setSearchParams,
+  ]);
 
-  if (isFetching && filter.activePage === 1) {
+  if (isFetching && status === "pending" && filter.activePage === 1) {
     return (
       <div className="grid w-full grid-cols-4 gap-5">
         {Array(8)
@@ -83,9 +78,9 @@ function ProductLoadMore() {
 
   if (data?.data.length === 0 && !isFetching) {
     return (
-      <div className="flex flex-col justify-center items-center mt-10">
+      <div className="flex flex-col items-center justify-center mt-10">
         <img alt="" srcSet="/search_notfound.png" className="w-40" />
-        {searchParams.size > 1 && searchParams.has("s") ? (
+        {searchParams.size > 2 && searchParams.has("s") ? (
           <>
             <span>
               Hix. Không có sản phẩm nào. Bạn thử tắt điều kiện lọc và tìm lại

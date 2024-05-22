@@ -6,14 +6,10 @@ class Comment {
     try {
       const listComment = await commentModel
         .find({ productId })
-        .populate([
-          { path: "userId" },
-          { path: "productId" },
-          { path: "imageIDs" },
-        ])
+        .populate([{ path: "userId" }, { path: "imageIds" }])
         .lean();
-      const totalComment = await commentModel.countDocuments();
-      res.status(200).json({ listComment, totalComment });
+      const total = await commentModel.countDocuments();
+      res.status(200).json({ listComment, total });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }

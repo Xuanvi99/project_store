@@ -32,7 +32,7 @@ function Filter() {
     <div className="flex flex-col items-start w-full mb-2 gap-y-5">
       {pathname === "/search" && (
         <>
-          <div className="flex justify-center items-center w-full text-xl font-bold">
+          <div className="flex items-center justify-center w-full text-xl font-bold">
             Tìm Kiếm sản phẩm
           </div>
           <div className="flex items-center justify-between w-full font-bold">
@@ -47,7 +47,7 @@ function Filter() {
       )}
       {slug && (
         <>
-          <div className="flex justify-center items-center w-full text-xl font-bold">
+          <div className="flex items-center justify-center w-full text-xl font-bold">
             Danh mục sản phẩm
           </div>
           <div
@@ -68,9 +68,9 @@ function Filter() {
           </div>
         </>
       )}
-      <div className="flex items-center w-full mb-3 justify-between">
-        <div className="flex gap-x-2 items-center">
-          <span className="text-orange font-bold">Sắp xếp theo:</span>
+      <div className="flex items-center justify-between w-full mb-3">
+        <div className="flex items-center gap-x-2">
+          <span className="font-bold text-orange">Sắp xếp theo:</span>
           <div className="flex items-center mr-3 text-sm gap-x-4">
             {OptionSearch.map((item, index) => {
               return (
@@ -121,7 +121,7 @@ function Filter() {
               handleSetFilter({
                 activePage: 1,
                 sortBy: "price",
-                order: value as "asc" | "desc",
+                order: value as "" | "desc" | "asc" | undefined,
               });
               handleSetData({
                 data: [],
@@ -132,8 +132,8 @@ function Filter() {
             }}
           />
         </div>
-        <div className="flex gap-x-2 text-sm items-center">
-          <span className="text-orange font-bold">Kết quả:</span>
+        <div className="flex items-center text-sm gap-x-2">
+          <span className="font-bold text-orange">Kết quả:</span>
           <span>{data?.result_filter}</span>
           <span>sản phẩm</span>
         </div>

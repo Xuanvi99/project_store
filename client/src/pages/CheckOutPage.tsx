@@ -23,7 +23,7 @@ function CheckOutPage() {
       <LayoutMain>
         <section className="w-full bg-white relative py-7 px-[30px] flex flex-col gap-y-5 shadow-sm shadow-gray">
           <div className="w-full h-[3px] absolute top-0 left-0 borderCheckOut"></div>
-          <div className="flex items-center gap-x-3 text-orange text-xl">
+          <div className="flex items-center text-xl gap-x-3 text-orange">
             <IconAddress size={20}></IconAddress>
             <h2>Địa Chỉ Nhận Hàng</h2>
           </div>
@@ -32,25 +32,28 @@ function CheckOutPage() {
             <span>Thôn Giao Tự, Xã Kim Sơn, Huyện Gia Lâm, Hà Nội</span>
             <span
               onClick={handleShow}
-              className="text-blue hover:text-orange cursor-pointer ml-10"
+              className="ml-10 cursor-pointer text-blue hover:text-orange"
             >
               Thay đổi
             </span>
-            <ModalAddress show={openShow} handle={handleShow}></ModalAddress>
+            <ModalAddress
+              show={openShow}
+              handleShow={handleShow}
+            ></ModalAddress>
           </div>
         </section>
         <section className="w-full mx-auto mt-5 px-[30px] shadow-sm shadow-grayCa  bg-white rounded-[3px] flex flex-col justify-between items-center">
-          <div className="w-full flex items-center font-bold py-5">
+          <div className="flex items-center w-full py-5 font-bold">
             <div className="w-1/2">Sản phẩm</div>
-            <div className="w-1/2 grid grid-cols-3 text-gray gap-x-5 text-center text-sm">
+            <div className="grid w-1/2 grid-cols-3 text-sm text-center text-gray gap-x-5">
               <span>Đơn giá</span>
               <span>Số lượng</span>
               <span>Thành tiền</span>
             </div>
           </div>
-          <div className="flex flex-col w-full gap-y-2 border-t-1 border-dashed border-grayCa">
-            <div className="w-full py-5 flex items-center">
-              <div className="w-1/2 flex gap-x-2 items-center text-sm font-normal">
+          <div className="flex flex-col w-full border-dashed gap-y-2 border-t-1 border-grayCa">
+            <div className="flex items-center w-full py-5">
+              <div className="flex items-center w-1/2 text-sm font-normal gap-x-2">
                 <img
                   alt=""
                   srcSet="/shoes.jpg"
@@ -60,20 +63,20 @@ function CheckOutPage() {
                   Giày Nike Air Jordan 1 Low Panda Like Auth
                 </span>
               </div>
-              <div className="w-1/2 grid grid-cols-3 text-gray gap-x-5 text-center text-sm">
+              <div className="grid w-1/2 grid-cols-3 text-sm text-center text-gray gap-x-5">
                 <span>Đơn giá</span>
                 <span>Số lượng</span>
                 <span>Thành tiền</span>
               </div>
             </div>
-            <div className="w-full py-5 flex items-center">
-              <div className="w-1/2 flex gap-x-2 items-center text-sm font-normal">
+            <div className="flex items-center w-full py-5">
+              <div className="flex items-center w-1/2 text-sm font-normal gap-x-2">
                 <img alt="" srcSet="/shoes.jpg" className="w-[80px]" />
                 <span className="line-clamp-1">
                   Giày Nike Air Jordan 1 Low Panda Like Auth
                 </span>
               </div>
-              <div className="w-1/2 grid grid-cols-3 text-gray gap-x-5 text-center text-sm">
+              <div className="grid w-1/2 grid-cols-3 text-sm text-center text-gray gap-x-5">
                 <span>Đơn giá</span>
                 <span>Số lượng</span>
                 <span>Thành tiền</span>
@@ -82,7 +85,7 @@ function CheckOutPage() {
           </div>
         </section>
         <section className="w-full mx-auto mt-5 px-[30px] py-5 shadow-sm shadow-grayCa  bg-white rounded-[3px]">
-          <div className="my-5 w-full">
+          <div className="w-full my-5">
             <span className="font-bold">Ghi chú đơn hàng (tuỳ chọn)</span>
             <TextArea
               cols={50}
@@ -92,7 +95,7 @@ function CheckOutPage() {
             ></TextArea>
           </div>
           <div className="flex justify-between ">
-            <div className="w-1/2 flex flex-col justify-start gap-y-5">
+            <div className="flex flex-col justify-start w-1/2 gap-y-5">
               <h1 className="text-xl font-bold">Phương thức thanh toán</h1>
               <Field variant="flex-row" className="justify-start">
                 <Input
@@ -111,21 +114,21 @@ function CheckOutPage() {
                 <Label> Chuyển khoản ngân hàng</Label>
               </Field>
             </div>
-            <div className="w-1/2 flex flex-col items-end gap-y-5">
+            <div className="flex flex-col items-end w-1/2 gap-y-5">
               <h1 className="text-xl font-bold">Thông tin đơn hàng</h1>
               <div className="grid grid-cols-2 grid-rows-3 gap-5">
                 <span className="text-gray">Tổng tiền hàng:</span>
                 <span className="text-end">₫105.000</span>
                 <span className="text-gray">Phí vận chuyển:</span>
                 <span className="text-end">₫15.000</span>
-                <span className="text-gray flex items-center">
+                <span className="flex items-center text-gray">
                   Tổng thanh toán:
                 </span>
-                <span className="text-end text-red-600 text-3xl">₫120.000</span>
+                <span className="text-3xl text-red-600 text-end">₫120.000</span>
               </div>
             </div>
           </div>
-          <div className="text-end my-5">
+          <div className="my-5 text-end">
             <Button variant="default" type="button" className="px-10">
               Đặt hàng
             </Button>

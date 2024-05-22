@@ -9,16 +9,19 @@ type THoverDropdownProps = {
     select?: string;
     option?: string;
   };
+  onClick?: () => void;
 };
 const HoverDropdown = ({
   select,
   children,
   className,
+  onClick,
 }: THoverDropdownProps) => {
   const nodeRef = useRef<HTMLDivElement>(null);
   const { isHover } = useHover(nodeRef);
   return (
     <div
+      onClick={onClick}
       className={cn(
         "relative px-2 transition-all cursor-pointer ",
         isHover &&

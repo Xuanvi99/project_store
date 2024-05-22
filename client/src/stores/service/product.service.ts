@@ -5,6 +5,7 @@ import {
   paramsFilterProduct,
   paramsListProduct,
   paramsListSale,
+  productItem,
 } from "@/types/product.type";
 
 interface IResponsive {
@@ -15,6 +16,11 @@ interface IResponsive {
 interface IResponsiveFilter extends IResponsive {
   result_filter: number;
   result_search: IProductRes[];
+}
+
+interface IResProductDetail {
+  data: IProductRes;
+  listProductItem: productItem[];
 }
 
 type request<T> = T;
@@ -90,7 +96,7 @@ export const productApi = createApi({
             ]
           : [{ type: "Product", id: "LOAD_MORE" }],
     }),
-    getOneProduct: build.query<{ data: IProductRes }, string>({
+    getOneProduct: build.query<IResProductDetail, string>({
       query: (slugOrId) => ({ url: "product/" + slugOrId }),
       providesTags: (result, error, id) => [{ type: "Product", id }],
     }),

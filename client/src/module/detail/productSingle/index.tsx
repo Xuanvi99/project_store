@@ -6,7 +6,7 @@ function ProductSingle() {
   return (
     <section className="flex justify-between w-full bg-white gap-x-5 py-5 px-[10px] mt-10">
       <ProductSingle.Gallery></ProductSingle.Gallery>
-      <ProductSingle.InfoShoes type="sale"></ProductSingle.InfoShoes>
+      <ProductSingle.InfoShoes></ProductSingle.InfoShoes>
       <ProductSingle.Sidebar></ProductSingle.Sidebar>
     </section>
   );

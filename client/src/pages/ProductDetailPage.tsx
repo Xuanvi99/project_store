@@ -1,31 +1,25 @@
 import { Fragment, useEffect } from "react";
-import { ProductSlideshow } from "../components/product";
 import { BannerCommon } from "../components/banner";
-import LayoutMain from "../layout/LayoutMain";
-import {
-  ProductDesc,
-  ProductReviews,
-  ProductSingle,
-  ProductSummary,
-} from "@/module/detail";
+import { ProductDetailProvide } from "@/module/detail/context";
+import DetailContent from "@/module/detail/content";
+import { useParams } from "react-router-dom";
 
 function ProductDetailPage() {
+  const { slug } = useParams();
   useEffect(() => {
-    window.scrollTo({ top: 0 });
-  }, []);
+    if (slug) {
+      window.scrollTo({ top: 0 });
+    }
+  }, [slug]);
   return (
     <Fragment>
       <BannerCommon
         heading="Chi tiết sản phẩm"
         title=" Chi tiết sản phẩm"
       ></BannerCommon>
-      <LayoutMain>
-        <ProductSingle></ProductSingle>
-        <ProductSummary></ProductSummary>
-        <ProductDesc></ProductDesc>
-        <ProductReviews></ProductReviews>
-        <ProductSlideshow name="Khám phá thêm"></ProductSlideshow>
-      </LayoutMain>
+      <ProductDetailProvide>
+        <DetailContent></DetailContent>
+      </ProductDetailProvide>
     </Fragment>
   );
 }

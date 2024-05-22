@@ -1,6 +1,6 @@
 function Sidebar() {
   return (
-    <div className="max-w-[280px] w-full">
+    <div className="basis-3/12">
       <div className="flex flex-col border-[1px] border-grayCa rounded p-5">
         <div className="flex items-center justify-center pb-5 font-bold gap-x-2 border-b-[1px] border-grayCa">
           <img src="" alt="" srcSet="/logo.png" />

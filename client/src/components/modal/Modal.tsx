@@ -11,20 +11,29 @@ type IModalBaseProps = {
   };
   isOpenModal: boolean;
   onClick: () => void;
+  variant?: "fixed" | "relative";
 };
 
-function Modal({ children, onClick, isOpenModal, className }: IModalBaseProps) {
+function Modal({
+  children,
+  onClick,
+  isOpenModal,
+  className,
+  variant,
+}: IModalBaseProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    switch (isOpenModal) {
-      case true:
-        document.body.style.overflowY = "hidden";
-        break;
-      default:
-        document.body.style.overflowY = "";
+    if (variant && variant === "fixed") {
+      switch (isOpenModal) {
+        case true:
+          document.body.style.overflowY = "hidden";
+          break;
+        default:
+          document.body.style.overflowY = "";
+      }
     }
-  }, [isOpenModal]);
+  }, [variant, isOpenModal]);
 
   if (!isOpenModal) return;
 
@@ -32,7 +41,7 @@ function Modal({ children, onClick, isOpenModal, className }: IModalBaseProps) {
     <Portal>
       <div
         ref={nodeRef}
-        className="fixed inset-0 flex items-center justify-center w-full h-screen z-[60]"
+        className="fixed inset-0 flex items-center justify-center w-full h-screen z-[60] "
       >
         <div
           onClick={onClick}

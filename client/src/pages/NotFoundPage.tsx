@@ -11,7 +11,7 @@ function NotFoundPage() {
         <div className="flex flex-col items-center gap-y-5">
           <h1 className="text-6xl font-bold">404</h1>
           <p className="text-2xl font-semibold text-red-600">
-            Oops! Không tìm thấy trang
+            Rất tiếc! trang bạn tìm không tồn tại
           </p>
         </div>
         <button

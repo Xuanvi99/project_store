@@ -10,6 +10,7 @@ import { imageApi } from "../service/image.service";
 import { productApi } from "../service/product.service";
 import { categoryApi } from "../service/category.service";
 import { saleApi } from "../service/sale.service";
+import { commentApi } from "../service/comment.service";
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   [productApi.reducerPath]: productApi.reducer,
   [categoryApi.reducerPath]: categoryApi.reducer,
   [saleApi.reducerPath]: saleApi.reducer,
+  [commentApi.reducerPath]: commentApi.reducer,
   authSlice: authSlice,
   cartSlice: cartSlice,
 });

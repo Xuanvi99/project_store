@@ -55,7 +55,7 @@ const productItemSchema = new Schema(
       ref: "products",
       required: true,
     },
-    size: { type: String, default: "" },
+    size: { type: Number, required: true },
     quantity: { type: Number, default: 0 },
   },
   { timestamps: true }

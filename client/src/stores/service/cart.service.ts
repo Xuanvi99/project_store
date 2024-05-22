@@ -1,8 +1,8 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "../baseQueryToken";
-import { ICart } from "@/types/cart.type";
+import { ICart, ICartItem } from "@/types/cart.type";
 
-type TArg = { id: string };
+type TArg = { id: string; productId: string; size: string; quantity: number };
 
 type TRes = { cart: ICart };
 
@@ -16,31 +16,66 @@ export const cartApi = createApi({
         url: `cart/${id}`,
         method: "GET",
       }),
+      providesTags: (result, error, id) => [{ type: "Carts", id }],
     }),
-    addCart: build.mutation<TRes, TArg>({
-      query: () => ({
-        url: "login",
+    addToCart: build.mutation<{ message: string; cartItem: ICartItem }, TArg>({
+      query: ({ id, ...body }) => ({
+        url: `cart/${id}`,
         method: "POST",
+        body,
       }),
+      invalidatesTags: (result, error, data) => [
+        { type: "Carts", id: data.id },
+      ],
     }),
     updateCart: build.mutation<{ message: string }, TArg>({
-      query: () => ({
-        url: "update_password",
-        method: "POST",
+      query: ({ id, ...body }) => ({
+        url: `cart/${id}`,
+        method: "PUT",
+        body,
       }),
+      invalidatesTags: (result, error, data) => [
+        { type: "Carts", id: data.id },
+      ],
     }),
-    deleteCart: build.mutation<TRes, void>({
-      query: () => ({
-        url: "refreshToken",
-        method: "POST",
+    deleteCartOne: build.mutation<{ message: string }, Omit<TArg, "quantity">>({
+      query: ({ id, ...body }) => ({
+        url: `cart/${id}`,
+        method: "DELETE",
+        body,
       }),
+      invalidatesTags: (result, error, data) => [
+        { type: "Carts", id: data.id },
+      ],
+    }),
+    deleteCartMultiple: build.mutation<
+      { message: string },
+      { id: string; listIdProduct: string[] }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `cart/deleteMultiple/${id}`,
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: (result, error, data) => [
+        { type: "Carts", id: data.id },
+      ],
+    }),
+    deleteCartAll: build.mutation<{ message: string }, string>({
+      query: (id) => ({
+        url: `cart/deleteALl/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, id) => [{ type: "Carts", id }],
     }),
   }),
 });
 
 export const {
   useGetCartQuery,
-  useAddCartMutation,
+  useAddToCartMutation,
   useUpdateCartMutation,
-  useDeleteCartMutation,
+  useDeleteCartOneMutation,
+  useDeleteCartMultipleMutation,
+  useDeleteCartAllMutation,
 } = cartApi;

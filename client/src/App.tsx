@@ -18,8 +18,8 @@ function App() {
   const { data: cart, status } = useGetCartQuery(id, { skip: !id });
 
   useEffect(() => {
-    if (!effectRun.current && !user) {
-      refreshToken()
+    const handleRefetch = async () => {
+      await refreshToken()
         .unwrap()
         .then((res) => {
           dispatch(updateAuth({ ...res, isLogin: true }));
@@ -27,6 +27,9 @@ function App() {
         .catch(() => {
           dispatch(logOut());
         });
+    };
+    if (!effectRun.current && !user) {
+      handleRefetch();
     }
     return () => {
       effectRun.current = true;

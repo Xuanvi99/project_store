@@ -34,7 +34,6 @@ class Product {
         .populate([
           { path: "thumbnail", select: "url" },
           { path: "imageIds", select: "url" },
-          { path: "commentIds" },
           { path: "inventoryId", select: "_id sold total stocked" },
         ])
         .sort({ $natural: -1 })
@@ -181,24 +180,31 @@ class Product {
 
   getOneProduct = async (req, res) => {
     try {
-      const slugOrId = req.params.slugOrId;
-      if (!slugOrId)
+      const slug = req.params.slug;
+      if (!slug)
         return res.status(403).json({ errorMessage: "Invalid slug or íd" });
       const product = await productModel
-        .findOne({ $or: [{ _id: slugOrId }, { slug: slugOrId }] })
+        .findOne({ slug })
         .populate([
           { path: "thumbnail", select: "url" },
           { path: "imageIds", select: "url" },
           { path: "commentIds" },
           { path: "inventoryId", select: "_id sold total stocked" },
         ])
-        .lean();
+        .lean()
+        .catch((error) => console.log(error));
       if (!product) {
         return res
           .status(404)
-          .json({ message: "ProductId not exit in product" });
+          .json({ errorMessage: "ProductId not exit in product" });
       }
-      res.status(200).json({ data: product });
+      const listProductItem = await productItemModel
+        .find({
+          productId: product._id,
+        })
+        .lean();
+
+      res.status(200).json({ data: product, listProductItem });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
@@ -399,7 +405,7 @@ class Product {
   updateAbc = async (req, res) => {
     try {
       await productModel
-        .updateMany({}, { $set: { is_sale: "normal" } })
+        .updateMany({}, { $unset: { summary: "" } })
         .catch((error) => console.log(error));
       res.status(200).json({ message: "update success" });
     } catch (error) {

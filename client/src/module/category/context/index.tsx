@@ -1,16 +1,20 @@
+import { useGetLoadMoreDataQuery } from "@/stores/service/product.service";
 import { IProductRes, paramsFilterProduct } from "@/types/product.type";
+import { QueryStatus } from "@reduxjs/toolkit/query";
 import { createContext, useEffect, useState } from "react";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 
 export type ICategoryProvide = {
   filter: paramsFilterProduct;
 
-  data: {
-    data: IProductRes[];
-    totalPage: number;
-    result_filter: number;
-    result_search: IProductRes[];
-  };
+  data:
+    | {
+        data: IProductRes[];
+        totalPage: number;
+        result_filter: number;
+        result_search: IProductRes[];
+      }
+    | undefined;
 
   maxPrice: number;
 
@@ -19,6 +23,10 @@ export type ICategoryProvide = {
   handleSetFilter: (value: valueFilter<paramsFilterProduct>) => void;
 
   handleSetData: (data: ICategoryProvide["data"]) => void;
+
+  isFetching: boolean;
+
+  status: QueryStatus;
 };
 
 type valueFilter<Type> = {
@@ -33,7 +41,6 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
   const { pathname, state } = useLocation();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  console.log(searchParams.get("s"));
   const [maxPrice, setMaxPrice] = useState<number>(0);
   const [minPrice, setMinPrice] = useState<number>(0);
 
@@ -55,6 +62,12 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
       : maxPrice || 0,
   });
 
+  const {
+    data: resProduct,
+    isFetching,
+    status,
+  } = useGetLoadMoreDataQuery(filter);
+
   const [data, setData] = useState<ICategoryProvide["data"]>({
     data: [],
     totalPage: 0,
@@ -65,6 +78,12 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
   const handleSetData = (value: ICategoryProvide["data"]) => {
     setData(value);
   };
+
+  useEffect(() => {
+    if (resProduct && status === "fulfilled") {
+      setData(resProduct);
+    }
+  }, [resProduct, status]);
 
   const handleSetFilter = (value: valueFilter<paramsFilterProduct>) => {
     setFilter({ ...filter, ...value });
@@ -152,6 +171,8 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
       value={{
         filter,
         data,
+        isFetching,
+        status,
         maxPrice,
         minPrice,
         handleSetFilter,

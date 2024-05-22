@@ -2,26 +2,26 @@ export const listFeature = [
   {
     title: "Sales sốc",
     image: "/sales.jpg",
-    path: "/#",
+    path: "/category/sale",
   },
   {
     title: "Giày Nike",
     image: "/nike.png",
-    path: "/#",
+    path: "/category/nike",
   },
   {
     title: "Giày Adidas",
     image: "/adidas.png",
-    path: "/#",
+    path: "/category/adidas",
   },
   {
     title: "Giày Vans",
     image: "/vans.png",
-    path: "/#",
+    path: "/category/vans",
   },
   {
     title: "Giày Converse",
     image: "/converse.png",
-    path: "/#",
+    path: "/category/converse",
   },
 ];

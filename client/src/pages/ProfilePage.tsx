@@ -5,13 +5,14 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import FormAddress from "../module/Profile/address";
 import { useAppSelector } from "../hook";
 import { ChangePassword, ProfileInfo } from "../module/Profile";
+import { RootState } from "@/stores";
 
 function ProfilePage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
 
   const redirectUrl = import.meta.env.VITE_DOMAIN_CLIENT + pathname;
 

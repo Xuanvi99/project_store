@@ -3,11 +3,9 @@ import { IconBadgeSales } from "../icon";
 
 export default function CardSales({
   discount,
-  type,
   className,
 }: {
   discount: number;
-  type: "sale" | "normal";
   className?: string;
 }) {
   return (
@@ -23,11 +21,9 @@ export default function CardSales({
           - {discount}%
         </span>
       </div>
-      {type === "sale" && (
-        <div className="absolute top-0 right-0 z-20 inline-block px-2 py-1 text-xs font-normal bg-orangeLinear rounded-xl">
-          Deal giá sốc
-        </div>
-      )}
+      <div className="absolute top-0 right-0 z-20 inline-block px-2 py-1 text-xs font-normal bg-orangeLinear rounded-xl">
+        Deal giá sốc
+      </div>
     </div>
   );
 }

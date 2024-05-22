@@ -4,7 +4,7 @@ const { uploadFileMdw } = require("../middleware");
 const { verifyMdw } = require("../middleware");
 const routes = express.Router();
 
-routes.route("/api/comment/getAll").get(commentCtrl.getAllComment);
+routes.route("/api/comment/getAll/:productId").get(commentCtrl.getAllComment);
 routes
   .route("/api/comment")
   .post(

@@ -28,6 +28,7 @@ import IconPlus from "./IconPlus";
 import IconLocation from "./IconLocation";
 import IconVerifyPw from "./IconVerifyPw";
 import IconUploadImage from "./IconUploadImage";
+import IconNotification from "./IconNotification";
 
 export {
   IconSearch,
@@ -61,4 +62,5 @@ export {
   IconLocation,
   IconVerifyPw,
   IconUploadImage,
+  IconNotification,
 };

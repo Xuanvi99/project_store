@@ -10,9 +10,16 @@ type TProps = {
     overlay?: string;
     content?: string;
   };
+  time?: number;
 };
 
-function ModalNotification({ isOpen, onClick, children, className }: TProps) {
+function ModalNotification({
+  isOpen,
+  onClick,
+  children,
+  className,
+  time,
+}: TProps) {
   useEffect(() => {
     if (isOpen) {
       let countDown = 5;
@@ -22,9 +29,9 @@ function ModalNotification({ isOpen, onClick, children, className }: TProps) {
           onClick();
           clearInterval(timer);
         }
-      }, 800);
+      }, time || 800);
     }
-  }, [isOpen, onClick]);
+  }, [isOpen, onClick, time]);
 
   return (
     <Modal

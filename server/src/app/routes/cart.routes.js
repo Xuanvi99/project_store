@@ -3,12 +3,16 @@ const { cartCtrl } = require("../controller");
 const { verifyMdw } = require("../middleware");
 const routes = express.Router();
 
-routes.route("/api/cart/:userId").get(verifyMdw.verifyToken, cartCtrl.getCart);
-routes.route("/api/cart/:userId").post(verifyMdw.verifyToken, cartCtrl.addCart);
 routes
   .route("/api/cart/:userId")
-  .put(verifyMdw.verifyToken, cartCtrl.updateCart);
+  .get(cartCtrl.getCart)
+  .post(cartCtrl.addCart)
+  .put(cartCtrl.updateCart)
+  .delete(cartCtrl.deleteCartOneItem);
+
+routes.route("/api/cart/deleteAll/:userId").delete(cartCtrl.deleteCartAllItem);
 routes
-  .route("/api/cart/:userId")
-  .delete(verifyMdw.verifyToken, cartCtrl.deleteCart);
+  .route("/api/cart/deleteMultiple/:userId")
+  .delete(cartCtrl.deleteCartMultipleItem);
+
 module.exports = routes;

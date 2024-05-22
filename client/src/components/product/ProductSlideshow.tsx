@@ -6,30 +6,20 @@ import Card from "../card";
 import SlideSwiper from "../slideshows";
 import { IconChevronRight } from "../icon";
 import { useGetListProductQuery } from "@/stores/service/product.service";
-import { useEffect, useState } from "react";
-import { IProductRes } from "@/types/product.type";
+import CartSkeleton from "../card/cart-skeleton";
 
 interface IProps {
-  name: string;
+  name: string | "";
 }
 
 export default function ProductSlideshow({ name }: IProps) {
-  const { data: resProduct } = useGetListProductQuery({
+  const { data: resProduct, isFetching } = useGetListProductQuery({
     search: name,
     activePage: 1,
     limit: 10,
   });
 
-  const [listProduct, setListProduct] = useState<{
-    data: IProductRes[];
-    totalPage: number;
-  }>();
-
-  useEffect(() => {
-    if (resProduct) {
-      setListProduct(resProduct);
-    }
-  }, [name, resProduct]);
+  if (!resProduct) return <></>;
 
   return (
     <LayoutProduct>
@@ -43,8 +33,9 @@ export default function ProductSlideshow({ name }: IProps) {
       >
         <div className="relative flex items-center text-2xl gap-x-2">
           <span>
-            {name === "sale"
-              ? "Giảm Giá Sốc"
+            {name === "sale" && "Giảm Giá Sốc"}
+            {name === ""
+              ? "Khám phá thêm"
               : "Giày " + name.charAt(0).toUpperCase() + name.slice(1)}
           </span>
           {name === "sale" && (
@@ -57,7 +48,7 @@ export default function ProductSlideshow({ name }: IProps) {
           )}
         </div>
         <Link
-          to={"#"}
+          to={`/category/${name}`}
           className={cn(
             "flex items-center text-base duration-500 gap-x-1 ",
             name === "flashSale" ? "hover:text-white" : "hover:text-black"
@@ -67,30 +58,45 @@ export default function ProductSlideshow({ name }: IProps) {
           <IconChevronRight size={14}></IconChevronRight>
         </Link>
       </div>
-      <SlideSwiper
-        optionSwiper={{
-          quantitySlide: listProduct?.data.length || 10,
-          slidesPerView: 5,
-          spaceBetween: 10,
-          slidesPerGroup: 1,
-          lazyPreloadPrevNext: 1,
-          grabCursor: true,
-          loop: true,
-          speed: 100,
-        }}
-        slideHover={
-          listProduct?.data && listProduct?.data.length > 5 ? true : false
-        }
-        className={{ container: "mt-5" }}
-      >
-        {listProduct?.data.map((product, index) => {
-          return (
-            <SwiperSlide key={index}>
-              <Card product={product}></Card>
-            </SwiperSlide>
-          );
-        })}
-      </SlideSwiper>
+      {!isFetching && (
+        <SlideSwiper
+          optionSwiper={{
+            quantitySlide: resProduct?.data.length || 10,
+            slidesPerView: 5,
+            spaceBetween: 10,
+            slidesPerGroup: 1,
+            lazyPreloadPrevNext: 1,
+            grabCursor: true,
+            loop: resProduct && resProduct?.data.length > 5 ? true : false,
+            speed: 100,
+          }}
+          slideHover={
+            resProduct?.data && resProduct?.data.length > 5 ? true : false
+          }
+          className={{ container: "mt-5" }}
+        >
+          {resProduct?.data.map((product, index) => {
+            return (
+              <SwiperSlide key={index}>
+                <Card product={product}></Card>
+              </SwiperSlide>
+            );
+          })}
+        </SlideSwiper>
+      )}
+      {isFetching && (
+        <div className="flex w-full mt-5 gap-x-3">
+          {Array(5)
+            .fill(null)
+            .map((_, index) => {
+              return (
+                <div key={index} className="basis-1/5">
+                  <CartSkeleton></CartSkeleton>
+                </div>
+              );
+            })}
+        </div>
+      )}
     </LayoutProduct>
   );
 }

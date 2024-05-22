@@ -17,18 +17,17 @@ function Card({ product }: ICardItemProps) {
           discount={Math.ceil(
             ((product.price - product.priceSale) * 100) / product.price
           )}
-          type={product.is_sale}
         ></CardSales>
       )}
       <div className="flex flex-col">
         <Card.Thumbnails
           src={product?.thumbnail.url || ""}
-          path={`/productDetail/${product?.slug}`}
+          path={`/product_detail/${product?.slug}`}
         ></Card.Thumbnails>
         <div className="flex flex-col flex-1 text-sm gap-y-4 p-[10px]">
           <Card.Heading
             title={product?.name || ""}
-            path={`/productDetail/${product?.slug}`}
+            path={`/product_detail/${product?.slug}`}
           ></Card.Heading>
           {!product.inventoryId.stocked && (
             <Card.Info title="Giá">

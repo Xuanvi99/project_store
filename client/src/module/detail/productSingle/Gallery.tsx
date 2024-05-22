@@ -3,19 +3,18 @@ import { IconCLose, IconExpand } from "@/components/icon";
 import Modal from "@/components/modal";
 import SlideSwiper from "@/components/slideshows";
 import { useToggle } from "@/hook";
+import useTestContext from "@/hook/useTestContext";
 import { cn } from "@/utils";
 import { useState } from "react";
 import { SwiperSlide } from "swiper/react";
-
-const listImage = [
-  "/shoes.jpg",
-  "/shoes1.jpeg",
-  "/shoes2.jpeg",
-  "/shoes3.jpeg",
-  "/shoes4.jpeg",
-];
+import { IProductDetailProvide, PDetailContext } from "../context";
+import LoadingSpinner from "../../../components/loading/index";
 
 const Gallery = () => {
+  const { data } = useTestContext<IProductDetailProvide>(
+    PDetailContext as React.Context<IProductDetailProvide>
+  );
+
   const { toggle: showModal, handleToggle: handleShowModal } = useToggle();
   const [slideSmallIndex, setSlideSmallIndex] = useState<number>(0);
   const [slideBigIndex, setSlideBigIndex] = useState<number>(0);
@@ -47,8 +46,16 @@ const Gallery = () => {
     }
   };
 
+  if (!data) {
+    return (
+      <div className="w-[400px] h-[400px] flex justify-center items-center">
+        <LoadingSpinner className="w-10 h-10 border-4 border-orangeFe border-r-transparent"></LoadingSpinner>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-[400px]">
+    <div className="max-w-[400px] basis-4/12">
       <div className="w-full min-h-[400px] relative">
         <SlideSwiper
           slideActive={slideSmallIndex}
@@ -67,12 +74,12 @@ const Gallery = () => {
             container: "slide-product_normal ",
           }}
         >
-          {listImage.map((src, index) => {
+          {data?.imageIds.map((image, index) => {
             return (
               <SwiperSlide key={index}>
                 <img
                   alt=""
-                  srcSet={src}
+                  srcSet={image.url}
                   data-index={index}
                   className="object-cover"
                   onClick={() => {
@@ -83,11 +90,14 @@ const Gallery = () => {
             );
           })}
         </SlideSwiper>
-        <CardSales
-          type="normal"
-          discount="30%"
-          className="-left-1 top-1"
-        ></CardSales>
+        {data.is_sale === "sale" && (
+          <CardSales
+            discount={Math.ceil(
+              ((data.price - data.priceSale) * 100) / data.price
+            )}
+            className="-left-1 top-1"
+          ></CardSales>
+        )}
         <div
           onClick={() => {
             handleShowModal();
@@ -108,7 +118,7 @@ const Gallery = () => {
           <div className="flex flex-col justify-between w-full h-full">
             <div className="h-[50px] flex justify-between items-center text-white px-5">
               <span className="text-2xl">
-                {slideBigIndex + 1}/{listImage.length}
+                {slideBigIndex + 1}/{data?.imageIds.length}
               </span>
               <span
                 onClick={handleShowModal}
@@ -124,7 +134,7 @@ const Gallery = () => {
                   slidesPerView: 1,
                   slidesPerGroup: 1,
                   quantitySlide: 5,
-                  loop: true,
+                  loop: data.imageIds.length > 5 ? true : false,
                   onSlideNextTransitionEnd: () => handleChangeSlide("zoom"),
                   onSlidePrevTransitionEnd: () => handleChangeSlide("zoom"),
                 }}
@@ -135,22 +145,21 @@ const Gallery = () => {
                   btnRight: "opacity-100",
                 }}
               >
-                {listImage.map((src, index) => {
+                {data?.imageIds.map((image, index) => {
                   return (
                     <SwiperSlide key={index} onClick={handleShowModal}>
                       <div className="flex justify-center h-full">
-                        <img alt="" srcSet={src} loading="lazy" />
+                        <img alt="" srcSet={image.url} loading="lazy" />
                       </div>
                     </SwiperSlide>
                   );
                 })}
               </SlideSwiper>
             </div>
-
             <div className="w-full h-[50px] text-white relative">
               <span className="absolute inset-0 z-40 bg-black opacity-70"></span>
               <p className="absolute inset-0 z-50 flex items-center justify-center">
-                Giày Nike Air Jordan 1 Low Panda Like Auth
+                {data.name}
               </p>
             </div>
           </div>
@@ -170,12 +179,12 @@ const Gallery = () => {
           slideActive={slideSmallIndex}
           className={{ btnLeft: "py-4", btnRight: "py-4" }}
         >
-          {listImage.map((src, index) => {
+          {data?.imageIds.map((image, index) => {
             return (
               <SwiperSlide key={index}>
                 <img
                   alt=""
-                  srcSet={src}
+                  srcSet={image.url}
                   className={cn(
                     "bg-white opacity-50 max-h-[150px] duration-300 hover:opacity-100 hover:scale-110 hover:border-none",
                     index === slideSmallIndex
