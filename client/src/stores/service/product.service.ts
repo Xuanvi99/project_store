@@ -4,7 +4,6 @@ import {
   IProductRes,
   paramsFilterProduct,
   paramsListProduct,
-  paramsListSale,
   productItem,
 } from "@/types/product.type";
 
@@ -27,7 +26,7 @@ type request<T> = T;
 
 export const productApi = createApi({
   reducerPath: "product",
-  tagTypes: ["Product"],
+  tagTypes: ["Product", "ProductItem"],
   baseQuery: baseQueryWithAuth,
   endpoints: (build) => ({
     getListProduct: build.query<IResponsive, request<paramsListProduct>>({
@@ -46,23 +45,6 @@ export const productApi = createApi({
               { type: "Product", id: "LIST" },
             ]
           : [{ type: "Product", id: "LIST" }],
-    }),
-    getListSale: build.query<IResponsive, request<paramsListSale>>({
-      query: (params) => ({
-        url: "product/listSale",
-        method: "GET",
-        params: { ...params },
-      }),
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.data.map(({ _id }) => ({
-                type: "Product" as const,
-                id: _id,
-              })),
-              { type: "Product", id: "LIST_SALE" },
-            ]
-          : [{ type: "Product", id: "LIST_SALE" }],
     }),
     getLoadMoreData: build.query<
       IResponsiveFilter,
@@ -114,6 +96,16 @@ export const productApi = createApi({
         body,
       }),
     }),
+    getProductItem: build.query<
+      { data: productItem },
+      { productId: string; size: string }
+    >({
+      query: (params) => ({
+        url: "productItem",
+        method: "GET",
+        params: { ...params },
+      }),
+    }),
   }),
 });
 
@@ -122,6 +114,6 @@ export const {
   useCheckNameMutation,
   useGetListProductQuery,
   useGetOneProductQuery,
-  useGetListSaleQuery,
   useGetLoadMoreDataQuery,
+  useGetProductItemQuery,
 } = productApi;

@@ -4,6 +4,7 @@ import Thumbnails from "./Thumbnails.card";
 import Info from "./Info.card";
 import CardSales from "./Sale.card";
 import OutOfStock from "./OutOfStock.card";
+import CardExpired from "./CardExpired";
 
 interface ICardItemProps {
   product: IProductRes;
@@ -53,6 +54,7 @@ function Card({ product }: ICardItemProps) {
         </div>
       </div>
       {product.inventoryId.stocked && <Card.OutOfStock />}
+      {product.status === "inactive" && <Card.CardExpired />}
     </div>
   );
 }
@@ -63,3 +65,4 @@ Card.Info = Info;
 Card.Heading = Heading;
 Card.Thumbnails = Thumbnails;
 Card.OutOfStock = OutOfStock;
+Card.CardExpired = CardExpired;

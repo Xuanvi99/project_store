@@ -1,13 +1,12 @@
 import { Button } from "@/components/button";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import HoverDropdown from "./HoverDropdown";
 import { IconUser } from "@/components/icon";
-import { cn } from "@/utils";
 import { useLogOutAuthMutation } from "@/stores/service/auth.service";
 import { useAppDispatch, useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
 import { logOut } from "@/stores/reducer/authReducer";
 import { updateCart } from "@/stores/reducer/cartReducer";
+import Tooltip from "@/components/tooltip";
 
 type TProps = {
   displayName?: boolean;
@@ -50,9 +49,10 @@ function Profile({ displayName }: TProps) {
           </Button>
         </div>
       ) : (
-        <HoverDropdown
+        <Tooltip
+          place="bottom"
           select={
-            <div className="flex items-center h-10 tex-sm gap-x-3">
+            <div className="flex items-center h-9 tex-sm gap-x-3">
               <span className="overflow-hidden rounded-full w-9 h-9">
                 <img
                   alt="err"
@@ -70,46 +70,42 @@ function Profile({ displayName }: TProps) {
               )}
             </div>
           }
+          className={{
+            content: "w-[200px] -translate-x-3/4",
+          }}
         >
-          <div
-            className={cn(
-              "absolute top-[130%] -right-5  w-[200px] z-50 ",
-              "border-2 rounded-lg border-orange bg-white shadow-shadowButton px-2 py-3 font-medium leading-6"
-            )}
-          >
-            <div className="flex text-xs text-slate-400 gap-x-2">
-              <span>
-                <IconUser size={12}></IconUser>:
-              </span>
-              <span>{user?.userName}</span>
-            </div>
-            <div className="flex flex-col gap-y-5">
-              <Link
-                to={"/user/account/profile"}
-                className="inline-block whitespace-nowrap hover:text-orange"
-              >
-                Tài khoản
-              </Link>
-              <Link
-                to={""}
-                className="inline-block whitespace-nowrap hover:text-orange"
-              >
-                Đơn mua
-              </Link>
-              {user?.role === "admin" && (
-                <Link
-                  to={"/dashboard/home"}
-                  className="inline-block whitespace-nowrap hover:text-orange"
-                >
-                  Quản lí Store
-                </Link>
-              )}
-              <Button type="button" variant="outLine" onClick={handleLogOut}>
-                Đăng xuất
-              </Button>
-            </div>
+          <div className="flex text-xs text-slate-400 gap-x-2">
+            <span>
+              <IconUser size={12}></IconUser>:
+            </span>
+            <span>{user?.userName}</span>
           </div>
-        </HoverDropdown>
+          <div className="flex flex-col gap-y-5">
+            <Link
+              to={"/user/account/profile"}
+              className="inline-block whitespace-nowrap hover:text-orange"
+            >
+              Tài khoản
+            </Link>
+            <Link
+              to={""}
+              className="inline-block whitespace-nowrap hover:text-orange"
+            >
+              Đơn mua
+            </Link>
+            {user?.role === "admin" && (
+              <Link
+                to={"/dashboard/home"}
+                className="inline-block whitespace-nowrap hover:text-orange"
+              >
+                Quản lí Store
+              </Link>
+            )}
+            <Button type="button" variant="outLine" onClick={handleLogOut}>
+              Đăng xuất
+            </Button>
+          </div>
+        </Tooltip>
       )}
     </>
   );

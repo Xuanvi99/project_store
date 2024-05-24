@@ -25,7 +25,7 @@ const UserSchema = new Schema(
     role: { type: String, enum: ["admin", "buyer", "staff"], default: "buyer" },
     deleted: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 UserSchema.pre("save", function (next) {

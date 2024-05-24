@@ -8,7 +8,7 @@ const ImageSchema = new Schema(
     url: { type: String, required: true },
     folder: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 ImageSchema.statics.uploadSingleFile = async function (file, folder) {

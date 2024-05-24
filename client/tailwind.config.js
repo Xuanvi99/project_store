@@ -37,15 +37,14 @@ export default {
       backgroundImage: {
         orangeLinear: "linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)",
 
-        orangeLinearReverse:
-          "linear-gradient(90deg,#ee2d14 30%,#ff6c00 70%)",
+        orangeLinearReverse: "linear-gradient(90deg,#ee2d14 30%,#ff6c00 70%)",
 
         redLinear: "linear-gradient(100deg,rgb(146 0 9),rgb(212 6 6))",
         whiteLinear:
           "linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%)",
       },
       boxShadow: {
-        shadowButton: "0 10px 25px rgba(0,0,0,0.5)",
+        shadowButton: "0 5px 5px rgba(0,0,0,0.5)",
         shadow77: " 0px 2px 8px rgba(0, 0, 0, 0.15)",
       },
       animation: {

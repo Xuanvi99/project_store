@@ -6,7 +6,7 @@ import Card from "../card";
 import SlideSwiper from "../slideshows";
 import { IconChevronRight } from "../icon";
 import { useGetListProductQuery } from "@/stores/service/product.service";
-import CartSkeleton from "../card/cart-skeleton";
+import CartSkeleton from "../card/card-skeleton";
 
 interface IProps {
   name: string | "";

@@ -23,6 +23,8 @@ routes
     productCtrl.checkNameProduct
   );
 
+routes.route("/api/productItem").get(productCtrl.getProductItem);
+
 routes.route("/api/product/filter").get(productCtrl.getListProductFilter);
 
 routes.route("/api/product/test").post(productCtrl.updateAbc);

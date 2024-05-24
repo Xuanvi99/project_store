@@ -2,7 +2,7 @@ import useTestContext from "@/hook/useTestContext";
 import ProductDesc from "../productDesc";
 import ProductPropose from "../productPropose";
 import ProductReviews from "../productReviews";
-import ProductSingle from "../productSingle";
+import ProductSingle from "../productInfo";
 import ProductSummary from "../productSummary";
 import { IProductDetailProvide, PDetailContext } from "../context";
 import { useNavigate } from "react-router-dom";

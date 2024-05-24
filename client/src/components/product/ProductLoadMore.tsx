@@ -3,7 +3,7 @@ import useTestContext from "@/hook/useTestContext";
 import { CategoryContext, ICategoryProvide } from "@/module/category/context";
 import { Fragment, useEffect, useRef } from "react";
 import LoadingSpinner from "../loading";
-import CartSkeleton from "../card/cart-skeleton";
+import CartSkeleton from "../card/card-skeleton";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "../button";
 

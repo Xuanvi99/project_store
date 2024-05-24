@@ -8,7 +8,7 @@ const CategorySchema = new Schema(
     status: { type: String, enum: ["active", "deactive"], default: "deactive" },
     productIds: [{ type: Schema.Types.ObjectId, ref: "products" }],
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 module.exports = mongoose.model("categories", CategorySchema);

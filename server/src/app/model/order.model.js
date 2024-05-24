@@ -1,9 +1,19 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const constants = require("../../constants");
 
 const OrderSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "users", required: true },
+    customer: {
+      type: {
+        name: { type: String, trim: true, required: true },
+        phone: { type: String, trim: true, required: true },
+        address: { type: String, trim: true, required: true },
+      },
+      required: false,
+    },
+    desc: { type: String, required: true, default: "" },
     listProduct: [
       {
         productId: {
@@ -23,21 +33,37 @@ const OrderSchema = new Schema(
         },
       },
     ],
-    totalPrice: {
-      type: Number,
-      required: true,
-    },
-    is_payment: {
-      type: Boolean,
-      default: false,
-    },
+
     status: {
       type: String,
-      enum: ["PENDING", "SUCCESS", "FAILED"],
-      default: "PENDING",
+      enum: Object.values(constants.ORDER.STATUS),
+      default: constants.ORDER.STATUS.PENDING,
+      required: true,
     },
+
+    paymentMethod: {
+      type: String,
+      enum: Object.values(constants.ORDER.PAYMENT_METHOD),
+      default: constants.ORDER.PAYMENT_METHOD.CASH,
+      required: true,
+    },
+    paymentStatus: {
+      type: String,
+      enum: Object.values(constants.ORDER.PAYMENT_STATUS),
+      default: constants.ORDER.PAYMENT_STATUS.PENDING,
+      required: true,
+    },
+
+    subTotal: { type: Number, required: true },
+    shippingFee: { type: Number, required: true },
+    discount: { type: Number, required: true },
+    total: { type: Number, required: true },
+
+    canceled_at: { type: Date },
+    complete_at: { type: Date },
+    delivery_at: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 module.exports = mongoose.model("orders", OrderSchema);

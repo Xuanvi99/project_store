@@ -1,11 +1,11 @@
 import { RootState } from "@/stores";
-import HoverDropdown from "./HoverDropdown";
 import { IconBag } from "@/components/icon";
 import { cn } from "@/utils";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/hook";
 import { Button } from "@/components/button";
 import { ICart } from "@/types/cart.type";
+import Tooltip from "@/components/tooltip";
 
 function Cart() {
   const navigate = useNavigate();
@@ -15,7 +15,8 @@ function Cart() {
   );
 
   return (
-    <HoverDropdown
+    <Tooltip
+      place="bottom"
       select={
         <IconBag
           size={30}
@@ -23,14 +24,11 @@ function Cart() {
         ></IconBag>
       }
       onClick={() => navigate(`/cart`)}
+      className={{
+        content: "-translate-x-3/4",
+      }}
     >
-      <div
-        className={cn(
-          "absolute top-[160%] left-2/4 transition-all -translate-x-3/4 border-2 max-w-[420px] rounded-lg z-50 hoverDropdown",
-          "border-orange bg-white shadow-shadowButton",
-          "flex flex-col p-2 gap-y-2"
-        )}
-      >
+      <>
         {cart && cart.listProduct.length > 0 && (
           <div className="h-6 text-sm leading-6 text-grayCa">
             Sản phẩm đã thêm
@@ -90,8 +88,8 @@ function Cart() {
             </Button>
           </div>
         )}
-      </div>
-    </HoverDropdown>
+      </>
+    </Tooltip>
   );
 }
 

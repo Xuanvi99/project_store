@@ -26,7 +26,11 @@ const ProductSchema = new Schema(
     },
     priceSale: { type: Number, require: true, default: 0 },
     sold: { type: Number, default: 0 },
-    status: { type: String, enum: ["active", "deactive"], default: "deactive" },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "inactive",
+    },
     imageIds: [{ type: Schema.Types.ObjectId, ref: "images", require: true }],
     commentIds: [{ type: Schema.Types.ObjectId, ref: "comments" }],
     categoryId: {
@@ -55,7 +59,7 @@ const productItemSchema = new Schema(
       ref: "products",
       required: true,
     },
-    size: { type: Number, required: true },
+    size: { type: String, required: true },
     quantity: { type: Number, default: 0 },
   },
   { timestamps: true }

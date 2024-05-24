@@ -46,7 +46,7 @@ function Modal({
         <div
           onClick={onClick}
           className={cn(
-            "absolute inset-0 z-50 bg-black opacity-90",
+            "absolute inset-0 z-50 bg-black opacity-70",
             className?.overlay
           )}
         ></div>

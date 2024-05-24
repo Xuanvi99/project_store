@@ -1,6 +1,7 @@
 import { IconDelete } from "@/components/icon";
 import { Input } from "@/components/input";
 import { useAppSelector } from "@/hook";
+import useTestContext from "@/hook/useTestContext";
 import { RootState } from "@/stores";
 import {
   useDeleteCartOneMutation,
@@ -10,26 +11,42 @@ import { ICartItem } from "@/types/cart.type";
 import { cn } from "@/utils";
 import { debounce } from "lodash";
 import { useMemo, useRef, useState } from "react";
+import { CartContext, TCartProvider } from "../context.cart";
+import { useNavigate } from "react-router-dom";
+import { useGetProductItemQuery } from "@/stores/service/product.service";
+import Modal from "@/components/modal";
+import { Button } from "@/components/button";
 
 type TCartItemProps = {
   data: ICartItem;
   handleCheckCart: (checked: boolean, id: string) => void;
   handleUpdateCartItem: (id: string, quantity: number) => void;
   handleDeleteItem: (id: string) => void;
-  handleOpenError: () => void;
   isChecked: boolean;
 };
 
 function CartItem({
-  data,
+  data: listCartItem,
   isChecked,
   handleCheckCart,
   handleUpdateCartItem,
   handleDeleteItem,
-  handleOpenError,
 }: TCartItemProps) {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
-  const { _id: id, size, quantity, productId: product } = data;
+
+  const { handleOpenError } = useTestContext<TCartProvider>(
+    CartContext as React.Context<TCartProvider>
+  );
+  const [openModal, setOpenModal] = useState<boolean>(false);
+
+  const { _id: id, size, quantity, productId: product } = listCartItem;
+
+  const { data: res } = useGetProductItemQuery({
+    productId: product._id,
+    size,
+  });
+
+  const navigate = useNavigate();
 
   const inputQuantityRef = useRef<HTMLInputElement>(null);
 
@@ -54,7 +71,7 @@ function CartItem({
             handleUpdateCartItem(id, quantity);
           })
           .catch(() => {
-            handleOpenError;
+            handleOpenError(true);
           });
       },
       500,
@@ -88,7 +105,7 @@ function CartItem({
             handleUpdateCartItem(id, Number(quantity));
           })
           .catch(() => {
-            handleOpenError;
+            handleOpenError(true);
           });
       },
       500,
@@ -111,6 +128,12 @@ function CartItem({
   };
 
   const handleIncrement = () => {
+    if (res?.data && quantityOrder + 1 > res?.data.quantity) {
+      const quantity = res?.data && res?.data.quantity;
+      setOpenModal(true);
+      setQuantityOrder(quantity || 1);
+      return;
+    }
     setQuantityOrder((quantityOrder) => quantityOrder + 1);
     debounceHandleClickUpdate(quantityOrder + 1);
   };
@@ -122,6 +145,13 @@ function CartItem({
   const handleBlurQuantity = (
     e: React.FocusEvent<HTMLInputElement, Element>
   ) => {
+    const quantityOrder = Number(e.target.value);
+    const quantity = res?.data && res?.data.quantity;
+    if (quantity && quantityOrder > quantity) {
+      setOpenModal(true);
+      setQuantityOrder(quantity || 1);
+      return;
+    }
     if (e.target.value === "" || e.target.value === "0") {
       setQuantityOrder(1);
     }
@@ -129,7 +159,34 @@ function CartItem({
   };
 
   return (
-    <section className="cart mt-5 w-full py-[30px] shadow-₫sm shadow-grayCa bg-white mx-auto max-w-[1160px] rounded-[3px] flex justify-between items-center">
+    <div className="cartItem mt-2 w-full py-[25px] shadow-₫sm shadow-grayCa bg-white mx-auto  rounded-[3px] flex justify-between items-center">
+      <Modal
+        variant="fixed"
+        isOpenModal={openModal}
+        onClick={() => setOpenModal(false)}
+        className={{
+          content: "bg-white w-[450px] h-[150px] rounded-md p-3",
+        }}
+      >
+        <div className="flex flex-col justify-between h-full">
+          <span className="font-semibold">
+            Rất tiếc, bạn chỉ có thể mua tối đa {res?.data.quantity} sản phẩm
+            của sản phẩm này.
+          </span>
+          <div className="flex justify-end text-xs gap-x-2">
+            <Button
+              variant="default"
+              type="button"
+              className="min-w-[70px]"
+              onClick={() => {
+                setOpenModal(false);
+              }}
+            >
+              Có
+            </Button>
+          </div>
+        </div>
+      </Modal>
       <div className="flex items-center ml-5 w-[500px] gap-x-10">
         <Input
           type="checkbox"
@@ -144,10 +201,17 @@ function CartItem({
             wrap: "w-5 static",
           }}
         />
-        <div className="flex gap-x-3">
+        <div
+          className="flex cursor-pointer gap-x-3"
+          onClick={() => {
+            navigate(`/product_detail/${product.slug}`);
+          }}
+        >
           <img alt="" srcSet={product.thumbnail.url} className="w-[80px]" />
           <div className="flex flex-col">
-            <span className="font-semibold">{product.name}</span>
+            <span className="text-sm font-semibold line-clamp-2">
+              {product.name}
+            </span>
             <span className="mt-auto text-sm text-gray">Size: {size}</span>
           </div>
         </div>
@@ -222,7 +286,7 @@ function CartItem({
           size={30}
         ></IconDelete>
       </div>
-    </section>
+    </div>
   );
 }
 

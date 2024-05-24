@@ -12,7 +12,7 @@ const CommentSchema = new Schema(
     like: { type: Number, default: 0 },
     reply: { type: String, default: "" },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 module.exports = mongoose.model("comments", CommentSchema);

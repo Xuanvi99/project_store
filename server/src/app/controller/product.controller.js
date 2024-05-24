@@ -210,6 +210,23 @@ class Product {
     }
   };
 
+  getProductItem = async (req, res) => {
+    const { productId, size } = req.query;
+
+    try {
+      const productItem = await productItemModel
+        .findOne({ productId, size })
+        .lean()
+        .catch((error) => console.log(error));
+      if (!productItem) {
+        return res.status(404).json({ errorMessage: "Get product item fail" });
+      }
+      res.status(200).json({ data: productItem });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
   addProduct = async (req, res) => {
     const { files, body } = req;
     const { specs, ...common } = body;

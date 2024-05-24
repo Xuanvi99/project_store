@@ -60,6 +60,7 @@ export type paramsListSale = {
 };
 
 export type productItem = {
+  _id: string;
   productId: string;
   size: string;
   quantity: number;

@@ -1,24 +1,27 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const CodeOTPSchema = new Schema({
-  email: {
-    type: String,
-    required: true,
+const CodeOTPSchema = new Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+    },
+    code: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: Boolean,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      expires: "1h",
+    },
   },
-  code: {
-    type: String,
-    required: true,
-  },
-  status: {
-    type: Boolean,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    expires: "1h",
-  },
-});
+  { timestamps: true, versionKey: false }
+);
 
 CodeOTPSchema.statics.saveCodeOTP = async function (email, codeOTP) {
   const _object = new this({

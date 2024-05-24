@@ -8,7 +8,7 @@ const MessageSchema = new Schema(
     text: { type: String },
     imageIDs: [{ type: Schema.Types.ObjectId, ref: "images" }],
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 const RoomSchema = new Schema(
@@ -16,7 +16,7 @@ const RoomSchema = new Schema(
     users: [{ type: Schema.Types.ObjectId, ref: "users" }],
     messages: [MessageSchema],
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 module.exports = mongoose.model("messages", MessageSchema);

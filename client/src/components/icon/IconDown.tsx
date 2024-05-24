@@ -1,8 +1,8 @@
-function IconDown() {
+function IconDown({ size }: { size?: number }) {
   return (
     <svg
-      width="9"
-      height="6"
+      width={size || "9"}
+      height={(size && size - 3) || "6"}
       viewBox="0 0 9 6"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

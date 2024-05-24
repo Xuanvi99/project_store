@@ -4,9 +4,9 @@ import useTestContext from "@/hook/useTestContext";
 import { IProductDetailProvide, PDetailContext } from "@/module/detail/context";
 import LayoutProduct from "@/layout/LayoutProduct";
 import SlideSwiper from "@/components/slideshows";
-import CartSkeleton from "@/components/card/cart-skeleton";
 import Card from "@/components/card";
 import { cn } from "@/utils";
+import CartSkeleton from "@/components/card/card-skeleton";
 
 export default function ProductPropose() {
   const { data } = useTestContext<IProductDetailProvide>(

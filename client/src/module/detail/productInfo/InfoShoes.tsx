@@ -58,12 +58,17 @@ function InfoShoes() {
   }>();
 
   const handleIncrement = () => {
+    let quantityShoes = selectSizeQuantityShoes.size
+      ? selectSizeQuantityShoes.quantity
+      : data?.inventoryId.total;
+    quantityShoes = quantityShoes ? quantityShoes : 0;
+    if (quantityOrder + 1 > quantityShoes) return;
     setQuantityOrder((quantityOrder) => quantityOrder + 1);
     setProductOrder({ ...productOrder, quantity: quantityOrder + 1 });
   };
 
   const handleDecrement = () => {
-    if (quantityOrder === 0) return;
+    if (quantityOrder - 1 === 0) return;
     setQuantityOrder((quantityOrder) => quantityOrder - 1);
     setProductOrder({ ...productOrder, quantity: quantityOrder - 1 });
   };
@@ -82,6 +87,21 @@ function InfoShoes() {
     }
     setProductOrder({ ...productOrder, size: value.size });
     setSelectSizeQuantityShoes(value);
+  };
+
+  const handleBlurQuantityOrder = (
+    e: React.FocusEvent<HTMLInputElement, Element>
+  ) => {
+    const quantityChange = Number(e.target.value);
+    const quantityShoes = selectSizeQuantityShoes.size
+      ? selectSizeQuantityShoes.quantity || 0
+      : data?.inventoryId.total || 0;
+    if (e.target.value === "") {
+      setQuantityOrder(1);
+    }
+    if (quantityChange > quantityShoes) {
+      setQuantityOrder(quantityShoes);
+    }
   };
 
   const handleValidate = (func: () => void) => {
@@ -359,9 +379,7 @@ function InfoShoes() {
                 size={6}
                 min={1}
                 onBlur={(e) => {
-                  if (e.target.value === "") {
-                    setQuantityOrder(1);
-                  }
+                  handleBlurQuantityOrder(e);
                 }}
                 onChange={(e) => {
                   setQuantityOrder(Number(e.target.value));
