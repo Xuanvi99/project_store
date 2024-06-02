@@ -4,7 +4,7 @@ import useTestContext from "@/hook/useTestContext";
 import { RootState } from "@/stores";
 import { useDeleteCartOneMutation } from "@/stores/service/cart.service";
 import { ICartItem } from "@/types/cart.type";
-import { cn } from "@/utils";
+import { cn, formatPrice } from "@/utils";
 import { CartContext, TCartProvider } from "../context.cart";
 
 type TCartItemProps = {
@@ -41,12 +41,12 @@ function CartItemExpired({ data }: TCartItemProps) {
           {product && product.is_sale === "sale" ? (
             <>
               <p className="text-sm line-through text-gray">
-                {new Intl.NumberFormat().format(product.price)}₫
+                {formatPrice(product.price)}₫
               </p>
-              <p>{new Intl.NumberFormat().format(product.priceSale)}₫</p>
+              <p>{formatPrice(product.priceSale)}₫</p>
             </>
           ) : (
-            <p>{new Intl.NumberFormat().format(product.price)}₫</p>
+            <p>{formatPrice(product.price)}₫</p>
           )}
         </span>
         <div
@@ -56,11 +56,11 @@ function CartItemExpired({ data }: TCartItemProps) {
         </div>
         {product && product.is_sale === "sale" ? (
           <span className="flex items-center justify-center text-red-600">
-            {new Intl.NumberFormat().format(product.priceSale * quantity)}₫
+            {formatPrice(product.priceSale * quantity)}₫
           </span>
         ) : (
           <span className="flex items-center justify-center text-red-600">
-            {new Intl.NumberFormat().format(product.price * quantity)}₫
+            {formatPrice(product.price * quantity)}₫
           </span>
         )}
       </div>

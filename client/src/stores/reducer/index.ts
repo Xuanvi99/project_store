@@ -11,6 +11,7 @@ import { productApi } from "../service/product.service";
 import { categoryApi } from "../service/category.service";
 import { saleApi } from "../service/sale.service";
 import { commentApi } from "../service/comment.service";
+import { transportApi } from "../service/transport.service";
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   [categoryApi.reducerPath]: categoryApi.reducer,
   [saleApi.reducerPath]: saleApi.reducer,
   [commentApi.reducerPath]: commentApi.reducer,
+  [transportApi.reducerPath]: transportApi.reducer,
   authSlice: authSlice,
   cartSlice: cartSlice,
 });

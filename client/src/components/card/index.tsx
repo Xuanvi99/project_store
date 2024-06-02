@@ -5,6 +5,7 @@ import Info from "./Info.card";
 import CardSales from "./Sale.card";
 import OutOfStock from "./OutOfStock.card";
 import CardExpired from "./CardExpired";
+import { formatPrice } from "@/utils";
 
 interface ICardItemProps {
   product: IProductRes;
@@ -39,11 +40,11 @@ function Card({ product }: ICardItemProps) {
                     : "text-red-600 text-lg"
                 }
               >
-                {new Intl.NumberFormat().format(product.price)}₫
+                {formatPrice(product.price)}₫
               </span>
               {product.is_sale === "sale" && (
                 <span className="text-lg text-red-600">
-                  {new Intl.NumberFormat().format(product.priceSale)}₫
+                  {formatPrice(product.priceSale)}₫
                 </span>
               )}
             </Card.Info>

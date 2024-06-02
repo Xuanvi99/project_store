@@ -2,7 +2,7 @@ import { Button } from "@/components/button";
 import { IconAlert, IconDown } from "@/components/icon";
 import { Input } from "@/components/input";
 import Modal, { ModalNotification } from "@/components/modal";
-import { useAppDispatch, useAppSelector, useHover } from "@/hook";
+import { useAppSelector, useHover } from "@/hook";
 import { useEffect, useRef, useState } from "react";
 import Tooltip from "../../../components/tooltip/index";
 import PromotionDetail from "./PromotionDetail";
@@ -14,8 +14,8 @@ import {
 } from "@/stores/service/cart.service";
 import { RootState } from "@/stores";
 import generateUniqueId from "generate-unique-id";
-import { updateCart } from "@/stores/reducer/cartReducer";
 import { useNavigate } from "react-router-dom";
+import { formatPrice } from "@/utils";
 function Footer() {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
   const {
@@ -31,7 +31,6 @@ function Footer() {
     CartContext as React.Context<TCartProvider>
   );
 
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const [deleteCartAll] = useDeleteCartAllMutation();
@@ -81,7 +80,6 @@ function Footer() {
         return a + b.productId.price * b.quantity;
       }
     }, 0);
-
     handleSetTotalPriceOrder(totalPriceOrder);
   }, [handleSetTotalPriceOrder, listCheckCart]);
 
@@ -94,7 +92,7 @@ function Footer() {
         if (b.productId.is_sale === "sale") {
           return a + (b.productId.price - b.productId.priceSale) * b.quantity;
         } else {
-          return a + 0;
+          return 0;
         }
       }, 0);
       setTotalPrice(calculatePrice);
@@ -212,16 +210,16 @@ function Footer() {
               <div className="flex flex-col justify-between gap-y-1">
                 <div ref={nodeRef} className="flex items-center gap-x-2">
                   <span className="text-2xl text-red-600 ">
-                    ₫{new Intl.NumberFormat().format(totalPrice - discount)}
+                    {formatPrice(totalPrice - discount)}₫
                   </span>
-                  <span className={isHover ? "rotate-0" : "rotate-180 "}>
+                  <span className={isHover ? "rotate-0" : "rotate-180"}>
                     <IconDown size={18}></IconDown>
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs gap-x-2">
                   <span>Tiết kiệm</span>
                   <span className={"text-red-600"}>
-                    ₫{new Intl.NumberFormat().format(discount)}
+                    {formatPrice(discount)}₫
                   </span>
                 </div>
               </div>
@@ -248,16 +246,14 @@ function Footer() {
               useLetters: true,
               useNumbers: true,
             });
-            dispatch(
-              updateCart({
-                selectProductCart: {
-                  id,
-                  listProduct: listCheckCart,
-                  totalPrice: totalPrice - discount,
-                },
+            localStorage.setItem(
+              "selectProductCart",
+              JSON.stringify({
+                id,
+                listIdProductOrder: listSelectItem,
               })
             );
-            navigate(`/checkout/?id=${id}`, { state: { id } });
+            navigate(`/checkout/?id=${id}`);
           }}
         >
           Mua Hàng

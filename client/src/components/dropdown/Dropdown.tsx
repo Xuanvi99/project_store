@@ -5,7 +5,7 @@ import { IconDown } from "../icon";
 import Option from "./Option";
 import Select from "./Select";
 
-export type option = { label: string; value: string; id: string };
+export type option = { label: string; value: string; id: string | number };
 
 interface IDropdownProps<T> {
   title: string;

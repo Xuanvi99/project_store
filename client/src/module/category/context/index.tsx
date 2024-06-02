@@ -6,7 +6,6 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 
 export type ICategoryProvide = {
   filter: paramsFilterProduct;
-
   data:
     | {
         data: IProductRes[];

@@ -20,7 +20,6 @@ class Cart {
             },
           },
         })
-
         .lean();
 
       if (!cart) {
@@ -78,9 +77,24 @@ class Cart {
       if (!result) {
         return res.status(400).json({ errMessage: "add to item Cart fail" });
       }
+      const newCart = await cartModel
+        .findById(result._id)
+        .populate({
+          path: "listProduct",
+          populate: {
+            path: "productId",
+            model: "products",
+            populate: {
+              path: "thumbnail",
+              model: "images",
+              select: "url",
+            },
+          },
+        })
+        .lean();
       res.status(200).json({
         message: "Add to Cart successfully!",
-        cartItem: result.listProduct[0],
+        cartItem: newCart.listProduct[0],
       });
     } catch (error) {
       console.log("error: ", error);

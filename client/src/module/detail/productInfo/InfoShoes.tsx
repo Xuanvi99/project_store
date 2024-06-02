@@ -7,7 +7,7 @@ import {
   IconTick,
 } from "@/components/icon";
 import useTestContext from "@/hook/useTestContext";
-import { cn } from "@/utils";
+import { cn, formatPrice } from "@/utils";
 import { useEffect, useState } from "react";
 import { IProductDetailProvide, PDetailContext } from "../context";
 import { ModalNotification } from "@/components/modal";
@@ -274,19 +274,19 @@ function InfoShoes() {
             <span>
               Giá sale:
               <strong className="ml-1 text-xl font-bold text-yellow">
-                {new Intl.NumberFormat().format(data?.priceSale)}₫
+                {formatPrice(data?.priceSale)}₫
               </strong>
             </span>
             <span className="flex items-center">
               Giá gốc:
               <strong className="ml-1 line-through ">
-                {new Intl.NumberFormat().format(data?.price)}₫
+                {formatPrice(data?.price)}₫
               </strong>
             </span>
             <span>
               Tiết kiệm:
               <strong className="ml-1 text-xl font-bold text-yellow">
-                {new Intl.NumberFormat().format(data?.price - data?.priceSale)}₫
+                {formatPrice(data?.price - data?.priceSale)}₫
               </strong>
             </span>
           </div>
@@ -299,7 +299,7 @@ function InfoShoes() {
         <div className="flex items-end mt-5 gap-x-3">
           <span className="text-lg font-bold">Giá:</span>
           <span className="text-2xl font-bold text-red-600">
-            {new Intl.NumberFormat().format(850000)}₫
+            {formatPrice(850000)}₫
           </span>
         </div>
       )}

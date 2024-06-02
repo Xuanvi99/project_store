@@ -5,9 +5,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Field from "../fields/index";
 import { Label } from "../label";
 import InputForm from "../input/InputForm";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Button } from "../button";
-import axios from "axios";
 import { DropdownForm } from "../dropdown";
 import ErrorInput from "../error/ErrorInput";
 import IconCLose from "../icon/IconCLose";
@@ -20,6 +19,13 @@ import {
 import LoadingSpinner from "../loading";
 import { useAppSelector } from "../../hook";
 import { IAddress } from "@/types/address.type";
+import { RootState } from "@/stores";
+import { IUser } from "@/types/user.type";
+import {
+  useLazyGetProvinceQuery,
+  usePostDistrictMutation,
+  usePostWardMutation,
+} from "@/stores/service/transport.service";
 
 const validatingSchema = Yup.object({
   name: Yup.string()
@@ -32,8 +38,11 @@ const validatingSchema = Yup.object({
     .required("Vui lòng điền Số điện thoại")
     .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, "Số điện thoại không hợp lệ"),
   province: Yup.string().required("Invalid!"),
+  provinceId: Yup.number().required("Invalid!"),
   district: Yup.string().required("Invalid!"),
+  districtId: Yup.number().required("Invalid!"),
   ward: Yup.string().required("Invalid!"),
+  wardCode: Yup.string().required("Invalid!"),
   specific: Yup.string().required(
     "Vui lòng điền thêm thông tin địa chỉ cụ thể"
   ),
@@ -41,16 +50,20 @@ const validatingSchema = Yup.object({
 
 type formValues = Yup.InferType<typeof validatingSchema>;
 
-type optionValue = { label: string; value: string; id: string };
+type optionValue = { label: string; value: string; id: number | string };
 
 function ModalAddress({
   show,
   handleShow,
+  checkAddress = true,
 }: {
   show: boolean;
   handleShow: () => void;
+  checkAddress?: boolean;
 }) {
-  const user = useAppSelector((state) => state.authSlice.user);
+  const user: IUser | null = useAppSelector(
+    (state: RootState) => state.authSlice.user
+  );
 
   const [listProvince, setListProvince] = useState<optionValue[]>([]);
   const [listDistrict, setListDistrict] = useState<optionValue[]>([]);
@@ -59,9 +72,13 @@ function ModalAddress({
 
   const id = user ? user._id : "";
   const { data, status } = useGetAddressQuery(id, { skip: !id });
+  const [addAddress, { isLoading: loadingAdd }] = useAddAddressMutation();
+  const [upDateAddress, { isLoading: loadingUpdate }] =
+    useUpDateAddressMutation();
 
-  const [addAddress] = useAddAddressMutation();
-  const [upDateAddress, { isLoading }] = useUpDateAddressMutation();
+  const [getProvince] = useLazyGetProvinceQuery();
+  const [postDistrict] = usePostDistrictMutation();
+  const [postWard] = usePostWardMutation();
 
   const {
     control,
@@ -69,101 +86,150 @@ function ModalAddress({
     setValue,
     watch,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<formValues>({
     defaultValues: {
       name: "",
       phone: "",
       province: "",
+      provinceId: 0,
       district: "",
+      districtId: 0,
       ward: "",
+      wardCode: "",
       specific: "",
     },
     resolver: yupResolver(validatingSchema),
     mode: "onChange",
   });
 
-  const handleFetchData = async ({
-    params,
-    id,
-  }: {
-    params: "province" | "district" | "ward";
-    id?: string;
-  }) => {
-    switch (params) {
-      case "province": {
-        const responsive = await axios({
-          method: "GET",
-          url: `https://vapi.vnappmob.com/api/province`,
-        });
-        const data = await responsive.data.results;
-        const results: optionValue[] = [];
-        if (data) {
-          data.forEach(
-            (item: { province_name: string; province_id: string }) => {
-              const label = item.province_name.includes("Tỉnh")
-                ? item.province_name
-                : item.province_name.replace("Thành phố", "Tp");
-              results.push({
-                label: label,
-                value: label,
-                id: item.province_id,
-              });
-            }
-          );
-        }
-        setListProvince(results);
-        break;
-      }
-
-      case "district": {
-        const responsive = await axios({
-          method: "GET",
-          url: `https://vapi.vnappmob.com/api/province/${params}/${id}`,
-        });
-        const data = await responsive.data.results;
-        const results: optionValue[] = [];
-        if (data) {
-          data.forEach(
-            (item: { district_name: string; district_id: string }) => {
-              results.push({
-                label: item.district_name,
-                value: item.district_name,
-                id: item.district_id,
-              });
-            }
-          );
-        }
-        setListDistrict(results);
-        break;
-      }
-
-      case "ward": {
-        const responsive = await axios({
-          method: "GET",
-          url: `https://vapi.vnappmob.com/api/province/${params}/${id}`,
-        });
-        const data = await responsive.data.results;
-        const results: optionValue[] = [];
-        data.length > 0
-          ? data.forEach((item: { ward_name: string; ward_id: string }) => {
-              results.push({
-                label: item.ward_name,
-                value: item.ward_name,
-                id: item.ward_id,
-              });
-            })
-          : results.push({
-              label: "Không có Phường xã",
-              value: "",
-              id: "0",
+  const handleFetchDataAddress = useCallback(
+    async ({
+      params,
+      id,
+    }: {
+      params: "province" | "district" | "ward";
+      id: number;
+    }) => {
+      switch (params) {
+        case "province": {
+          await getProvince()
+            .unwrap()
+            .then((res) => {
+              const data = res.data;
+              const results: optionValue[] = [];
+              if (data) {
+                data.forEach(
+                  (item: { ProvinceName: string; ProvinceID: number }) => {
+                    results.push({
+                      label: item.ProvinceName,
+                      value: item.ProvinceName,
+                      id: item.ProvinceID,
+                    });
+                  }
+                );
+              }
+              setListProvince(results);
             });
-        setListWard(results);
-        break;
+          break;
+        }
+
+        case "district": {
+          await postDistrict({
+            province_id: id,
+          })
+            .unwrap()
+            .then((res) => {
+              const data = res.data;
+              const results: optionValue[] = [];
+              if (data) {
+                data.forEach(
+                  (item: { DistrictName: string; DistrictID: number }) => {
+                    results.push({
+                      label: item.DistrictName,
+                      value: item.DistrictName,
+                      id: item.DistrictID,
+                    });
+                  }
+                );
+              }
+              setListDistrict(results);
+            });
+          break;
+        }
+
+        case "ward": {
+          await postWard({
+            district_id: id,
+          })
+            .unwrap()
+            .then((res) => {
+              const data = res.data;
+              const results: optionValue[] = [];
+              data.length > 0
+                ? data.forEach(
+                    (item: { WardName: string; WardCode: string }) => {
+                      results.push({
+                        label: item.WardName,
+                        value: item.WardName,
+                        id: item.WardCode,
+                      });
+                    }
+                  )
+                : results.push({
+                    label: "Không có Phường xã",
+                    value: "",
+                    id: "0",
+                  });
+              setListWard(results);
+            });
+          break;
+        }
+        default:
+          break;
       }
-      default:
-        break;
+    },
+    [getProvince, postDistrict, postWard]
+  );
+
+  const handleResetData = useCallback(() => {
+    if (address) {
+      reset({
+        name: address.name,
+        phone: address.phone,
+        province: address.province,
+        provinceId: address.provinceId,
+        district: address.district,
+        districtId: address.districtId,
+        ward: address.ward ? address.ward : "",
+        wardCode: address.wardCode ? address.wardCode : "",
+        specific: address.specific,
+      });
+    } else {
+      reset({
+        name: "",
+        phone: "",
+        province: "",
+        provinceId: 0,
+        district: "",
+        districtId: 0,
+        ward: "",
+        wardCode: "",
+        specific: "",
+      });
     }
+  }, [address, reset]);
+
+  const checkDisabledSubmit = (): boolean  => {
+    if (address) {
+      return isDirty ||
+        watch("province") !== address.province ||
+        watch("district") !== address.district ||
+        watch("ward") !== address.ward
+        ? false
+        : true;
+    }
+    return false;
   };
 
   useLayoutEffect(() => {
@@ -173,63 +239,63 @@ function ModalAddress({
   }, [data, status]);
 
   useEffect(() => {
-    if (address) {
-      setValue("name", address.name);
-      setValue("phone", address.phone);
-      setValue("province", address.province);
-      setValue("district", address.district);
-      setValue("ward", address.ward || "");
-      setValue("specific", address.specific);
-    }
-  }, [address, setValue]);
+    handleResetData();
+  }, [handleResetData]);
 
   useEffect(() => {
-    handleFetchData({ params: "province" });
-  }, []);
+    handleFetchDataAddress({ params: "province", id: 0 });
+    if (address) {
+      handleFetchDataAddress({ params: "district", id: +address.provinceId });
+      handleFetchDataAddress({ params: "ward", id: +address.districtId });
+    }
+  }, [address, handleFetchDataAddress]);
 
   const Onsubmit = async (data: formValues) => {
     address
       ? await upDateAddress({ id: address.userId, body: data }).unwrap()
       : await addAddress({ body: { ...data, userId: id } }).unwrap();
-    if (!isLoading) {
-      reset({
-        name: "",
-        phone: "",
-        province: "",
-        district: "",
-        ward: "",
-        specific: "",
-      });
+    if (!loadingUpdate || !loadingAdd) {
+      handleResetData();
       handleShow();
     }
   };
+
   return (
     <Modal
       isOpenModal={show}
       onClick={() => {
-        reset({
-          name: "",
-          phone: "",
-          province: "",
-          district: "",
-          ward: "",
-          specific: "",
-        });
-        handleShow();
+        if (checkAddress) {
+          handleResetData();
+          handleShow();
+        }
       }}
       className={{
         content:
           "modal-content max-w-[600px] w-full p-[30px] relative bg-white rounded z-[70]",
       }}
     >
-      <div
-        onClick={handleShow}
-        className="absolute cursor-pointer top-2 right-2 hover:text-red-600"
+      {checkAddress && (
+        <div
+          onClick={handleShow}
+          className="absolute cursor-pointer top-2 right-2 hover:text-red-600"
+        >
+          <IconCLose size={25}></IconCLose>
+        </div>
+      )}
+      {checkAddress ? (
+        <h1 className="text-2xl mb-[15px]">Cập nhật địa chỉ</h1>
+      ) : (
+        <>
+          <h1 className="text-2xl">Địa chỉ mới</h1>
+          <p className="my-2 text-xs">
+            Để đặt hàng, vui lòng thêm địa chỉ nhận hàng
+          </p>
+        </>
+      )}
+      <form
+        onSubmit={handleSubmit(Onsubmit)}
+        className="flex flex-col mt-5 gap-y-7"
       >
-        <IconCLose size={25}></IconCLose>
-      </div>
-      <h1 className="text-2xl mb-[15px]">Cập nhật địa chỉ</h1>
-      <form onSubmit={handleSubmit(Onsubmit)} className="flex flex-col gap-y-7">
         <div className="flex w-full gap-x-2">
           <Field variant="flex-col" className="w-1/2">
             <Label name="name">Họ và tên:</Label>
@@ -271,7 +337,7 @@ function ModalAddress({
                 options={listProvince}
                 error={errors.district && !watch("province")}
                 search={{
-                  display: true,
+                  display: listProvince.length > 0 ? true : false,
                   place: "top",
                 }}
                 className={{
@@ -279,9 +345,13 @@ function ModalAddress({
                 }}
                 onClick={(option) => {
                   setValue("province", option.value);
+                  setValue("provinceId", +option.id);
                   setValue("district", "");
                   setValue("ward", "");
-                  handleFetchData({ params: "district", id: option.id });
+                  handleFetchDataAddress({
+                    params: "district",
+                    id: +option.id,
+                  });
                 }}
               />
             </Field>
@@ -299,17 +369,20 @@ function ModalAddress({
                 options={listDistrict}
                 error={errors.district && !watch("district")}
                 search={{
-                  display: true,
+                  display: listDistrict.length > 0 ? true : false,
                   place: "top",
                 }}
                 className={{
-                  select: watch("province") ? "" : "shadow-inner text-gray",
+                  select: watch("province")
+                    ? "line-clamp-1 whitespace-nowrap"
+                    : "shadow-inner text-gray",
                   option: "max-h-[160px] overflow-y-scroll rounded-none",
                 }}
                 onClick={(option) => {
                   setValue("district", option.value);
+                  setValue("districtId", +option.id);
                   setValue("ward", "");
-                  handleFetchData({ params: "ward", id: option.id });
+                  handleFetchDataAddress({ params: "ward", id: +option.id });
                 }}
               />
             </Field>
@@ -329,18 +402,20 @@ function ModalAddress({
                 options={listWard}
                 error={errors.ward && !watch("ward")}
                 search={{
-                  display: true,
+                  display: listWard.length > 0 ? true : false,
                   place: "top",
                 }}
                 className={{
                   select: `${
-                    watch("district") ? "" : "shadow-inner text-gray"
+                    watch("district")
+                      ? "line-clamp-1 whitespace-nowrap"
+                      : "shadow-inner text-gray"
                   } `,
                   option: "max-h-[160px] overflow-y-scroll rounded-none",
                 }}
                 onClick={(option) => {
-                  console.log("option: ", option);
                   setValue("ward", option.value ? option.value : "Không");
+                  setValue("wardCode", "" + option.id);
                 }}
               />
             </Field>
@@ -378,10 +453,14 @@ function ModalAddress({
           <Button
             variant="default"
             type="submit"
-            // disabled={!isDirty}
+            disabled={checkDisabledSubmit()}
             className="min-w-[130px] flex justify-center"
           >
-            {isLoading ? <LoadingSpinner></LoadingSpinner> : "Cập nhật"}
+            {loadingUpdate || loadingAdd ? (
+              <LoadingSpinner></LoadingSpinner>
+            ) : (
+              "Cập nhật"
+            )}
           </Button>
         </div>
       </form>

@@ -11,6 +11,7 @@ import { productApi } from "./service/product.service";
 import { categoryApi } from "./service/category.service";
 import { saleApi } from "./service/sale.service";
 import { commentApi } from "./service/comment.service";
+import { transportApi } from "./service/transport.service";
 
 export const store = configureStore({
   reducer: rootReducer,
@@ -29,6 +30,7 @@ export const store = configureStore({
       categoryApi.middleware,
       saleApi.middleware,
       commentApi.middleware,
+      transportApi.middleware,
     ]),
 });
 

@@ -1,18 +1,12 @@
-import { ICart, ICartItem } from "@/types/cart.type";
+import { ICart } from "@/types/cart.type";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 interface IPayload {
-  cart?: ICart | null;
-  selectProductCart?: {
-    id: string;
-    listProduct: ICartItem[];
-    totalPrice: number;
-  } | null;
+  cart: ICart | null;
 }
 
 const initialState: IPayload = {
   cart: null,
-  selectProductCart: null,
 };
 
 const cartSlice = createSlice({

@@ -8,7 +8,7 @@ import {
   useUpdateCartMutation,
 } from "@/stores/service/cart.service";
 import { ICartItem } from "@/types/cart.type";
-import { cn } from "@/utils";
+import { cn, formatPrice } from "@/utils";
 import { debounce } from "lodash";
 import { useMemo, useRef, useState } from "react";
 import { CartContext, TCartProvider } from "../context.cart";
@@ -221,12 +221,12 @@ function CartItem({
           {product && product.is_sale === "sale" ? (
             <>
               <p className="text-sm line-through text-gray">
-                {new Intl.NumberFormat().format(product.price)}₫
+                {formatPrice(product.price)}₫
               </p>
-              <p>{new Intl.NumberFormat().format(product.priceSale)}₫</p>
+              <p>{formatPrice(product.priceSale)}₫</p>
             </>
           ) : (
-            <p>{new Intl.NumberFormat().format(product.price)}₫</p>
+            <p>{formatPrice(product.price)}₫</p>
           )}
         </span>
         <div
@@ -262,11 +262,11 @@ function CartItem({
         </div>
         {product && product.is_sale === "sale" ? (
           <span className="flex items-center justify-center text-red-600">
-            {new Intl.NumberFormat().format(product.priceSale * quantityOrder)}₫
+            {formatPrice(product.priceSale * quantityOrder)}₫
           </span>
         ) : (
           <span className="flex items-center justify-center text-red-600">
-            {new Intl.NumberFormat().format(product.price * quantityOrder)}₫
+            {formatPrice(product.price * quantityOrder)}₫
           </span>
         )}
       </div>

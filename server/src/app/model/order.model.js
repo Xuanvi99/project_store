@@ -13,7 +13,7 @@ const OrderSchema = new Schema(
       },
       required: false,
     },
-    desc: { type: String, required: true, default: "" },
+    note: { type: String, required: true, default: "" },
     listProduct: [
       {
         productId: {

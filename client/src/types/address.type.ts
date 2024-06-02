@@ -4,7 +4,10 @@ export interface IAddress {
   name: string;
   phone: string;
   province: string;
+  provinceId: number;
   district: string;
+  districtId: number;
   ward?: string;
+  wardCode?: string;
   specific: string;
 }

@@ -7,9 +7,12 @@ const AddressModel = new Schema(
     name: { type: String, required: true },
     phone: { type: String, required: true },
     province: { type: String, required: true },
+    provinceId: { type: Number, required: true },
     district: { type: String, required: true },
+    districtId: { type: Number, required: true },
     ward: { type: String, default: "" },
-    specific: { type: String, required: true },
+    wardCode: { type: String, default: "" },
+    specific: { type: String, required: true, default: "" },
   },
   { timestamps: true, versionKey: false }
 );
@@ -20,8 +23,11 @@ AddressModel.statics.saveAddress = async function (address) {
     name: address.name,
     phone: address.phone,
     province: address.province,
+    provinceId: address.provinceId,
     district: address.district,
+    districtId: address.districtId,
     ward: address.ward,
+    wardCode: address.wardCode,
     specific: address.specific,
   });
   await _object.save();

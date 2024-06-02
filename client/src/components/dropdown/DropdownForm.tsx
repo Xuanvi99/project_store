@@ -6,7 +6,8 @@ import Option from "./Option";
 import Select from "./Select";
 import { FieldValues, UseControllerProps, useWatch } from "react-hook-form";
 import { Input } from "../input";
-type options = { label: string; value: string; id: string };
+
+type options = { label: string; value: string; id: number | string };
 
 interface IDropdownFormProps<T> {
   title: string;
@@ -141,7 +142,7 @@ function DropdownForm<T extends FieldValues>({
               </div>
             )}
             {add?.display && (
-              <div className="h-10 px-2 text-xs leading-10 text-center list-none cursor-pointer  border-grayCa hover:text-orange">
+              <div className="h-10 px-2 text-xs leading-10 text-center list-none cursor-pointer border-grayCa hover:text-orange">
                 +Thêm thương hiệu
               </div>
             )}

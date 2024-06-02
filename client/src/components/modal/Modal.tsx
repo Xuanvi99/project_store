@@ -10,7 +10,7 @@ type IModalBaseProps = {
     content?: string;
   };
   isOpenModal: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   variant?: "fixed" | "relative";
 };
 

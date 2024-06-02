@@ -1,5 +1,5 @@
 import useTestContext from "@/hook/useTestContext";
-import { cn } from "@/utils";
+import { cn, formatPrice } from "@/utils";
 import Slider from "rc-slider";
 import { CategoryContext, ICategoryProvide } from "../context";
 import { useSearchParams } from "react-router-dom";
@@ -28,7 +28,7 @@ function PriceFilter() {
   }, [filter.max_price, filter.min_price, maxPrice, minPrice]);
 
   const currency = (value: number) => {
-    return new Intl.NumberFormat().format(value);
+    return formatPrice(value);
   };
 
   return (
