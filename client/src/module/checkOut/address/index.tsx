@@ -11,17 +11,24 @@ import { IUser } from "@/types/user.type";
 import { cn } from "@/utils";
 import { CheckoutContext, ICheckoutProvide } from "../context";
 import { useCallback, useEffect, useState } from "react";
-import { usePostShippingFeeMutation } from "@/stores/service/transport.service";
+import {
+  usePostShippingFeeMutation,
+  usePostTimeShippingMutation,
+} from "@/stores/service/transport.service";
 
 function AddressCheckout() {
   const user: IUser | null = useAppSelector(
     (state: RootState) => state.authSlice.user
   );
 
-  const { setAddressOrder, setShippingFree, quantityProductOrder } =
-    useTestContext<ICheckoutProvide>(
-      CheckoutContext as React.Context<ICheckoutProvide>
-    );
+  const {
+    setAddressOrder,
+    setShippingFree,
+    quantityProductOrder,
+    setTimeShipping,
+  } = useTestContext<ICheckoutProvide>(
+    CheckoutContext as React.Context<ICheckoutProvide>
+  );
 
   const [openShowModal, setOpenShowModal] = useState<boolean>(false);
   const [addressId, setAddressId] = useState<{
@@ -36,6 +43,7 @@ function AddressCheckout() {
   console.log(dataAddress);
 
   const [postShippingFee] = usePostShippingFeeMutation();
+  const [postTimeShipping] = usePostTimeShippingMutation();
 
   const handleShowModal = () => {
     setOpenShowModal(!openShowModal);
@@ -68,6 +76,32 @@ function AddressCheckout() {
     setShippingFree,
   ]);
 
+  const handleCalculateTimeShipping = useCallback(async () => {
+    if (addressId.districtId > 0) {
+      await postTimeShipping({
+        ShopID: +import.meta.env.VITE_SHOP_ID,
+        service_id: 53320,
+        from_district_id: +import.meta.env.VITE_ADDRESS_DISTRICT_STORE,
+        from_ward_code: import.meta.env.VITE_ADDRESS_WARD_STORE,
+        to_district_id: addressId.districtId,
+        to_ward_code: addressId.wardCode,
+      })
+        .unwrap()
+        .then((res) => {
+          console.log(res.data);
+          setTimeShipping(res.data.leadtime);
+          const date = new Date();
+          console.log(date.getMilliseconds());
+         
+        });
+    }
+  }, [
+    addressId.districtId,
+    addressId.wardCode,
+    postTimeShipping,
+    setTimeShipping,
+  ]);
+
   useEffect(() => {
     if (dataAddress && statusAddress === "fulfilled") {
       const addressOrder = `${dataAddress.address.specific}, ${dataAddress.address.ward}, ${dataAddress?.address.district}, TP ${dataAddress?.address.province}`;
@@ -91,7 +125,12 @@ function AddressCheckout() {
 
   useEffect(() => {
     handleCalculateShippingFee();
-  }, [handleCalculateShippingFee, quantityProductOrder]);
+    handleCalculateTimeShipping();
+  }, [
+    handleCalculateShippingFee,
+    handleCalculateTimeShipping,
+    quantityProductOrder,
+  ]);
 
   return (
     <section className="w-full bg-white relative py-7 px-[30px] flex flex-col gap-y-5 shadow-sm shadow-gray">

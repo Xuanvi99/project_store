@@ -88,7 +88,7 @@ function Profile({ displayName }: TProps) {
               Tài khoản
             </Link>
             <Link
-              to={""}
+              to={"/user/account/purchaseOrder"}
               className="inline-block whitespace-nowrap hover:text-orange"
             >
               Đơn mua

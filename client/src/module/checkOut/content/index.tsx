@@ -2,12 +2,15 @@ import { Button } from "@/components/button";
 import Modal from "@/components/modal";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
-import { ICart, ICartItem } from "@/types/cart.type";
+import { ICart } from "@/types/cart.type";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import OrderItem from "./OrderItem";
 import useTestContext from "@/hook/useTestContext";
 import { CheckoutContext, ICheckoutProvide } from "../context";
+import { IOrderItem } from "@/types/order.type";
+import TextArea from "@/components/textArea";
+import { formatPrice } from "@/utils";
 
 type TSelectProductOrder = {
   id: string;
@@ -19,7 +22,7 @@ function ListProductOrder() {
     (state: RootState) => state.cartSlice.cart
   );
 
-  const { listProductOrder, setListProductOrder } =
+  const { listProductOrder, setListProductOrder, shippingFree } =
     useTestContext<ICheckoutProvide>(
       CheckoutContext as React.Context<ICheckoutProvide>
     );
@@ -30,6 +33,11 @@ function ListProductOrder() {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [redirect, setRedirect] = useState<boolean>(false);
   const [checkOrder, setCheckOrder] = useState<boolean>(false);
+  const [textArea, setTextArea] = useState<string>("");
+
+  const handleChangeTextArea = (value: string) => {
+    setTextArea(value);
+  };
 
   const orderId = useMemo<string>(
     () => searchParams.get("id") || "",
@@ -61,7 +69,7 @@ function ListProductOrder() {
       setOpenModal(true);
       setCheckOrder(true);
     } else {
-      const array: ICartItem[] = [];
+      const array: IOrderItem[] = [];
       for (const idProduct of listSelectProduct) {
         const index = cart.listProduct.findIndex(({ _id }) => _id == idProduct);
         if (index === -1) {
@@ -69,7 +77,10 @@ function ListProductOrder() {
           setCheckOrder(true);
           return;
         } else {
-          array.push(cart.listProduct[index]);
+          const productItemOrder = cart.listProduct[index].productId;
+          const price = productItemOrder.price;
+          const priceSale = productItemOrder.priceSale;
+          array.push({ ...cart.listProduct[index], price, priceSale });
         }
       }
       setListProductOrder(array);
@@ -133,6 +144,34 @@ function ListProductOrder() {
               })}
           </div>
         )}
+      </section>
+      <section className="w-full mx-auto border-dashed bg-grayFa border-1 border-grayCa">
+        <div className="flex px-5 text-sm">
+          <div className="flex w-full px-2 my-5 basis-3/5 gap-x-2">
+            <span className="whitespace-nowrap">Lời nhắn: </span>
+            <TextArea
+              cols={50}
+              placeholder="Lưu ý cho người bán..."
+              textValue={textArea}
+              handleChange={handleChangeTextArea}
+            ></TextArea>
+          </div>
+          <div className="flex flex-col justify-between p-2 border-dashed basis-2/5 border-l-1 border-l-grayCa ">
+            <div className="flex gap-x-2">
+              <span className="font-semibold">Đơn vị vận chuyển:</span>
+              <span className="underline text-blue">Giao hàng nhanh</span>
+            </div>
+            <div className="flex gap-x-2">
+              <span className="font-semibold">Thời gian giao hàng:</span>
+              <span>0</span>
+            </div>
+            <div className="flex gap-x-2">
+              <span className="font-semibold">Phí vận chuyển:</span>
+              <span>{formatPrice(shippingFree)}₫</span>
+            </div>
+          </div>
+        </div>
+        <div></div>
       </section>
     </Fragment>
   );

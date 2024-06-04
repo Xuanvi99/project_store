@@ -12,6 +12,7 @@ const CartPage = lazy(() => import("./CartPage"));
 const CheckOutPage = lazy(() => import("./CheckOutPage"));
 const DashboardPage = lazy(() => import("./DashboardPage"));
 const VerifyPage = lazy(() => import("./VerifyPage"));
+const PaymentPage = lazy(() => import("./PaymentPage"));
 
 export {
   HomePage,
@@ -26,4 +27,5 @@ export {
   CheckOutPage,
   DashboardPage,
   VerifyPage,
+  PaymentPage,
 };

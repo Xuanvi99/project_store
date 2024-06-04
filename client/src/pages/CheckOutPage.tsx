@@ -2,9 +2,9 @@ import { Fragment } from "react";
 import { BannerCommon } from "../components/banner";
 import LayoutMain from "../layout/LayoutMain";
 import AddressCheckout from "@/module/checkout/address";
-import ListProductOrder from "@/module/checkout/product";
+import ListProductOrder from "@/module/checkout/content";
 import { CheckoutProvide } from "@/module/checkout/context";
-import InfoOrder from "@/module/checkout/info_Order";
+import InfoOrder from "@/module/checkout/infoOrder";
 
 function CheckOutPage() {
   return (

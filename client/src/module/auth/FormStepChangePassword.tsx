@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FormCheckCodeOtp, FormNotifyPWSuccess, FormUpdatePassword } from ".";
+import { FormCheckCodeOTP, FormNotifyPWSuccess, FormUpdatePassword } from ".";
 import LayoutFormAuth from "../../layout/LayoutFormAuth";
 import { useLocation } from "react-router-dom";
 
@@ -45,12 +45,12 @@ function FormStepChangePassword({ phoneOrEmail, indexForm, onBack }: TProps) {
 
       default:
         return (
-          <FormCheckCodeOtp
+          <FormCheckCodeOTP
             account={phoneOrEmail}
             phoneOrEmail="phone"
             handleActiveForm={handleActiveForm}
             onBack={onBack}
-          ></FormCheckCodeOtp>
+          ></FormCheckCodeOTP>
         );
     }
   };

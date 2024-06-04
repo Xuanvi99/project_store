@@ -13,6 +13,7 @@ const UserSchema = new Schema(
     phone: { type: String, default: "" },
     email: { type: String, default: "" },
     password: { type: String, default: "" },
+    modifiedPassword: { type: Boolean, default: true },
     date: { type: String, default: new Date().toISOString().split("T")[0] },
     gender: { type: String, default: "other" },
     avatar: { type: Schema.Types.ObjectId, ref: "images" },

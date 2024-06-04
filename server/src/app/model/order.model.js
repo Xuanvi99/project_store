@@ -33,35 +33,36 @@ const OrderSchema = new Schema(
         },
       },
     ],
-
+    // trang thai don hang
     status: {
       type: String,
       enum: Object.values(constants.ORDER.STATUS),
       default: constants.ORDER.STATUS.PENDING,
       required: true,
     },
-
+    // phuong thuc thanh toan
     paymentMethod: {
       type: String,
       enum: Object.values(constants.ORDER.PAYMENT_METHOD),
       default: constants.ORDER.PAYMENT_METHOD.CASH,
       required: true,
     },
+    // trang thai thanh toan
     paymentStatus: {
       type: String,
       enum: Object.values(constants.ORDER.PAYMENT_STATUS),
       default: constants.ORDER.PAYMENT_STATUS.PENDING,
-      required: true,
     },
 
-    subTotal: { type: Number, required: true },
+    CodePayment: { type: String, default: "" },
+
     shippingFee: { type: Number, required: true },
     discount: { type: Number, required: true },
-    total: { type: Number, required: true },
+    totalPrice: { type: Number, required: true },
 
+    delivery_at: { type: Date },
     canceled_at: { type: Date },
     complete_at: { type: Date },
-    delivery_at: { type: Date },
   },
   { timestamps: true, versionKey: false }
 );

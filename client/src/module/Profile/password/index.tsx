@@ -126,14 +126,14 @@ function ChangePassword() {
   };
 
   useLayoutEffect(() => {
-    if (!state) {
+    if (!state && user?.modifiedPassword) {
       navigate("/verify/pw", {
         state: {
           phoneOrEmail: (user?.email as string) || (user?.phone as string),
         },
       });
     }
-  }, [navigate, state, user?.email, user?.phone]);
+  }, [navigate, state, user?.email, user?.modifiedPassword, user?.phone]);
 
   useEffect(() => {
     handleOpenModal.current;

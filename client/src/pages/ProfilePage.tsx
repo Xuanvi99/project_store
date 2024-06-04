@@ -6,6 +6,7 @@ import FormAddress from "../module/Profile/address";
 import { useAppSelector } from "../hook";
 import { ChangePassword, ProfileInfo } from "../module/Profile";
 import { RootState } from "@/stores";
+import PurchaseOrder from "@/module/Profile/purchaseOrder";
 
 function ProfilePage() {
   const { slug } = useParams();
@@ -20,9 +21,17 @@ function ProfilePage() {
     if (!user) {
       const query = encodeURIComponent(redirectUrl);
       navigate("/auth/login?next=" + query, { state: { path: pathname } });
-    }
-    if (!["address", "password", "profile"].includes(slug as string)) {
-      navigate("/notfound/");
+    } else if (
+      ![
+        "address",
+        "password",
+        "profile",
+        "purchaseOrder",
+        "email",
+        "phone",
+      ].includes(slug as string)
+    ) {
+      navigate("/user/account/profile");
     }
   }, [navigate, pathname, redirectUrl, slug, user]);
 
@@ -38,11 +47,11 @@ function ProfilePage() {
       case "password":
         return <ChangePassword></ChangePassword>;
 
-      case "profile":
-        return <ProfileInfo slug={slug}></ProfileInfo>;
+      case "purchaseOrder":
+        return <PurchaseOrder></PurchaseOrder>;
 
       default:
-        break;
+        return <ProfileInfo></ProfileInfo>;
     }
   };
 

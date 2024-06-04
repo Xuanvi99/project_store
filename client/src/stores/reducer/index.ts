@@ -12,6 +12,7 @@ import { categoryApi } from "../service/category.service";
 import { saleApi } from "../service/sale.service";
 import { commentApi } from "../service/comment.service";
 import { transportApi } from "../service/transport.service";
+import { vnpayApi } from "../service/vnpay.service";
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   [saleApi.reducerPath]: saleApi.reducer,
   [commentApi.reducerPath]: commentApi.reducer,
   [transportApi.reducerPath]: transportApi.reducer,
+  [vnpayApi.reducerPath]: vnpayApi.reducer,
   authSlice: authSlice,
   cartSlice: cartSlice,
 });

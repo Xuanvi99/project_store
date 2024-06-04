@@ -1,18 +1,17 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useLayoutEffect } from "react";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
-import { FormCheckCodeOtp } from "@/module/auth";
+import { FormCheckCodeOTP } from "@/module/auth";
 
 function VerifyOtp() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const user = useAppSelector((state: RootState) => state.authSlice.user);
 
-  const query = useLocation().search;
-  const params = new URLSearchParams(query);
-  const account = params.get("account") || "";
-  const phoneOrEmail = params.get("phoneOrEmail") || "";
+  const [searchParams] = useSearchParams();
+  const account = searchParams.get("account") || "";
+  const phoneOrEmail = searchParams.get("phoneOrEmail") || "";
 
   useLayoutEffect(() => {
     if (!account || !phoneOrEmail) {
@@ -33,11 +32,11 @@ function VerifyOtp() {
   }, [navigate, user]);
   return (
     <div className="w-[500px] shadow-lg rounded-lg shadow-slate-500 ">
-      <FormCheckCodeOtp
+      <FormCheckCodeOTP
         account={account}
         phoneOrEmail={phoneOrEmail as "phone" | "email"}
         onBack={() => navigate(state.path, { replace: true })}
-      ></FormCheckCodeOtp>
+      ></FormCheckCodeOTP>
     </div>
   );
 }

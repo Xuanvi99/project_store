@@ -12,6 +12,7 @@ import {
   CheckOutPage,
   DashboardPage,
   VerifyPage,
+  PaymentPage,
 } from "./pages";
 import LayoutRoot from "./layout/LayoutRoot";
 import LayoutRequireAuth from "./layout/LayoutRequireAuth";
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
       {
         path: "/checkout/",
         element: <CheckOutPage></CheckOutPage>,
+      },
+      {
+        path: "/payment/",
+        element: <PaymentPage></PaymentPage>,
       },
       {
         path: "*",

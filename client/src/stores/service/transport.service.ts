@@ -1,4 +1,9 @@
-import { resShippingFee, shippingFee } from "@/types/transport.type";
+import {
+  resShippingFee,
+  resTimeShipping,
+  shippingFee,
+  timeShipping,
+} from "@/types/transport.type";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react";
 
 type responsive<T> = { code: number; message: string; data: T };
@@ -36,6 +41,15 @@ export const transportApi = createApi({
         body,
       }),
     }),
+    postTimeShipping: build.mutation<responsive<resTimeShipping>, timeShipping>(
+      {
+        query: (body) => ({
+          url: "v2/shipping-order/leadtime",
+          method: "POST",
+          body,
+        }),
+      }
+    ),
     getProvince: build.query<responsive<province[]>, void>({
       query: () => ({
         url: "master-data/province",
@@ -67,4 +81,5 @@ export const {
   useLazyGetProvinceQuery,
   usePostDistrictMutation,
   usePostWardMutation,
+  usePostTimeShippingMutation,
 } = transportApi;

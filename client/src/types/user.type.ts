@@ -14,5 +14,6 @@ export interface IUser {
   gender: "male" | "female" | "other";
   avatar: IAvatar | null;
   avatarDefault: string;
+  modifiedPassword: boolean;
   role: string;
 }

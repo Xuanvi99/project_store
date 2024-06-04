@@ -1,3 +1,4 @@
+import { ICartItem } from "./cart.type";
 import { IProductRes } from "./product.type";
 
 export interface IOrder {
@@ -29,3 +30,8 @@ type TProductOrderItem = {
   quantity: number;
   price: number;
 };
+
+export interface IOrderItem extends ICartItem {
+  price: number;
+  priceSale: number;
+}

@@ -166,7 +166,7 @@ function ModalAddress({
             .then((res) => {
               const data = res.data;
               const results: optionValue[] = [];
-              data.length > 0
+              data && data.length > 0
                 ? data.forEach(
                     (item: { WardName: string; WardCode: string }) => {
                       results.push({
@@ -220,7 +220,7 @@ function ModalAddress({
     }
   }, [address, reset]);
 
-  const checkDisabledSubmit = (): boolean  => {
+  const checkDisabledSubmit = (): boolean => {
     if (address) {
       return isDirty ||
         watch("province") !== address.province ||

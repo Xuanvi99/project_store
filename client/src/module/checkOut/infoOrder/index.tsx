@@ -2,12 +2,10 @@ import { Button } from "@/components/button";
 import Field from "@/components/fields";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
-import TextArea from "@/components/textArea";
 import useTestContext from "@/hook/useTestContext";
 import { useState } from "react";
 import { CheckoutContext, ICheckoutProvide } from "../context";
 import { formatPrice } from "@/utils";
-import IconCamera from "../../../components/icon/IconCamera";
 import { IconAlert } from "@/components/icon";
 import Tooltip from "@/components/tooltip";
 
@@ -17,23 +15,10 @@ function InfoOrder() {
       CheckoutContext as React.Context<ICheckoutProvide>
     );
 
-  const [textArea, setTextArea] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<string>("cod");
 
-  const handleChangeTextArea = (value: string) => {
-    setTextArea(value);
-  };
   return (
     <section className="w-full mx-auto mt-5 px-[30px] py-5 shadow-sm shadow-grayCa  bg-white rounded-[3px]">
-      <div className="w-full my-5">
-        <span className="font-bold">Ghi chú đơn hàng (tuỳ chọn)</span>
-        <TextArea
-          cols={100}
-          placeholder="Lưu ý cho người bán..."
-          textValue={textArea}
-          handleChange={handleChangeTextArea}
-        ></TextArea>
-      </div>
       <div className="flex justify-between ">
         <div className="flex flex-col justify-start w-1/2 gap-y-5">
           <h1 className="text-xl font-bold">Phương thức thanh toán</h1>
@@ -67,9 +52,7 @@ function InfoOrder() {
             <span className="text-end">{formatPrice(totalPriceOrder)}₫</span>
             <span className="text-gray">Phí vận chuyển:</span>
             <span className={`text-end flex justify-end items-center gap-x-1`}>
-              <span
-                className={quantityProductOrder > 1 ? "line-through " : ""}
-              >
+              <span className={quantityProductOrder > 1 ? "line-through " : ""}>
                 {formatPrice(shippingFree)}₫
               </span>
               {quantityProductOrder > 1 && (

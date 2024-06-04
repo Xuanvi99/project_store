@@ -8,7 +8,7 @@ import {
 } from "@/components/icon/SidebarProfile";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
-import { IconWrite } from "@/components/icon";
+import { IconPurchase, IconWrite } from "@/components/icon";
 
 const ListNavProfile = [
   {
@@ -26,11 +26,11 @@ const ListNavProfile = [
     path: "/user/account/password",
     icon: <IconPassword size={20}></IconPassword>,
   },
-  // {
-  //   title: "Ngân hàng",
-  //   path: "/user/payment",
-  //   icon: <IconPayment size={20}></IconPayment>,
-  // },
+  {
+    title: "Đơn mua",
+    path: "/user/account/purchaseOrder",
+    icon: <IconPurchase size={20}></IconPurchase>,
+  },
 ];
 function SidebarProfile() {
   const { pathname } = useLocation();

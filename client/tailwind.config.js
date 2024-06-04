@@ -30,6 +30,7 @@ export default {
         light: "#f4f4f4",
         dark: "#343a40",
         gray98: "#98a6ab",
+        grayFa: "#fafdff",
       },
       fontFamily: {
         poppins: "Poppins, sans-serif",

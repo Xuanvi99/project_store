@@ -12,6 +12,15 @@ export interface shippingFee {
   width: number;
 }
 
+export interface timeShipping {
+  ShopID: number;
+  service_id: number;
+  from_district_id: number;
+  from_ward_code: string;
+  to_district_id: number;
+  to_ward_code: string;
+}
+
 export interface transportRes<T> {
   code: number;
   message: string;
@@ -26,3 +35,10 @@ export type resShippingFee = {
   coupon_value: number;
   r2s_fee: number;
 };
+
+const exampleTimeShipping = {
+  leadtime: 1593187200,
+  order_date: 1592981718,
+};
+
+export type resTimeShipping = typeof exampleTimeShipping;

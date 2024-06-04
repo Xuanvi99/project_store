@@ -80,36 +80,36 @@ class Order {
         return res.status(400).json({ errMessage: "Create order fail" });
       }
 
-      // for (const productOrder of listProduct) {
-      //   await productItemModel
-      //     .updateOne(
-      //       {
-      //         productId: productOrder.productId,
-      //         size: productOrder.size,
-      //       },
-      //       {
-      //         $inc: { quantity: -productOrder.quantity },
-      //       }
-      //     )
-      //     .exec()
-      //     .catch(() => {
-      //       throw new Error();
-      //     });
+      for (const productOrder of listProduct) {
+        await productItemModel
+          .updateOne(
+            {
+              productId: productOrder.productId,
+              size: productOrder.size,
+            },
+            {
+              $inc: { quantity: -productOrder.quantity },
+            }
+          )
+          .exec()
+          .catch(() => {
+            throw new Error();
+          });
 
-      //   await inventoryModel
-      //     .updateOne(
-      //       {
-      //         productId: productOrder.productId,
-      //       },
-      //       {
-      //         $inc: { total: -productOrder.quantity },
-      //       }
-      //     )
-      //     .exec()
-      //     .catch(() => {
-      //       throw new Error();
-      //     });
-      // }
+        await inventoryModel
+          .updateOne(
+            {
+              productId: productOrder.productId,
+            },
+            {
+              $inc: { total: -productOrder.quantity },
+            }
+          )
+          .exec()
+          .catch(() => {
+            throw new Error();
+          });
+      }
       await session.endSession();
       res.status(400).json({ message: "Create order success" });
     } catch (error) {

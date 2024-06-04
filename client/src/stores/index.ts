@@ -12,6 +12,7 @@ import { categoryApi } from "./service/category.service";
 import { saleApi } from "./service/sale.service";
 import { commentApi } from "./service/comment.service";
 import { transportApi } from "./service/transport.service";
+import { vnpayApi } from "./service/vnpay.service";
 
 export const store = configureStore({
   reducer: rootReducer,
@@ -31,6 +32,7 @@ export const store = configureStore({
       saleApi.middleware,
       commentApi.middleware,
       transportApi.middleware,
+      vnpayApi.middleware,
     ]),
 });
 

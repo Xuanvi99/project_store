@@ -1,7 +1,9 @@
+import { useParams } from "react-router-dom";
 import { FormEmail, FormInfoUser } from "..";
 import FormPhone from "./phone";
 
-function ProfileInfo({ slug }: { slug: string | undefined }) {
+function ProfileInfo() {
+  const { slug } = useParams();
   const selectForm = (slug: string | undefined) => {
     switch (slug) {
       case "email":

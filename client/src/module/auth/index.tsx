@@ -1,5 +1,5 @@
 import FormCheckPhoneOrEmail from "./FormCheckPhoneOrEmail.auth";
-import FormCheckCodeOtp from "./FormCheckCodeOtp.auth";
+import FormCheckCodeOTP from "./FormCheckCodeOTP.auth";
 import FormStepCreatePassword from "./FormStepCreatePassword";
 import FormUpdatePassword from "./FormUpdatePassword.auth";
 import Header from "./Header.auth";
@@ -10,7 +10,7 @@ import FormStepChangePassword from "./FormStepChangePassword";
 export {
   Header,
   FormCheckPhoneOrEmail,
-  FormCheckCodeOtp,
+  FormCheckCodeOTP,
   FormUpdatePassword,
   FormStepCreatePassword,
   FormNotifyPWSuccess,

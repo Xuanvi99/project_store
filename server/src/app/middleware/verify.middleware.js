@@ -54,8 +54,10 @@ class verify {
         .exec();
       if (!user) {
         const newUser = new userModel({
-          phone: "022121",
-          password: "aaaaaaaaa",
+          userName: userName,
+          email,
+          password: "XVStore",
+          modifiedPassword: false,
         });
         const result = await newUser.save();
         req.user = result;

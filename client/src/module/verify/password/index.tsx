@@ -91,7 +91,7 @@ function VerifyChangePw() {
             className={{
               input:
                 dirtyFields.password && !errors["password"]
-                  ? "border-green "
+                  ? "border-gray "
                   : "",
             }}
           >

@@ -8,7 +8,10 @@ import {
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { RootState } from "@/stores";
-import { useSendOTPEmailMutation, useVerifyEmailMutation } from "@/stores/service/otp.service";
+import {
+  useSendOTPEmailMutation,
+  useVerifyEmailMutation,
+} from "@/stores/service/otp.service";
 import { useUpdateUserMutation } from "@/stores/service/user.service";
 import { useAppSelector } from "@/hook";
 import { IconBack, IconError } from "@/components/icon";
@@ -25,7 +28,7 @@ type TFormProps = {
   className?: string;
 };
 
-function FormCheckCodeOtp({
+function FormCheckCodeOTP({
   account,
   handleActiveForm,
   phoneOrEmail,
@@ -42,7 +45,7 @@ function FormCheckCodeOtp({
   const timeRef = useRef<HTMLParagraphElement>(null);
   const effectRun = useRef<boolean>(false);
 
-  const user = useAppSelector((state:RootState) => state.authSlice.user);
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
 
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -407,4 +410,4 @@ const Notification = ({ account }: { account: string }) => {
   );
 };
 
-export default FormCheckCodeOtp;
+export default FormCheckCodeOTP;

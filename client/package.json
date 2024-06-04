@@ -18,6 +18,7 @@
     "@types/react-transition-group": "^4.4.9",
     "async-mutex": "^0.5.0",
     "axios": "^1.6.2",
+    "config": "^3.3.11",
     "date-fns": "^2.30.0",
     "firebase": "^10.7.2",
     "formik": "^2.4.5",
