@@ -45,6 +45,7 @@ class authController {
       const refreshToken = user.generateRefreshToken();
       await tokenModel.saveToken(user, refreshToken);
       const { password: pw, __v, ...others } = user._doc;
+
       return res
         .status(200)
         .cookie("refreshToken", refreshToken, {
@@ -81,9 +82,8 @@ class authController {
           user: others,
           accessToken,
         });
-      res.status(200);
     } catch (error) {
-      res.status(403).json({ errMessage: "error auth google" });
+      res.status(500).json({ errMessage: "error auth google" });
     }
   };
 

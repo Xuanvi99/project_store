@@ -8,6 +8,8 @@ import { logOut, updateAuth } from "./stores/reducer/authReducer";
 import { useGetCartQuery } from "./stores/service/cart.service";
 import { updateCart } from "./stores/reducer/cartReducer";
 import { RootState } from "./stores";
+import LoadingSpinner from "./components/loading";
+import { cn } from "./utils";
 
 function App() {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
@@ -41,10 +43,22 @@ function App() {
       dispatch(updateCart(cart));
     }
   }, [cart, dispatch, status]);
-
   return (
     <ErrorBoundary FallbackComponent={fallbackRender}>
-      <Suspense fallback={<></>}>
+      <Suspense
+        fallback={
+          <div
+            className={cn(
+              "relative w-full h-screen",
+              "before:absolute before:left-1/2 before:top-1/2  before:-translate-x-1/2 before:-translate-y-1/2 before:w-16  before:h-16 before:border-grayCa before:rounded-full before:border-4  before:z-20"
+            )}
+          >
+            <span className="absolute z-30 w-16 h-16 -translate-x-1/2 -translate-y-1/2 rounded-full left-1/2 top-1/2">
+              <LoadingSpinner className="w-16 h-16 border-4 left-1/2 top-1/2 border-r-orange border-l-transparent border-t-transparent border-b-transparent"></LoadingSpinner>
+            </span>
+          </div>
+        }
+      >
         <RouterProvider router={router}></RouterProvider>
       </Suspense>
     </ErrorBoundary>

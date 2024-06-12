@@ -30,6 +30,7 @@ export const transportApi = createApi({
     baseUrl: "https://dev-online-gateway.ghn.vn/shiip/public-api/",
     prepareHeaders: (headers) => {
       headers.set("token", import.meta.env.VITE_TOKEN_GHN_API);
+      headers.set("ShopID", import.meta.env.VITE_SHOP_ID);
       return headers;
     },
   }),

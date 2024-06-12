@@ -1,10 +1,13 @@
-import axios from "axios";
 import { Button } from ".";
 import { cn } from "../../utils";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAppDispatch } from "../../hook";
 import { updateAuth } from "../../stores/reducer/authReducer";
 import { useNavigate } from "react-router-dom";
+import {
+  useLazyGetInfoAuthGoogleQuery,
+  useLoginAuthGoogleMutation,
+} from "@/stores/service/authGoogle.service";
 
 type TProps = {
   text: string;
@@ -14,36 +17,39 @@ type TProps = {
   };
   pathname: string;
   onClick?: () => void;
+  handleErrorLogin?: (errorStatus: number) => void;
 };
 
-function ButtonGoogle({ text, className, pathname }: TProps) {
+function ButtonGoogle({ text, className, pathname, handleErrorLogin }: TProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const [getInfoAuthGoogle] = useLazyGetInfoAuthGoogleQuery();
+
+  const [loginAuthGoogle] = useLoginAuthGoogleMutation();
+
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const responsive = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: {
-              Authorization: "Bearer " + tokenResponse.access_token,
-            },
-          }
-        );
-        if (responsive.data) {
-          const res = await axios({
-            method: "POST",
-            url: "http://localhost:3000/api/auth/loginGoogle",
-            data: { ...responsive.data },
-            withCredentials: true,
+        await getInfoAuthGoogle(tokenResponse.access_token)
+          .unwrap()
+          .then(async (res) => {
+            await loginAuthGoogle(res)
+              .unwrap()
+              .then((res) => {
+                dispatch(updateAuth({ ...res, isLogin: true }));
+                navigate(pathname, { replace: true });
+              })
+              .catch((error) => {
+                if (handleErrorLogin) handleErrorLogin(error.status);
+              });
+          })
+          .catch((error) => {
+            throw new Error(error);
           });
-          if (res.data) {
-            dispatch(updateAuth({ ...res.data, isLogin: true }));
-            navigate(pathname, { replace: true });
-          }
-        }
       } catch (error) {
-        console.log(error);
+        console.log("error: ", error);
+        if (handleErrorLogin) handleErrorLogin(400);
       }
     },
   });

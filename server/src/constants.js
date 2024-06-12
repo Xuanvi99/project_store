@@ -5,6 +5,7 @@ const ORDER = {
     SHIPPING: "shipping", // order has been picked up by staff and is being shipped
     COMPLETED: "completed", // order has been delivered
     CANCELLED: "cancelled", // order has been cancelled
+    REFUND: "refund",
   },
   PAYMENT_METHOD: {
     // CASH: "cash", // paid at store
@@ -18,6 +19,9 @@ const ORDER = {
     PENDING: "pending", // payment is pending
     PAID: "paid", // payment has been made
     CANCELLED: "cancelled", // payment has been cancelled
+  },
+  SHIPPING_UNIT: {
+    GHN: "giaohangnhanh",
   },
 };
 

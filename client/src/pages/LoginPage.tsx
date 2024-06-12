@@ -15,6 +15,7 @@ import { useState } from "react";
 import { ModalNotification } from "../components/modal";
 import { useLoginMutation } from "../stores/service/auth.service";
 import { updateAuth } from "../stores/reducer/authReducer";
+import LoadingSpinner from "@/components/loading";
 
 const validationSchema = Yup.object({
   phoneOrEmail: Yup.string()
@@ -39,9 +40,11 @@ function LoginPage() {
 
   const dispatch = useAppDispatch();
 
-  const [login] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
 
   const { toggle: showPW, handleToggle: handleShowPW } = useToggle();
+
+  const [statusError, setStatusError] = useState<number>(0);
 
   const {
     control,
@@ -75,12 +78,16 @@ function LoginPage() {
         dispatch(updateAuth({ ...data, isLogin: true }));
       })
       .catch((error) => {
-        if (error.status === 403) {
-          setOpenModal(true);
-          reset({ phoneOrEmail: "", password: "" });
-        }
+        setOpenModal(true);
+        reset({ password: "" });
+        setStatusError(error.status);
       });
     navigate(pathname, { replace: true });
+  };
+
+  const handleErrorLogin = (errorStatus: number) => {
+    setOpenModal(true);
+    setStatusError(errorStatus);
   };
 
   return (
@@ -91,7 +98,8 @@ function LoginPage() {
           <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
             <IconAlert size={50}></IconAlert>
             <span className="text-center">
-              <p>Tài Khoản hoặc mật khẩu không đúng</p>
+              {statusError === 400 && <p>Tài Khoản hoặc mật khẩu không đúng</p>}
+              {statusError > 0 && <p>Lỗi đăng nhập! Vui lòng thủ lại</p>}
             </span>
           </div>
         </div>
@@ -154,7 +162,11 @@ function LoginPage() {
               type="submit"
               variant="default"
             >
-              Đăng nhập
+              {isLoading ? (
+                <LoadingSpinner className="w-6 h-6 border-2 border-white rounded-full animate-spin border-r-transparent"></LoadingSpinner>
+              ) : (
+                "Đăng nhập"
+              )}
             </Button>
           </div>
         </form>
@@ -168,6 +180,7 @@ function LoginPage() {
         <ButtonGoogle
           text="Đăng nhập với Google"
           pathname={pathname}
+          handleErrorLogin={handleErrorLogin}
         ></ButtonGoogle>
         <div className="mt-5 text-sm text-center text-gray">
           Bạn mới biết đến XVStore?

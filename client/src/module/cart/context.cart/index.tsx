@@ -34,10 +34,8 @@ function CartProvider({ children }: { children: React.ReactNode }) {
   >([]);
 
   const [listCheckCart, setListCheckCart] = useState<ICartItem[]>([]);
-  console.log("listCheckCart: ", listCheckCart);
 
   const [listSelectItem, setListSelectItem] = useState<string[]>([]);
-  console.log("listSelectItem: ", listSelectItem);
 
   const [totalPriceOrder, setTotalPriceOrder] = useState<number>(0);
 

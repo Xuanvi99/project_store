@@ -22,22 +22,23 @@ function ListProductOrder() {
     (state: RootState) => state.cartSlice.cart
   );
 
-  const { listProductOrder, setListProductOrder, shippingFree } =
-    useTestContext<ICheckoutProvide>(
-      CheckoutContext as React.Context<ICheckoutProvide>
-    );
+  const {
+    listProductOrder,
+    setListProductOrder,
+    shippingFree,
+    note,
+    setNote,
+    deliveryTime,
+  } = useTestContext<ICheckoutProvide>(
+    CheckoutContext as React.Context<ICheckoutProvide>
+  );
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [redirect, setRedirect] = useState<boolean>(false);
   const [checkOrder, setCheckOrder] = useState<boolean>(false);
-  const [textArea, setTextArea] = useState<string>("");
-
-  const handleChangeTextArea = (value: string) => {
-    setTextArea(value);
-  };
+  const [redirect, setRedirect] = useState<boolean>(false);
 
   const orderId = useMemo<string>(
     () => searchParams.get("id") || "",
@@ -58,11 +59,11 @@ function ListProductOrder() {
     const listSelectProduct: string[] | undefined =
       selectProductToOrder?.listIdProductOrder;
     if (
+      !cart ||
+      cart.listProduct.length === 0 ||
       !selectProductToOrder ||
       !orderId ||
       orderId !== selectProductToOrder.id ||
-      !cart ||
-      cart.listProduct.length === 0 ||
       !listSelectProduct ||
       listSelectProduct?.length === 0
     ) {
@@ -71,7 +72,9 @@ function ListProductOrder() {
     } else {
       const array: IOrderItem[] = [];
       for (const idProduct of listSelectProduct) {
-        const index = cart.listProduct.findIndex(({ _id }) => _id == idProduct);
+        const index = cart.listProduct.findIndex(
+          ({ _id }) => _id === idProduct
+        );
         if (index === -1) {
           setOpenModal(true);
           setCheckOrder(true);
@@ -117,9 +120,7 @@ function ListProductOrder() {
               className="min-w-[70px]"
               onClick={() => {
                 setOpenModal(false);
-                if (cart && cart.listProduct.length === 0) {
-                  setRedirect(true);
-                }
+                setRedirect(true);
               }}
             >
               ĐỒNG Ý
@@ -145,25 +146,27 @@ function ListProductOrder() {
           </div>
         )}
       </section>
-      <section className="w-full mx-auto border-dashed bg-grayFa border-1 border-grayCa">
-        <div className="flex px-5 text-sm">
+      <section className="w-full mx-auto bg-grayFa">
+        <div className="flex px-5 text-sm border-dashed border-1 border-grayCa">
           <div className="flex w-full px-2 my-5 basis-3/5 gap-x-2">
             <span className="whitespace-nowrap">Lời nhắn: </span>
             <TextArea
               cols={50}
               placeholder="Lưu ý cho người bán..."
-              textValue={textArea}
-              handleChange={handleChangeTextArea}
+              textValue={note}
+              handleChange={(value) => {
+                setNote(value);
+              }}
             ></TextArea>
           </div>
-          <div className="flex flex-col justify-between p-2 border-dashed basis-2/5 border-l-1 border-l-grayCa ">
+          <div className="flex flex-col justify-between px-5 py-2 border-dashed basis-2/5 border-l-1 border-l-grayCa ">
             <div className="flex gap-x-2">
               <span className="font-semibold">Đơn vị vận chuyển:</span>
               <span className="underline text-blue">Giao hàng nhanh</span>
             </div>
             <div className="flex gap-x-2">
-              <span className="font-semibold">Thời gian giao hàng:</span>
-              <span>0</span>
+              <span className="font-semibold">Thời gian dự kiến giao:</span>
+              <span>{deliveryTime.toLocaleDateString()}</span>
             </div>
             <div className="flex gap-x-2">
               <span className="font-semibold">Phí vận chuyển:</span>
@@ -171,7 +174,6 @@ function ListProductOrder() {
             </div>
           </div>
         </div>
-        <div></div>
       </section>
     </Fragment>
   );

@@ -1,8 +1,8 @@
-const IconSearch = () => {
+const IconSearch = ({ size }: { size: number }) => {
   return (
     <svg
-      width="18"
-      height="18"
+      width={size}
+      height={size}
       viewBox="0 0 18 18"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -18,7 +18,7 @@ const IconSearch = () => {
       </g>
       <defs>
         <clipPath id="clip0_291_1711">
-          <rect width="18" height="18" fill="white" />
+          <rect width="18" height="18" fill="currentColor" />
         </clipPath>
       </defs>
     </svg>

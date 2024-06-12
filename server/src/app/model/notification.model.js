@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const NotifySchema = new Schema(
+const NotificationSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "users" },
     listNotify: [
@@ -14,4 +14,4 @@ const NotifySchema = new Schema(
   { timestamps: true, versionKey: false }
 );
 
-module.exports = mongoose.model("notification", NotifySchema);
+module.exports = mongoose.model("notifications", NotificationSchema);

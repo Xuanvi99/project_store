@@ -13,7 +13,6 @@ export interface shippingFee {
 }
 
 export interface timeShipping {
-  ShopID: number;
   service_id: number;
   from_district_id: number;
   from_ward_code: string;

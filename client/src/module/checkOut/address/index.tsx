@@ -25,7 +25,7 @@ function AddressCheckout() {
     setAddressOrder,
     setShippingFree,
     quantityProductOrder,
-    setTimeShipping,
+    setDeliveryTime,
   } = useTestContext<ICheckoutProvide>(
     CheckoutContext as React.Context<ICheckoutProvide>
   );
@@ -40,7 +40,6 @@ function AddressCheckout() {
   const { data: dataAddress, status: statusAddress } = useGetAddressQuery(id, {
     skip: !id,
   });
-  console.log(dataAddress);
 
   const [postShippingFee] = usePostShippingFeeMutation();
   const [postTimeShipping] = usePostTimeShippingMutation();
@@ -68,18 +67,8 @@ function AddressCheckout() {
         .then((res) => {
           setShippingFree(res.data.total);
         });
-    }
-  }, [
-    addressId.districtId,
-    addressId.wardCode,
-    postShippingFee,
-    setShippingFree,
-  ]);
 
-  const handleCalculateTimeShipping = useCallback(async () => {
-    if (addressId.districtId > 0) {
       await postTimeShipping({
-        ShopID: +import.meta.env.VITE_SHOP_ID,
         service_id: 53320,
         from_district_id: +import.meta.env.VITE_ADDRESS_DISTRICT_STORE,
         from_ward_code: import.meta.env.VITE_ADDRESS_WARD_STORE,
@@ -88,18 +77,16 @@ function AddressCheckout() {
       })
         .unwrap()
         .then((res) => {
-          console.log(res.data);
-          setTimeShipping(res.data.leadtime);
-          const date = new Date();
-          console.log(date.getMilliseconds());
-         
+          setDeliveryTime(new Date(res.data.leadtime * 1000));
         });
     }
   }, [
     addressId.districtId,
     addressId.wardCode,
+    postShippingFee,
     postTimeShipping,
-    setTimeShipping,
+    setDeliveryTime,
+    setShippingFree,
   ]);
 
   useEffect(() => {
@@ -125,12 +112,7 @@ function AddressCheckout() {
 
   useEffect(() => {
     handleCalculateShippingFee();
-    handleCalculateTimeShipping();
-  }, [
-    handleCalculateShippingFee,
-    handleCalculateTimeShipping,
-    quantityProductOrder,
-  ]);
+  }, [handleCalculateShippingFee, quantityProductOrder]);
 
   return (
     <section className="w-full bg-white relative py-7 px-[30px] flex flex-col gap-y-5 shadow-sm shadow-gray">

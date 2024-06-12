@@ -9,7 +9,10 @@ import InfoOrder from "@/module/checkout/infoOrder";
 function CheckOutPage() {
   return (
     <Fragment>
-      <BannerCommon heading="Thanh Toán" title="Thanh Toán "></BannerCommon>
+      <BannerCommon
+        heading="Đặt hàng"
+        title="Thông tin đơn hàng"
+      ></BannerCommon>
       <LayoutMain>
         <CheckoutProvide>
           <AddressCheckout></AddressCheckout>

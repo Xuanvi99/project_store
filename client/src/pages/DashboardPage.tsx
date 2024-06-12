@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import { Header, Navbar } from "../module/dashboard";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../hook";
+import { RootState } from "@/stores";
 
 function DashboardPage() {
   const navigate = useNavigate();
-  const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
 
   useEffect(() => {
     if (!user) {

@@ -5,6 +5,7 @@ const constants = require("../../constants");
 const OrderSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "users", required: true },
+    codeOrder: { type: String, unique: true },
     customer: {
       type: {
         name: { type: String, trim: true, required: true },
@@ -13,8 +14,9 @@ const OrderSchema = new Schema(
       },
       required: false,
     },
-    note: { type: String, required: true, default: "" },
-    listProduct: [
+    nameProducts: { type: Array, required: true, default: [] },
+    note: { type: String, default: "" },
+    listProducts: [
       {
         productId: {
           type: Schema.Types.ObjectId,
@@ -28,6 +30,10 @@ const OrderSchema = new Schema(
           min: [1, "Quantity can not be less then 1."],
         },
         price: {
+          type: Number,
+          required: true,
+        },
+        priceSale: {
           type: Number,
           required: true,
         },
@@ -54,11 +60,29 @@ const OrderSchema = new Schema(
       default: constants.ORDER.PAYMENT_STATUS.PENDING,
     },
 
-    CodePayment: { type: String, default: "" },
+    codePayment: {
+      type: String,
+      default: function () {
+        if (this.paymentMethod !== "cod") {
+          return "";
+        } else {
+          return;
+        }
+      },
+    },
 
     shippingFee: { type: Number, required: true },
-    discount: { type: Number, required: true },
-    totalPrice: { type: Number, required: true },
+    total: { type: Number, required: true },
+
+    shippingUnit: {
+      type: String,
+      required: true,
+      enum: Object.values(constants.ORDER.SHIPPING_UNIT),
+      default: constants.ORDER.SHIPPING_UNIT.GHN,
+    },
+
+    reasonCanceled: { type: String },
+    canceller: { type: Schema.Types.ObjectId, ref: "users" },
 
     delivery_at: { type: Date },
     canceled_at: { type: Date },

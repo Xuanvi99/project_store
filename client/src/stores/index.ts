@@ -13,6 +13,8 @@ import { saleApi } from "./service/sale.service";
 import { commentApi } from "./service/comment.service";
 import { transportApi } from "./service/transport.service";
 import { vnpayApi } from "./service/vnpay.service";
+import { orderApi } from "./service/order.service";
+import { authGoogleApi } from "./service/authGoogle.service";
 
 export const store = configureStore({
   reducer: rootReducer,
@@ -33,6 +35,8 @@ export const store = configureStore({
       commentApi.middleware,
       transportApi.middleware,
       vnpayApi.middleware,
+      orderApi.middleware,
+      authGoogleApi.middleware,
     ]),
 });
 

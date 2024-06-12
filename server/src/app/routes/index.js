@@ -11,6 +11,7 @@ const addressRoutes = require("./address.routes");
 const categoryRoutes = require("./category.routes");
 const imageRoutes = require("./image.routes");
 const vnpayRoutes = require("./vnpay.routes");
+const orderRoutes = require("./order.routes");
 
 routes.use(uploadFile);
 routes.use(authRoutes);
@@ -23,5 +24,6 @@ routes.use(addressRoutes);
 routes.use(categoryRoutes);
 routes.use(imageRoutes);
 routes.use(vnpayRoutes);
+routes.use(orderRoutes);
 
 module.exports = routes;

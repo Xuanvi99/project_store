@@ -13,6 +13,8 @@ import { saleApi } from "../service/sale.service";
 import { commentApi } from "../service/comment.service";
 import { transportApi } from "../service/transport.service";
 import { vnpayApi } from "../service/vnpay.service";
+import { orderApi } from "../service/order.service";
+import { authGoogleApi } from "../service/authGoogle.service";
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
@@ -27,6 +29,8 @@ const rootReducer = combineReducers({
   [commentApi.reducerPath]: commentApi.reducer,
   [transportApi.reducerPath]: transportApi.reducer,
   [vnpayApi.reducerPath]: vnpayApi.reducer,
+  [orderApi.reducerPath]: orderApi.reducer,
+  [authGoogleApi.reducerPath]: authGoogleApi.reducer,
   authSlice: authSlice,
   cartSlice: cartSlice,
 });

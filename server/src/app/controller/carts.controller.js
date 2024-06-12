@@ -6,7 +6,7 @@ class Cart {
       return res.status(400).json({ errMessage: "Invalid user ID" });
     }
     try {
-      const cart = await cartModel
+      let cart = await cartModel
         .findOne({ userId: userId })
         .populate({
           path: "listProduct",
@@ -20,16 +20,32 @@ class Cart {
             },
           },
         })
-        .lean();
+        .exec();
 
       if (!cart) {
-        return res
-          .status(404)
-          .json({ errMessage: "Cart not found for this user" });
+        const user = await userModel.findOne({ _id: userId }).learn();
+        const newCart = await cartModel({
+          userId: user._id,
+          listProduct: [],
+        });
+        const result = await newCart.save();
+        cart = await result.populate({
+          path: "listProduct",
+          populate: {
+            path: "productId",
+            model: "products",
+            populate: {
+              path: "thumbnail",
+              model: "images",
+              select: "url",
+            },
+          },
+        });
       }
-      const { __v, ...others } = cart;
+      const { __v, ...others } = cart._doc;
       return res.status(200).json({ cart: others });
     } catch (error) {
+      console.log("error: ", error);
       return res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -187,7 +203,9 @@ class Cart {
           .status(404)
           .json({ errorMessage: "Cart not found for this user" });
       if (listIdProduct.length === 0) {
-        return res.status(404).json({ errorMessage: "Invalid request cart" });
+        return res
+          .status(400)
+          .json({ errorMessage: "Delete product in cart fail" });
       }
       const listProductCart = cart.listProduct.filter(
         (product) => !listIdProduct.includes(product._id.toString())

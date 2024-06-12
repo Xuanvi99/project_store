@@ -11,6 +11,7 @@ type TProps = {
     content?: string;
   };
   time?: number;
+  variant?: "fixed" | "relative";
 };
 
 function ModalNotification({
@@ -19,9 +20,10 @@ function ModalNotification({
   children,
   className,
   time,
+  variant,
 }: TProps) {
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && time && time > 0) {
       let countDown = 5;
       const timer = setInterval(function () {
         countDown--;
@@ -29,12 +31,13 @@ function ModalNotification({
           onClick();
           clearInterval(timer);
         }
-      }, time || 800);
+      }, time);
     }
   }, [isOpen, onClick, time]);
 
   return (
     <Modal
+      variant={variant}
       isOpenModal={isOpen}
       onClick={onClick}
       className={{

@@ -26,6 +26,7 @@ type TFormProps = {
   onClick?: () => void;
   onBack?: () => void;
   className?: string;
+  title?: string;
 };
 
 function FormCheckCodeOTP({
@@ -34,6 +35,7 @@ function FormCheckCodeOTP({
   phoneOrEmail,
   onBack,
   className,
+  title = "Nhập mã xác minh",
 }: TFormProps) {
   const [resend, setResend] = useState<boolean>(false);
   const [timeResend, setTimeResend] = useState<boolean>(false);
@@ -296,15 +298,19 @@ function FormCheckCodeOTP({
   return (
     <div className={cn("w-full checkCode pb-10", className)}>
       <div id="recaptcha-container"></div>
-      <div className="flex items-center py-7">
-        <div
-          onClick={onBack}
-          className="flex w-[80px] items-center justify-center font-bold cursor-pointer gap-x-2 text-blue hover:text-orange"
-        >
-          <IconBack size={25}></IconBack>
-        </div>
-        <div className=" w-[420px] pl-[80px] text-[20px] font-semibold">
-          <h1>Nhập mã xác minh</h1>
+      <div
+        className={cn("flex items-center py-7", !onBack && "justify-center")}
+      >
+        {onBack && (
+          <div
+            onClick={onBack}
+            className="flex w-[80px] items-center justify-center font-bold cursor-pointer gap-x-2 text-blue hover:text-orange"
+          >
+            <IconBack size={25}></IconBack>
+          </div>
+        )}
+        <div className=" w-[420px] text-center text-[20px] font-semibold">
+          <h1>{title}</h1>
         </div>
       </div>
       {errorOtp && (

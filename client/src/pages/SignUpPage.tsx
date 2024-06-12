@@ -37,6 +37,8 @@ function SignUpPage() {
   const [isCheckUser, setIsCheckUser] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [account, setAccount] = useState<string>("");
+  const [statusError, setStatusError] = useState<number>(0);
+
   const {
     control,
     handleSubmit,
@@ -50,17 +52,19 @@ function SignUpPage() {
   });
 
   const onSubmit = async (data: formValue) => {
-    try {
-      const res = await checkUser(data).unwrap();
-      if (!res.isCheckUser) {
-        setAccount(data.phoneOrEmail);
-        setIsCheckUser(false);
-      } else {
-        setOpenModal(true);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    await checkUser(data)
+      .unwrap()
+      .then((res) => {
+        if (!res.isCheckUser) {
+          setAccount(data.phoneOrEmail);
+          setIsCheckUser(false);
+        } else {
+          setOpenModal(true);
+        }
+      })
+      .catch(() => {
+        setStatusError(400);
+      });
   };
 
   const handleOpenModal = () => {
@@ -71,6 +75,26 @@ function SignUpPage() {
 
   const handleCheckUser = () => {
     setIsCheckUser(!openModal);
+  };
+
+  const handleErrorLogin = (errorStatus: number) => {
+    setOpenModal(true);
+    setStatusError(errorStatus);
+  };
+
+  const selectNotifications = (status: number) => {
+    switch (status) {
+      case 400:
+        return (
+          <>
+            <p>Số điện thoại bạn nhập đã đăng ký !</p>
+            <p> Bạn có thể đăng nhập</p>
+          </>
+        );
+
+      default:
+        return <p>Lỗi đăng ký! Vui lòng thử lại</p>;
+    }
   };
 
   if (!isCheckUser) {
@@ -92,8 +116,7 @@ function SignUpPage() {
           <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
             <IconAlert size={50}></IconAlert>
             <span className="text-center">
-              <p>Số điện thoại bạn nhập đã đăng ký !</p>
-              <p> Bạn có thể đăng nhập</p>
+              {selectNotifications(statusError)}
             </span>
           </div>
         </div>
@@ -148,6 +171,7 @@ function SignUpPage() {
           <ButtonGoogle
             text="Đăng ký với email"
             pathname={pathname}
+            handleErrorLogin={handleErrorLogin}
           ></ButtonGoogle>
         </div>
         <div className="mt-5 text-sm text-center text-gray">

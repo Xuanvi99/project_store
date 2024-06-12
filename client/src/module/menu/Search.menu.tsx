@@ -48,7 +48,7 @@ function Search({ className }: TProps) {
         }}
       />
       <Button variant="default" type="submit" className="px-5 py-2 ">
-        <IconSearch></IconSearch>
+        <IconSearch size={20}></IconSearch>
       </Button>
     </form>
   );
