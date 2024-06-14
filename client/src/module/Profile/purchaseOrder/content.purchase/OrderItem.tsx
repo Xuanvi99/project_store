@@ -4,18 +4,15 @@ import { IResOrder } from "@/types/order.type";
 import { cn, formatPrice } from "@/utils";
 import { Button } from "@/components/button";
 import { useState } from "react";
-import ModalReasonCanceled from "@/components/modal/ModalReasonCanceled";
 import { listHeaderOrder } from "@/constant/order.constant";
-import { RootState } from "@/stores";
-import { useAppSelector } from "@/hook";
+import { ToastContainer } from "react-toastify";
+import ModalReasonCanceled from "../modalReasonCanceled";
 
 type TProps = {
   data: IResOrder;
 };
 
 function OrderItem({ data }: TProps) {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
-
   const {
     listProducts,
     total,
@@ -23,6 +20,7 @@ function OrderItem({ data }: TProps) {
     status,
     canceller,
     reasonCanceled,
+    canceled_at,
   } = data;
 
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -43,9 +41,6 @@ function OrderItem({ data }: TProps) {
       case "pending":
         return (
           <div className="flex items-center justify-end text-sm gap-x-2">
-            <span className="px-3 py-2 border-2 rounded-md text-gray98 border-gray98 ">
-              Chờ xác nhận
-            </span>
             <Button variant="default" onClick={handleSetOpenModal}>
               Hủy đơn hàng
             </Button>
@@ -60,24 +55,6 @@ function OrderItem({ data }: TProps) {
           </div>
         );
 
-      case "confirmed":
-        return (
-          <div className="flex items-center justify-end text-sm gap-x-2">
-            <span className="px-3 py-2 border-2 rounded-md text-gray98 border-gray98 ">
-              Chờ giao hàng
-            </span>
-          </div>
-        );
-
-      case "shipping":
-        return (
-          <div className="flex items-center justify-end text-sm gap-x-2">
-            <span className="px-3 py-2 border-2 rounded-md text-gray98 border-gray98 ">
-              Đang giao hàng
-            </span>
-          </div>
-        );
-
       default:
         break;
     }
@@ -88,7 +65,9 @@ function OrderItem({ data }: TProps) {
       <ModalReasonCanceled
         isOpenModal={openModal}
         onClick={handleSetOpenModal}
+        id={data._id}
       ></ModalReasonCanceled>
+      <ToastContainer />
       <div className="w-full p-4 bg-white rounded-sm">
         <div className="flex items-center justify-end pb-3 border-dashed gap-x-2 border-b-1 border-b-grayCa">
           {status === "completed" && (
@@ -125,11 +104,14 @@ function OrderItem({ data }: TProps) {
               const { thumbnail, name } = productId;
               return (
                 <div key={product._id} className="flex w-full py-2 gap-x-3">
-                  <img
-                    alt=""
-                    srcSet={thumbnail.url}
-                    className="max-h-[80px] w-[80px]"
-                  />
+                  <div className="h-[80px] min-w-[80px]">
+                    <img
+                      alt="Thumbnail order"
+                      srcSet={thumbnail.url}
+                      className="w-full h-full"
+                    />
+                  </div>
+
                   <span className="flex flex-col w-full">
                     <h1>{name}</h1>
                     <span>x{quantity}</span>
@@ -166,9 +148,16 @@ function OrderItem({ data }: TProps) {
             status === "cancelled" && "justify-between"
           )}
         >
-          {status === "cancelled" && (
+          {canceller && status === "cancelled" && (
             <div className="flex flex-col text-xs gap-y-2">
-              <p>Đã hủy bởi {canceller === user?._id ? "bạn" : "Admin"}</p>
+              <p>Đã hủy bởi {canceller?.role === "admin" ? "Admin" : "bạn"}</p>
+              <span>
+                <span className="mr-2 font-bold">Thời gian hủy:</span>
+                <span>
+                  {new Date(canceled_at).toLocaleTimeString()},{" "}
+                  {new Date(canceled_at).toLocaleDateString()}
+                </span>
+              </span>
               <span>
                 <span className="mr-2 font-bold">Lý do:</span>
                 <span>{reasonCanceled}</span>

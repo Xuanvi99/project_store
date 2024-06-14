@@ -48,7 +48,7 @@ function InfoOrder() {
         .then(async () => {
           const listIdProduct = listProductOrder.map((item) => item._id);
           await deleteCartMultiple({ id: user._id, listIdProduct }).unwrap();
-          navigate("/user/account/purchaseOrder", {
+          navigate("/user/account/purchaseOrder?type=2", {
             replace: true,
           });
         })

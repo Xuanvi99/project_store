@@ -31,7 +31,7 @@ export default function BannerHome() {
               </Link>
             </button>
           </div>
-          <div className="max-w-[635px] relative w-full h-[450px] ">
+          <div className="max-w-[635px] relative w-full h-[450px] z-40">
             <img
               alt=""
               srcSet="/banner-shoes.png"

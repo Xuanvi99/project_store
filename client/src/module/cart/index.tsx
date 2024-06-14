@@ -20,7 +20,7 @@ function Container() {
     CartContext as React.Context<TCartProvider>
   );
   return (
-    <main>
+    <main className="flex flex-col items-center ">
       <ModalNotification
         isOpen={openModal}
         onClick={() => handleOpenError(false)}
@@ -37,8 +37,10 @@ function Container() {
           <span>Lỗi xóa sản phẩm trong giỏ hàng</span>
         </div>
       </ModalNotification>
+
       {listProductActiveToCart.length > 0 && (
         <LayoutMain>
+          <h1 className="mt-10 text-2xl font-semibold">Giỏ hàng của bạn</h1>
           <Header></Header>
           <Content></Content>
           <Footer></Footer>
@@ -55,7 +57,7 @@ function Container() {
 const NoItemsToCart = () => {
   const navigate = useNavigate();
   return (
-    <LayoutMain className="flex items-center justify-center">
+    <LayoutMain className="flex items-center justify-center my-10">
       <div className="flex flex-col items-center justify-center gap-y-3 py-[100px]">
         <img alt="" srcSet="/cart.png" className="w-[100px]" />
         <p>Giỏ hàng của bạn còn trống</p>

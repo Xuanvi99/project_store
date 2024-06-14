@@ -8,7 +8,7 @@ export default function LayoutMain({
   className?: string;
 }) {
   return (
-    <main className={cn("max-w-[1200px] my-10 w-full mx-auto", className)}>
+    <main className={cn("max-w-[1200px] mb-10 w-full mx-auto", className)}>
       {children}
     </main>
   );

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const constants = require("../../constants");
+const mongoose_delete = require("mongoose-delete");
 
 const OrderSchema = new Schema(
   {
@@ -90,5 +91,10 @@ const OrderSchema = new Schema(
   },
   { timestamps: true, versionKey: false }
 );
+
+OrderSchema.plugin(mongoose_delete, {
+  deletedAt: true,
+  overrideMethods: "all",
+});
 
 module.exports = mongoose.model("orders", OrderSchema);

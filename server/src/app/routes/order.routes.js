@@ -9,5 +9,6 @@ routes
   .route("/api/order/getAmountOrderUser/:userId")
   .get(orderCtrl.getAmountOrderUser);
 routes.route("/api/order/create").post(orderCtrl.createOrder);
+routes.route("/api/order/cancelled/:orderId").put(orderCtrl.cancelledOrder);
 
 module.exports = routes;

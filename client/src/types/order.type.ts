@@ -1,9 +1,8 @@
 import { IProductRes } from "./product.type";
-import { IUser } from "./user.type";
 
 export interface IResOrder {
   _id: string;
-  userId: string | IUser;
+  userId: string;
   customer: {
     name: string;
     phone: string;
@@ -26,7 +25,7 @@ export interface IResOrder {
   shippingFee: number;
   total: number;
   reasonCanceled?: string;
-  canceller?: string;
+  canceller?: { _id: string; role: "admin" | "user" };
   canceled_at: Date;
   complete_at: Date;
   delivery_at: Date;

@@ -8,9 +8,14 @@ interface IGetResponsive {
   amountOrder: number;
 }
 
+type reqCancelledOrder = {
+  reasonCanceled: string;
+  canceller: string;
+};
+
 export const orderApi = createApi({
   reducerPath: "order",
-  tagTypes: ["Order"],
+  tagTypes: ["Orders"],
   baseQuery: baseQueryWithAuth,
   endpoints: (build) => ({
     getListOrderUser: build.query<
@@ -22,32 +27,51 @@ export const orderApi = createApi({
         method: "GET",
         params: { ...params },
       }),
+      keepUnusedDataFor: 0,
       serializeQueryArgs: ({ queryArgs }) => {
-        const { params } = queryArgs;
+        const { id, params } = queryArgs;
         const { limit, status, search } = params;
-        return { limit, status, search };
+        return `order/getOrderUser/${id}?limit=${limit}&search=${status}&status=${search}`;
       },
 
-      merge: (currentCache, newItems) => {
-        currentCache.data.push(...newItems.data);
+      merge: (currentCache, newItems, { arg }) => {
+        // console.log("arg: ", arg);
+        // console.log("currentCache: ", currentCache.data.length);
+        // console.log("newItems", newItems.data);
+        const { activePage, status } = arg.params;
+        const currentActivePage = Math.ceil(currentCache.data.length / 4);
+        const deleteCount =
+          status === "pending"
+            ? newItems.data.length + 1
+            : newItems.data.length;
+        if (currentActivePage >= activePage) {
+          currentCache.data.splice(
+            4 * (activePage - 1),
+            deleteCount,
+            ...newItems.data
+          );
+        } else {
+          currentCache.data.push(...newItems.data);
+        }
+
+        // console.log(currentCache.data);
       },
 
       forceRefetch({ currentArg, previousArg }) {
-        return (
-          currentArg?.params.activePage !== previousArg?.params.activePage ||
-          currentArg?.params.search !== previousArg?.params.search
-        );
+        // console.log("currentArg: ", currentArg);
+        // console.log("previousArg: ", previousArg);
+        return currentArg?.params.activePage !== previousArg?.params.activePage;
       },
       providesTags: (result) =>
         result
           ? [
               ...result.data.map(({ _id }) => ({
-                type: "Order" as const,
+                type: "Orders" as const,
                 id: _id,
               })),
-              { type: "Order", id: "LOAD_MORE_ORDER_USER" },
+              { type: "Orders", id: "ORDER_LOAD_MORE" },
             ]
-          : [{ type: "Order", id: "LOAD_MORE_ORDER_USER" }],
+          : [{ type: "Orders", id: "ORDER_LOAD_MORE" }],
     }),
     getAmountOrderUser: build.query<
       { amountOrder: number },
@@ -58,7 +82,10 @@ export const orderApi = createApi({
         method: "GET",
         params: { statusOrder },
       }),
-      providesTags: (result, error, data) => [{ type: "Order", id: data.id }],
+      providesTags: (result, error, data) => [
+        { type: "Orders", id: data.id },
+        { type: "Orders", id: data.statusOrder },
+      ],
     }),
     createOrder: build.mutation<
       { message: string; orderId: string },
@@ -69,6 +96,21 @@ export const orderApi = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["Orders"],
+    }),
+    EditCancelledOrder: build.mutation<
+      { message: string; orderId: string },
+      { id: string; body: reqCancelledOrder }
+    >({
+      query: ({ id, body }) => ({
+        url: "order/cancelled/" + id,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: (result, error, data) => [
+        { type: "Orders", id: data.id },
+        { type: "Orders", id: "pending" },
+      ],
     }),
   }),
 });
@@ -77,4 +119,5 @@ export const {
   useCreateOrderMutation,
   useGetListOrderUserQuery,
   useGetAmountOrderUserQuery,
+  useEditCancelledOrderMutation,
 } = orderApi;

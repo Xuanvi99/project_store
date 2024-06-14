@@ -9,14 +9,14 @@ import { IPurchaseProvide, PurchaseContext } from "../context";
 import OrderItem from "./OrderItem";
 
 function ContentPurchase() {
-  const { data, isLoading, handleSetParams, params, typePurchase } =
+  const { data, isLoading, handleSetParams, params, typePurchase, statusReq } =
     useTestContext<IPurchaseProvide>(
       PurchaseContext as React.Context<IPurchaseProvide>
     );
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [textSearch, setTextSearch] = useState<string>(params.search);
+  const [textSearch, setTextSearch] = useState<string>("");
 
   const LoadRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +42,10 @@ function ContentPurchase() {
   };
 
   useEffect(() => {
+    setTextSearch(params.search);
+  }, [params.search]);
+
+  useEffect(() => {
     const callback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -64,15 +68,6 @@ function ContentPurchase() {
     };
   }, [data, handleSetParams, isLoading, params]);
 
-  if (!data || data.data.length === 0) {
-    return (
-      <div className="rounded-sm min-h-[600px] mt-3 bg-white flex flex-col justify-center items-center gap-y-3">
-        <img alt="" srcSet="/orderNull.png" className="w-40" />
-        <p>Chưa có đơn hàng</p>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full mt-5">
       {typePurchase === 1 && (
@@ -94,23 +89,35 @@ function ContentPurchase() {
           </div>
         </Input>
       )}
-      {isLoading && params.activePage === 1 ? (
-        <div className="w-full rounded-sm min-h-[600px] mt-5 text-center">
-          <LoadingSpinner className="w-10 h-10 mx-auto border-4 border-orange border-r-transparent"></LoadingSpinner>
+      {statusReq === "pending" && params.activePage === 1 && (
+        <div className="flex justify-center w-full mt-10">
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 z-30 w-16 h-16 border-4 rounded-full border-grayCa"></div>
+            <LoadingSpinner className="absolute inset-0 z-40 w-16 h-16 border-4 border-r-orange border-l-transparent border-t-transparent border-b-transparent"></LoadingSpinner>
+          </div>
         </div>
-      ) : (
-        <div className="rounded-sm min-h-[600px] mt-5">
+      )}
+      {data.data.length > 0 && (
+        <div className="rounded-sm min-h-[600px] ">
           <div className="flex flex-col gap-y-5">
             {data &&
               data.data.map((order, index) => {
                 return <OrderItem key={index} data={order}></OrderItem>;
               })}
           </div>
-          <div className="w-full mt-5 text-center" ref={LoadRef}>
-            {isLoading && (
+          {statusReq === "pending" ? (
+            <div className="w-full mt-5 text-center">
               <LoadingSpinner className="w-10 h-10 mx-auto border-4 border-orange border-r-transparent"></LoadingSpinner>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="w-full mt-5 text-center" ref={LoadRef}></div>
+          )}
+        </div>
+      )}
+      {statusReq === "fulfilled" && data.data.length === 0 && (
+        <div className="rounded-sm min-h-[600px] mt-3 bg-white flex flex-col justify-center items-center gap-y-3">
+          <img alt="" srcSet="/orderNull.png" className="w-40" />
+          <p>Chưa có đơn hàng</p>
         </div>
       )}
     </div>

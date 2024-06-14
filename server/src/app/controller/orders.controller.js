@@ -49,8 +49,7 @@ class Order {
               },
             },
           },
-          { path: "userId", model: "users", select: "_id userName role" },
-          { path: "canceller", model: "users", select: "_id userName role" },
+          { path: "canceller", model: "users", select: "_id role" },
         ])
         .sort({ $natural: -1 })
         .skip(skip)
@@ -138,8 +137,7 @@ class Order {
               },
             },
           },
-          { path: "userId", model: "users", select: "_id userName role" },
-          { path: "canceller", model: "users", select: "_id userName role" },
+          { path: "canceller", model: "users", select: "_id role" },
         ])
         .sort({ $natural: -1 })
         .skip(skip)
@@ -202,19 +200,22 @@ class Order {
     if (!orderId)
       return res.status(403).json({ errMessage: "Id order undefine" });
     try {
-      const order = await orderModel.findById(orderId).populate({
-        path: "listProducts",
-        populate: {
-          path: "productId",
-          model: "products",
-          select: "_id name thumbnail",
+      const order = await orderModel.findById(orderId).populate([
+        {
+          path: "listProducts",
           populate: {
-            path: "thumbnail",
-            model: "images",
-            select: "url",
+            path: "productId",
+            model: "products",
+            select: "_id name thumbnail",
+            populate: {
+              path: "thumbnail",
+              model: "images",
+              select: "url",
+            },
           },
         },
-      });
+        { path: "canceller", model: "users", select: "_id role" },
+      ]);
 
       if (!order) {
         return res.status(404).json({ errMessage: "Id not exit in Order" });
@@ -236,14 +237,14 @@ class Order {
       if (!user) {
         session.abortTransaction();
         session.endSession();
-        return res
-          .status(400)
-          .json({ errMessage: "Item does not exist in cart" });
+        return res.status(404).json({ errMessage: "user not found!" });
       }
+
+      const date = new Date();
 
       const newOrder = new orderModel({
         userId,
-        codeOrder: moment(new Date()).format("DDHHmmss"),
+        codeOrder: date.getTime(),
         ...req.body,
       });
       const result = await newOrder.save();
@@ -275,7 +276,7 @@ class Order {
         if (!inventory) {
           throw new Error();
         }
-        const { total, stocked } = inventory;
+        const { total } = inventory;
         const totalInventory = total - productOrder.quantity;
         if (totalInventory > 0) {
           await inventory.updateOne({
@@ -304,11 +305,61 @@ class Order {
     }
   };
 
-  postCancelled = async (req, res) => {
+  cancelledOrder = async (req, res) => {
+    const orderId = req.params.orderId;
     try {
-      const codeOrder = req.body.codeOrder;
-      const Order = await orderModel.findOne({ codeOrder });
+      const order = await orderModel.findById(orderId);
+
+      if (!order) {
+        return res.status(404).json({ errMessage: "Order not found!" });
+      }
+
+      await order
+        .updateOne({
+          canceled_at: new Date(),
+          status: "cancelled",
+          ...req.body,
+        })
+        .exec()
+        .catch(() => {
+          throw new Error("update order fail");
+        });
+
+      const listProducts = order.listProducts;
+
+      for (const productItem of listProducts) {
+        await productItemModel
+          .updateOne(
+            {
+              productId: productItem.productId,
+              size: productItem.size,
+            },
+            {
+              $inc: { quantity: +productItem.quantity },
+            }
+          )
+          .exec()
+          .catch(() => {
+            throw new Error("error update quantity shoes fail");
+          });
+
+        const inventory = await inventoryModel.findOne({
+          productId: productItem.productId,
+        });
+
+        if (!inventory) {
+          throw new Error();
+        }
+
+        const { total } = inventory;
+        await inventory.updateOne({
+          $inc: { total: +productItem.quantity },
+          stoked: total === 0 ? false : true,
+        });
+      }
+      res.status(200).json({ message: "Cancelled order success" });
     } catch (error) {
+      console.log("error: ", error);
       return res
         .status(500)
         .json({ errMessage: error ? error : "server error" });

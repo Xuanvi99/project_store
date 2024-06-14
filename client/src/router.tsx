@@ -36,43 +36,54 @@ import { Comment, Dashboard, Product } from "./module/dashboard";
 const router = createBrowserRouter([
   {
     path: "",
-    element: <LayoutRoot></LayoutRoot>,
     children: [
       {
-        path: "/",
-        element: <HomePage></HomePage>,
+        path: "",
+        element: <LayoutRoot menu={"scroll"}></LayoutRoot>,
+        children: [
+          {
+            path: "/",
+            element: <HomePage></HomePage>,
+          },
+          {
+            path: "/category/:slug",
+            element: <CategoryOrSearchPage></CategoryOrSearchPage>,
+          },
+          {
+            path: "/search",
+            element: <CategoryOrSearchPage></CategoryOrSearchPage>,
+          },
+          {
+            path: "/product_detail/:slug",
+            element: <ProductDetailPage></ProductDetailPage>,
+          },
+          {
+            path: "*",
+            element: <NotFoundPage></NotFoundPage>,
+          },
+        ],
       },
       {
-        path: "/category/:slug",
-        element: <CategoryOrSearchPage></CategoryOrSearchPage>,
-      },
-      {
-        path: "/search",
-        element: <CategoryOrSearchPage></CategoryOrSearchPage>,
-      },
-      {
-        path: "/product_detail/:slug",
-        element: <ProductDetailPage></ProductDetailPage>,
-      },
-      {
-        path: "/user/account/:slug",
-        element: <ProfilePage></ProfilePage>,
-      },
-      {
-        path: "/cart",
-        element: <CartPage></CartPage>,
-      },
-      {
-        path: "/checkout/",
-        element: <CheckOutPage></CheckOutPage>,
-      },
-      {
-        path: "/payment/",
-        element: <PaymentPage></PaymentPage>,
-      },
-      {
-        path: "*",
-        element: <NotFoundPage></NotFoundPage>,
+        path: "",
+        element: <LayoutRoot menu={"normal"}></LayoutRoot>,
+        children: [
+          {
+            path: "/user/account/:slug",
+            element: <ProfilePage></ProfilePage>,
+          },
+          {
+            path: "/cart",
+            element: <CartPage></CartPage>,
+          },
+          {
+            path: "/checkout/",
+            element: <CheckOutPage></CheckOutPage>,
+          },
+          {
+            path: "/payment/",
+            element: <PaymentPage></PaymentPage>,
+          },
+        ],
       },
     ],
   },

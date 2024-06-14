@@ -8,7 +8,7 @@ import Notification from "./Notification.menu";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
 
-function Menu() {
+function Menu({ type }: { type: "scroll" | "normal" }) {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
   const [scroll, setScroll] = useState<boolean>(false);
 
@@ -25,11 +25,14 @@ function Menu() {
   }, []);
 
   return (
-    <header className="absolute z-50 w-full">
+    <header className={`relative w-screen ${type === "normal" && "h-[80px]"}`}>
       <menu
         className={cn(
-          "menu w-[1200px] h-[80px] rounded-md absolute top-10 left-1/2 -translate-x-1/2 mt-auto bg-white shadow-[0_10px_25px_rgba(0,0,0,0.2)]",
-          scroll ? "fixed w-full top-0 rounded-none" : ""
+          "menu w-[1200px] h-[80px] rounded-md bg-white  shadow-[0_10px_25px_rgba(0,0,0,0.2)] z-50",
+          type === "scroll" && "absolute top-10 left-1/2 -translate-x-1/2",
+          type === "normal" &&
+            "absolute top-0 left-1/2 -translate-x-1/2 w-full shadow-none border-b-2 border-b-orange",
+          scroll && type === "scroll" && "menu fixed w-full top-0 rounded-none"
         )}
       >
         <div

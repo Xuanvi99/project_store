@@ -1,13 +1,18 @@
 import { reasonCanceled } from "@/constant/order.constant";
-import Modal from ".";
 import { cn } from "@/utils";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import InputRadio from "../input/InputRadio";
-import { Button } from "../button";
-import Field from "../fields";
-import { Label } from "../label";
+import { useEditCancelledOrderMutation } from "@/stores/service/order.service";
+import { RootState } from "@/stores";
+import { useAppSelector } from "@/hook";
+import { toast } from "react-toastify";
+import Field from "@/components/fields";
+import InputRadio from "@/components/input/InputRadio";
+import { Label } from "@/components/label";
+import { Button } from "@/components/button";
+import LoadingSpinner from "@/components/loading";
+import Modal from "@/components/modal";
 
 type TProps = {
   isOpenModal: boolean;
@@ -16,15 +21,18 @@ type TProps = {
     overlay?: string;
     content?: string;
   };
+  id: string;
 };
 
 const validationSchema = Yup.object({
-  reasonCanceled: Yup.string(),
+  reasonCanceled: Yup.string().required(),
 });
 
 type FormValues = Yup.InferType<typeof validationSchema>;
 
-function ModalReasonCanceled({ isOpenModal, onClick, className }: TProps) {
+function ModalReasonCanceled({ isOpenModal, onClick, className, id }: TProps) {
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
+
   const { control, handleSubmit, watch, reset } = useForm<FormValues>({
     defaultValues: {
       reasonCanceled: "",
@@ -33,8 +41,25 @@ function ModalReasonCanceled({ isOpenModal, onClick, className }: TProps) {
     mode: "onChange",
   });
 
+  const [editCancelledOrder, { isLoading }] = useEditCancelledOrderMutation();
+
   const onSubmit = async (data: FormValues) => {
-    console.log(data);
+    if (user) {
+      const body = {
+        reasonCanceled: data.reasonCanceled,
+        canceller: user._id,
+      };
+      await editCancelledOrder({ id, body })
+        .unwrap()
+        .then(() => {
+          reset({ reasonCanceled: "" });
+          onClick();
+          toast("Hủy đơn hàng thành công!", { type: "success" });
+        })
+        .catch(() => {
+          toast("Đã xảy ra lỗi", { type: "error" });
+        });
+    }
   };
 
   return (
@@ -64,7 +89,7 @@ function ModalReasonCanceled({ isOpenModal, onClick, className }: TProps) {
             );
           })}
         </div>
-        <div className="flex justify-end gap-x-2">
+        <div className="flex justify-end text-sm gap-x-2">
           <Button
             variant="outLine-border"
             onClick={() => {
@@ -76,9 +101,14 @@ function ModalReasonCanceled({ isOpenModal, onClick, className }: TProps) {
           </Button>
           <Button
             variant="default"
+            type="submit"
             disabled={!watch("reasonCanceled") ? true : false}
           >
-            Hủy đơn hàng
+            {isLoading ? (
+              <LoadingSpinner className="w-10 h-10 max-w-[150px]"></LoadingSpinner>
+            ) : (
+              "Hủy đơn hàng"
+            )}
           </Button>
         </div>
       </form>

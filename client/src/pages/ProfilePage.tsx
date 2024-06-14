@@ -1,5 +1,4 @@
-import { Fragment, useEffect } from "react";
-import { BannerCommon } from "../components/banner";
+import { useEffect } from "react";
 import LayoutProfile from "../layout/LayoutProfile";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import FormAddress from "../module/Profile/address";
@@ -56,15 +55,9 @@ function ProfilePage() {
   };
 
   return (
-    <Fragment>
-      <BannerCommon
-        heading="Quản lí tài khoản"
-        title="Tài khoản"
-      ></BannerCommon>
-      <LayoutProfile className="flex my-10 gap-x-5 min-h-[500px]">
-        {selectForm(slug)}
-      </LayoutProfile>
-    </Fragment>
+    <LayoutProfile className="flex my-10 gap-x-5 min-h-[500px]">
+      {selectForm(slug)}
+    </LayoutProfile>
   );
 }
 

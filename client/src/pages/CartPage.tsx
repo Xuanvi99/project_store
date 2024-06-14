@@ -1,5 +1,4 @@
-import { Fragment, useEffect } from "react";
-import { BannerCommon } from "../components/banner";
+import { useEffect } from "react";
 
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
@@ -27,12 +26,9 @@ function CartPage() {
   }, [navigate, pathname, redirectUrl, user]);
 
   return (
-    <Fragment>
-      <BannerCommon heading="Giỏ Hàng Của Bạn" title="Giỏ hàng "></BannerCommon>
-      <CartProvider>
-        <Container></Container>
-      </CartProvider>
-    </Fragment>
+    <CartProvider>
+      <Container></Container>
+    </CartProvider>
   );
 }
 

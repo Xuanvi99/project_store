@@ -5,15 +5,15 @@ import { useGetAmountOrderUserQuery } from "@/stores/service/order.service";
 import { cn } from "@/utils";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { IPurchaseProvide, PurchaseContext } from "../context";
+import useTestContext from "@/hook/useTestContext";
 
-function HeaderPurchase({
-  type,
-  handleSelectType,
-}: {
-  type: number;
-  handleSelectType: (type: number) => void;
-}) {
+function HeaderPurchase() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { handleSelectTypePurchase, typePurchase: type } =
+    useTestContext<IPurchaseProvide>(
+      PurchaseContext as React.Context<IPurchaseProvide>
+    );
   return (
     <header className="grid grid-flow-row grid-cols-7 bg-white rounded-sm shadow-[0_5px_10px_rgba(0,0,0,0.2)]">
       {listHeaderOrder.map((item, index) => {
@@ -28,7 +28,7 @@ function HeaderPurchase({
                 searchParams.delete("keyword");
                 searchParams.set("type", type.toString());
                 setSearchParams(searchParams);
-                handleSelectType(type);
+                handleSelectTypePurchase(type);
               }}
             ></NavItem>
           );
@@ -42,7 +42,7 @@ function HeaderPurchase({
                 const type = index + 1;
                 searchParams.set("type", type.toString());
                 setSearchParams(searchParams);
-                handleSelectType(type);
+                handleSelectTypePurchase(type);
               }}
             ></NavItem>
           );

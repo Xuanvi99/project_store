@@ -3,7 +3,7 @@ import Footer from "../module/footer";
 import Menu from "../module/menu";
 import { useEffect } from "react";
 
-function LayoutRoot() {
+function LayoutRoot({ menu }: { menu: "scroll" | "normal" }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -19,9 +19,10 @@ function LayoutRoot() {
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
+
   return (
     <div className="w-full bg-light">
-      <Menu></Menu>
+      <Menu type={menu}></Menu>
       <Outlet></Outlet>
       <Footer></Footer>
     </div>

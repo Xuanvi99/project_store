@@ -13,6 +13,7 @@ export const userApi = createApi({
   reducerPath: "user",
   tagTypes: ["Users"],
   baseQuery: baseQueryWithAuth,
+  refetchOnReconnect: true,
   endpoints: (build) => ({
     getListUser: build.query<IUser[], { page: string | "1"; search: string }>({
       query: ({ page, search }) => ({

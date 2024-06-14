@@ -3,6 +3,7 @@ import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
 import { useGetListOrderUserQuery } from "@/stores/service/order.service";
 import { IResOrder, paramsGetListOrder } from "@/types/order.type";
+import { QueryStatus } from "@reduxjs/toolkit/query";
 import { createContext, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -18,7 +19,11 @@ export type IPurchaseProvide = {
 
   params: paramsGetListOrder;
 
+  statusReq: QueryStatus;
+
   handleSetParams: (value: TParams) => void;
+
+  handleSelectTypePurchase: (type: number) => void;
 };
 
 type TParams = {
@@ -27,16 +32,16 @@ type TParams = {
 
 const PurchaseContext = createContext<IPurchaseProvide | null>(null);
 
-function PurchaseProvide({
-  typePurchase,
-  children,
-}: {
-  typePurchase: number;
-  children: React.ReactNode;
-}) {
+function PurchaseProvide({ children }: { children: React.ReactNode }) {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
 
   const [searchParams] = useSearchParams();
+
+  const [typePurchase, setTypePurchase] = useState<number>(1);
+
+  const handleSelectTypePurchase = (type: number) => {
+    setTypePurchase(type);
+  };
 
   const [params, setParams] = useState<paramsGetListOrder>({
     activePage: 1,
@@ -52,9 +57,9 @@ function PurchaseProvide({
   });
 
   const {
-    data: resData,
+    data: resOrder,
     isLoading,
-    status,
+    status: statusReq,
   } = useGetListOrderUserQuery(
     {
       id: user ? user._id : "",
@@ -63,10 +68,26 @@ function PurchaseProvide({
     { skip: user ? false : true }
   );
 
+  console.log(params.status, isLoading, statusReq);
+
   const handleSetParams = (value: TParams) => {
     const paramsCopy = { ...params };
     setParams({ ...paramsCopy, ...value });
   };
+
+  useEffect(() => {
+    if (searchParams.get("type")) {
+      setTypePurchase(Number(searchParams.get("type")));
+    } else {
+      setTypePurchase(1);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (resOrder && statusReq === "fulfilled") {
+      setData({ ...resOrder });
+    }
+  }, [resOrder, statusReq]);
 
   useEffect(() => {
     setParams({
@@ -75,17 +96,20 @@ function PurchaseProvide({
       search: searchParams.get("keyword") || "",
       status: listHeaderOrder[typePurchase - 1].status || "",
     });
+    setData({ data: [], totalPage: 0, amountOrder: 0 });
   }, [searchParams, typePurchase]);
-
-  useEffect(() => {
-    if (resData && status === "fulfilled") {
-      setData({ ...resData });
-    }
-  }, [resData, status]);
 
   return (
     <PurchaseContext.Provider
-      value={{ data, isLoading, params, handleSetParams, typePurchase }}
+      value={{
+        data,
+        isLoading,
+        params,
+        handleSetParams,
+        typePurchase,
+        statusReq,
+        handleSelectTypePurchase,
+      }}
     >
       {children}
     </PurchaseContext.Provider>
