@@ -16,9 +16,11 @@ import { useNavigate } from "react-router-dom";
 import { useGetProductItemQuery } from "@/stores/service/product.service";
 import Modal from "@/components/modal";
 import { Button } from "@/components/button";
+import { IProductRes } from "@/types/product.type";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 type TCartItemProps = {
-  data: ICartItem;
+  data: ICartItem<IProductRes>;
   handleCheckCart: (checked: boolean, id: string) => void;
   handleUpdateCartItem: (id: string, quantity: number) => void;
   handleDeleteItem: (id: string) => void;
@@ -207,7 +209,13 @@ function CartItem({
             navigate(`/product_detail/${product.slug}`);
           }}
         >
-          <img alt="" srcSet={product.thumbnail.url} className="w-[80px]" />
+          <LazyLoadImage
+            alt="Cart"
+            placeholderSrc={product.thumbnail.url}
+            srcSet={product.thumbnail.url}
+            effect="blur"
+            className="w-[80px]"
+          />
           <div className="flex flex-col">
             <span className="text-sm font-semibold line-clamp-2">
               {product.name}

@@ -52,7 +52,7 @@ export interface IReqOrder {
   total: number;
 }
 
-type TProductOrderItem<T> = {
+export type TProductOrderItem<T> = {
   _id: string;
   productId: T;
   size: string;

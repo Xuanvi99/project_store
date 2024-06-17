@@ -20,7 +20,7 @@ function CategoryOrSearchPage() {
         title={slug ? "Giày " + slug : "Tìm kiếm sản phẩm"}
       ></BannerCommon>
       <LayoutMain>
-        <section className={cn("w-full grid grid-cols-[280px_900px] gap-x-5")}>
+        <section className={cn("w-full grid grid-cols-[280px_900px] gap-x-5 ")}>
           <CategoryProvide>
             <Category.Sidebar></Category.Sidebar>
             <Category.Content></Category.Content>

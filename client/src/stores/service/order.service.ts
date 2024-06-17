@@ -45,16 +45,18 @@ export const orderApi = createApi({
             ? newItems.data.length + 1
             : newItems.data.length;
         if (currentActivePage >= activePage) {
-          currentCache.data.splice(
-            4 * (activePage - 1),
-            deleteCount,
-            ...newItems.data
-          );
+          if (newItems.data.length > 0) {
+            currentCache.data.splice(
+              4 * (activePage - 1),
+              deleteCount,
+              ...newItems.data
+            );
+          } else {
+            currentCache.data = [];
+          }
         } else {
           currentCache.data.push(...newItems.data);
         }
-
-        // console.log(currentCache.data);
       },
 
       forceRefetch({ currentArg, previousArg }) {

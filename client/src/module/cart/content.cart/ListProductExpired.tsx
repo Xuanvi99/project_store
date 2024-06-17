@@ -17,15 +17,13 @@ function ListProductExpired() {
 
   const [deleteCartMultiple] = useDeleteCartMultipleMutation();
 
-  const listSelectItem = listProductInactiveToCart.map(
-    (product) => product._id
-  );
+  const listSelectId = listProductInactiveToCart.map((product) => product._id);
 
   const handleDeleteMultiple = () => {
-    if (user && listSelectItem.length > 0) {
+    if (user && listSelectId.length > 0) {
       deleteCartMultiple({
         id: user?._id || "",
-        listIdProduct: listSelectItem,
+        listIdProduct: listSelectId,
       })
         .unwrap()
         .catch(() => handleOpenError(true));

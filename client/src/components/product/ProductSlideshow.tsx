@@ -9,17 +9,19 @@ import { useGetListProductQuery } from "@/stores/service/product.service";
 import CartSkeleton from "../card/card-skeleton";
 
 interface IProps {
-  name: string | "";
+  name?: string;
 }
 
-export default function ProductSlideshow({ name }: IProps) {
-  const { data: resProduct, isFetching } = useGetListProductQuery({
+export default function ProductSlideshow({ name = "" }: IProps) {
+  const { data: resProduct, isLoading } = useGetListProductQuery({
     search: name,
     activePage: 1,
     limit: 10,
   });
 
-  if (!resProduct) return <></>;
+  if ((!resProduct || resProduct.data.length === 0) && !isLoading) {
+    return <></>;
+  }
 
   return (
     <LayoutProduct>
@@ -40,8 +42,8 @@ export default function ProductSlideshow({ name }: IProps) {
           </span>
           {name === "sale" && (
             <img
-              src=""
               alt=""
+              loading="lazy"
               srcSet="/flashSales.png"
               className=" h-[50px] absolute left-[105%] top-1/2 -translate-y-1/2"
             />
@@ -58,7 +60,7 @@ export default function ProductSlideshow({ name }: IProps) {
           <IconChevronRight size={14}></IconChevronRight>
         </Link>
       </div>
-      {!isFetching && (
+      {!isLoading && (
         <SlideSwiper
           optionSwiper={{
             quantitySlide: resProduct?.data.length || 10,
@@ -84,7 +86,7 @@ export default function ProductSlideshow({ name }: IProps) {
           })}
         </SlideSwiper>
       )}
-      {isFetching && (
+      {isLoading && (
         <div className="flex w-full mt-5 gap-x-3">
           {Array(5)
             .fill(null)

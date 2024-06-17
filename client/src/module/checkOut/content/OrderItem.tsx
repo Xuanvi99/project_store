@@ -1,14 +1,18 @@
 import { ICartItem } from "@/types/cart.type";
+import { IProductRes } from "@/types/product.type";
 import { formatPrice } from "@/utils";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
-function OrderItem({ data }: { data: ICartItem }) {
+function OrderItem({ data }: { data: ICartItem<IProductRes> }) {
   const { productId, quantity } = data;
   return (
     <div className="flex items-center w-full py-5">
       <div className="flex items-center w-1/2 text-sm font-normal gap-x-2">
-        <img
-          alt=""
+        <LazyLoadImage
+          alt="order"
+          placeholderSrc={productId.thumbnail.url}
           srcSet={productId.thumbnail.url}
+          effect="blur"
           className="max-w-[80px] w-full"
         />
         <span className="line-clamp-1">{productId.name}</span>

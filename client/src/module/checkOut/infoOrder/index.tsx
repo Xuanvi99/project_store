@@ -35,7 +35,7 @@ function InfoOrder() {
 
   const navigate = useNavigate();
 
-  const [openModal, setOpenModal] = useState<boolean>(true);
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   const [createOrder, { status }] = useCreateOrderMutation();
 
@@ -67,12 +67,7 @@ function InfoOrder() {
         </div>
       );
     } else if (status === "rejected") {
-      return (
-        <>
-          <IconAlert size={50}></IconAlert>
-          <span>Lỗi đặt đơn hàng</span>
-        </>
-      );
+      return <span>Lỗi đặt đơn hàng</span>;
     }
   };
 
@@ -82,17 +77,17 @@ function InfoOrder() {
     <Fragment>
       <ModalNotification
         variant="fixed"
+        type={status === "pending" ? "default" : "error"}
         onClick={() => {
           if (status !== "pending") {
             setOpenModal(false);
           }
         }}
-        isOpen={openModal}
+        isOpenModal={openModal}
         className={{
-          overlay: "opacity-20",
-          content:
-            "modal-content max-w-[300px] h-[200px] w-full flex flex-col text-danger font-semibold gap-y-2 justify-center items-center bg-white rounded z-[70]",
+          content: "modal-content font-semibold rounded-md z-[70]",
         }}
+        time={status === "rejected" ? 700 : 0}
       >
         {selectNotification(status)}
       </ModalNotification>
@@ -175,6 +170,12 @@ function InfoOrder() {
             Đặt hàng
           </Button>
         </div>
+        <p className="text-xs text-gray">
+          Chú ý: Sau khi đăng ký đặt hàng thành công, trong 24h tới nhân viên
+          bên của cửa hàng sẽ liên hệ với bạn qua số điện thoại đã đăng ký ở
+          trên để xác nhận thông tin đơn hàng. Vui lòng chú ý đến điện thoại của
+          bạn
+        </p>
       </section>
     </Fragment>
   );

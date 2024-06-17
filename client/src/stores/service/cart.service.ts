@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "../baseQueryToken";
 import { ICart, ICartItem } from "@/types/cart.type";
+import { IProductRes } from "@/types/product.type";
 
 type TArg = { id: string; productId: string; size: string; quantity: number };
 
@@ -18,11 +19,27 @@ export const cartApi = createApi({
       }),
       providesTags: (result, error, id) => [{ type: "Carts", id }],
     }),
-    addToCart: build.mutation<{ message: string; cartItem: ICartItem }, TArg>({
+    addToCart: build.mutation<
+      { message: string; cartItem: ICartItem<IProductRes> },
+      TArg
+    >({
       query: ({ id, ...body }) => ({
         url: `cart/${id}`,
         method: "POST",
         body,
+      }),
+      invalidatesTags: (result, error, data) => [
+        { type: "Carts", id: data.id },
+      ],
+    }),
+    repurchaseProductToCart: build.mutation<
+      { message: string; listCartItem: ICartItem<IProductRes>[] },
+      { id: string; listProductToCart: Omit<ICartItem<string>, "_id">[] }
+    >({
+      query: ({ id, listProductToCart }) => ({
+        url: `cart/repurchase/${id}`,
+        method: "POST",
+        body: { listProductToCart },
       }),
       invalidatesTags: (result, error, data) => [
         { type: "Carts", id: data.id },
@@ -78,4 +95,5 @@ export const {
   useDeleteCartOneMutation,
   useDeleteCartMultipleMutation,
   useDeleteCartAllMutation,
+  useRepurchaseProductToCartMutation,
 } = cartApi;

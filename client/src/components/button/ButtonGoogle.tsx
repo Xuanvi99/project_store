@@ -59,7 +59,7 @@ function ButtonGoogle({ text, className, pathname, handleErrorLogin }: TProps) {
       className={cn("flex justify-center pt-5", className?.wrap)}
     >
       <Button type="button" variant="outLine-flex" className={className?.btn}>
-        <img alt="" srcSet="/google.png" className="w-7" />
+        <img alt="" loading="lazy" srcSet="/google.png" className="w-7" />
         <span className="text-xs">{text}</span>
       </Button>
     </div>

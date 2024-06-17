@@ -1,12 +1,12 @@
-import HeaderPurchase from "./header.purchase";
+import HeaderNavPurchase from "./headerNav.purchase";
 import { PurchaseProvide } from "./context";
 import ContentPurchase from "./content.purchase";
 
 function PurchaseOrder() {
   return (
-    <section className="max-w-[1000px] w-full">
+    <section className="max-w-[1000px] w-full min-h-[600px]">
       <PurchaseProvide>
-        <HeaderPurchase></HeaderPurchase>
+        <HeaderNavPurchase></HeaderNavPurchase>
         <ContentPurchase></ContentPurchase>
       </PurchaseProvide>
     </section>

@@ -1,5 +1,5 @@
 import { Button } from "@/components/button";
-import { IconAlert, IconDown } from "@/components/icon";
+import { IconDown } from "@/components/icon";
 import { Input } from "@/components/input";
 import Modal, { ModalNotification } from "@/components/modal";
 import { useAppSelector, useHover } from "@/hook";
@@ -15,16 +15,16 @@ import {
 import { RootState } from "@/stores";
 import generateUniqueId from "generate-unique-id";
 import { useNavigate } from "react-router-dom";
-import { formatPrice } from "@/utils";
+import { cn, formatPrice } from "@/utils";
 function Footer() {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
   const {
     handleOpenError,
     listProductActiveToCart,
     listCheckCart,
-    listSelectItem,
+    listSelectId,
     setListCheckCart,
-    setListSelectItem,
+    setListSelectId,
     handleSetTotalPriceOrder,
     handleCheckAllCart,
   } = useTestContext<TCartProvider>(
@@ -37,24 +37,26 @@ function Footer() {
   const [deleteCartMultiple] = useDeleteCartMultipleMutation();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const nodeRef = useRef<HTMLDivElement>(null);
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+  const footerRef = useRef<HTMLDivElement | null>(null);
 
   const { isHover } = useHover(nodeRef);
 
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
+  const [scrollFooter, setScrollFooter] = useState<boolean>(true);
 
   const handleDeleteMultiple = () => {
     if (user) {
       deleteCartMultiple({
         id: user?._id || "",
-        listIdProduct: listSelectItem,
+        listIdProduct: listSelectId,
       })
         .unwrap()
         .then(() => {
           setListCheckCart([]);
-          setListSelectItem([]);
+          setListSelectId([]);
         })
         .catch(() => handleOpenError(true));
     }
@@ -66,7 +68,7 @@ function Footer() {
         .unwrap()
         .then(() => {
           setListCheckCart([]);
-          setListSelectItem([]);
+          setListSelectId([]);
         })
         .catch(() => handleOpenError(true));
     }
@@ -101,24 +103,47 @@ function Footer() {
     handleCalculatePrice();
   }, [listCheckCart]);
 
+  useEffect(() => {
+    const handleScrollCheckFooter = () => {
+      if (footerRef.current) {
+        const boundingClientRect = footerRef.current.getBoundingClientRect();
+        window.scrollY < boundingClientRect.top - footerRef.current.scrollHeight
+          ? setScrollFooter(true)
+          : setScrollFooter(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScrollCheckFooter);
+
+    return () => {
+      window.removeEventListener("scroll", handleScrollCheckFooter);
+    };
+  }, []);
+
   return (
-    <section className="footer w-full mt-5 max-w-[1200px] mx-auto min-h-[60px] shadow-sm shadow-grayCa py-10 bg-white px-5 rounded-[3px] flex justify-between items-center">
+    <section
+      ref={footerRef}
+      className={cn(
+        "footer sticky bottom-0",
+        "w-full mt-5 max-w-[1200px] mx-auto min-h-[60px] py-10 bg-white px-5 rounded-[3px]",
+        "flex justify-between items-center",
+        scrollFooter &&
+          listProductActiveToCart.length > 1 &&
+          "shadow-[0px_-20px_10px_-10px_rgba(0,0,0,0.1)]"
+      )}
+    >
       {listCheckCart.length === 0 && (
         <ModalNotification
-          isOpen={openModal}
+          type={"info"}
+          isOpenModal={openModal}
           onClick={() => setOpenModal(false)}
           time={700}
           className={{
             content:
-              "bg-black w-[350px] h-[200px] rounded-md opacity-75 flex justify-center items-center gap-x-5 text-white font-semibold",
+              "bg-black w-[350px] h-[200px] rounded-md opacity-75 gap-x-5 text-white font-semibold",
           }}
         >
-          <div className="flex flex-col items-center justify-center gap-y-5">
-            <span>
-              <IconAlert size={50}></IconAlert>
-            </span>
-            <span>Vui lòng chọn sản phẩm</span>
-          </div>
+          <span>Vui lòng chọn sản phẩm</span>
         </ModalNotification>
       )}
       {listCheckCart.length > 0 && (
@@ -250,7 +275,7 @@ function Footer() {
               "selectProductCart",
               JSON.stringify({
                 id,
-                listIdProductOrder: listSelectItem,
+                listIdProductOrder: listSelectId,
               })
             );
             navigate(`/checkout/?id=${id}`);

@@ -84,7 +84,9 @@ function ModalReasonCanceled({ isOpenModal, onClick, className, id }: TProps) {
                   value={reason.value}
                   checked={watch("reasonCanceled") === reason.value}
                 ></InputRadio>
-                <Label className="text-base">{reason.value}</Label>
+                <Label name="reasonCanceled" className="text-base">
+                  {reason.value}
+                </Label>
               </Field>
             );
           })}

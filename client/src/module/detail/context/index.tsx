@@ -8,7 +8,7 @@ export type IProductDetailProvide = {
   data: IProductRes | undefined;
   listProductItem: productItem[] | undefined;
   status: QueryStatus;
-  isFetching: boolean;
+  isLoading: boolean;
 };
 
 const PDetailContext = createContext<IProductDetailProvide | null>(null);
@@ -19,7 +19,7 @@ function ProductDetailProvide({ children }: { children: React.ReactNode }) {
   const {
     data: res,
     status,
-    isFetching,
+    isLoading,
   } = useGetOneProductQuery(slug as string);
 
   return (
@@ -28,7 +28,7 @@ function ProductDetailProvide({ children }: { children: React.ReactNode }) {
         data: res?.data,
         listProductItem: res?.listProductItem,
         status,
-        isFetching,
+        isLoading,
       }}
     >
       {children}

@@ -58,3 +58,5 @@ export const listHeaderOrder = [
   { id: 6, title: "Đã hủy", status: "cancelled" },
   { id: 7, title: "Trả hàng/Hoàn tiền", status: "refund" },
 ];
+
+export const limitOrder = 4;

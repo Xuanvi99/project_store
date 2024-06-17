@@ -9,6 +9,7 @@ import {
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
 import { IconPurchase, IconWrite } from "@/components/icon";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const ListNavProfile = [
   {
@@ -55,9 +56,16 @@ function SidebarProfile() {
           to={"/user/profile/info"}
           className="w-12 h-12 overflow-hidden rounded-full cursor-pointer basis-12"
         >
-          <img
+          {/* <img
             alt="error"
             srcSet={avatar?.url || user?.avatarDefault}
+            className={"w-full h-full bg-center"}
+          /> */}
+          <LazyLoadImage
+            alt="avatar"
+            placeholderSrc={avatar?.url || user?.avatarDefault}
+            srcSet={avatar?.url || user?.avatarDefault}
+            effect="blur"
             className={"w-full h-full bg-center"}
           />
         </Link>

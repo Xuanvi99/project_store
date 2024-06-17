@@ -3,12 +3,12 @@ import { IProductRes } from "./product.type";
 export interface ICart {
   _id: string;
   userId: string;
-  listProduct: ICartItem[];
+  listProduct: ICartItem<IProductRes>[];
 }
 
-export interface ICartItem {
+export interface ICartItem<T> {
   _id: string;
-  productId: IProductRes;
+  productId: T;
   size: string;
   quantity: number;
 }

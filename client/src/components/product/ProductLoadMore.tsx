@@ -79,7 +79,12 @@ function ProductLoadMore() {
   if (data?.data.length === 0 && !isFetching) {
     return (
       <div className="flex flex-col items-center justify-center mt-10">
-        <img alt="" srcSet="/search_notfound.png" className="w-40" />
+        <img
+          alt=""
+          loading="lazy"
+          srcSet="/search_notfound.png"
+          className="w-40"
+        />
         {searchParams.size > 2 && searchParams.has("s") ? (
           <>
             <span>

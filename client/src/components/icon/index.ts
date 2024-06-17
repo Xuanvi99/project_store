@@ -30,7 +30,8 @@ import IconVerifyPw from "./IconVerifyPw";
 import IconUploadImage from "./IconUploadImage";
 import IconNotification from "./IconNotification";
 import IconPurchase from "./IconPurchase";
-import IconShoppingFee from "./iconShoppingFee";
+import IconInfo from "./IconInfo";
+import IconShoppingFee from "./IconShoppingFee";
 
 export {
   IconSearch,
@@ -67,4 +68,5 @@ export {
   IconNotification,
   IconPurchase,
   IconShoppingFee,
+  IconInfo,
 };

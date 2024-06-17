@@ -10,6 +10,7 @@ import { updateCart } from "./stores/reducer/cartReducer";
 import { RootState } from "./stores";
 import LoadingSpinner from "./components/loading";
 import { cn } from "./utils";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
@@ -60,6 +61,7 @@ function App() {
         }
       >
         <RouterProvider router={router}></RouterProvider>
+        <ToastContainer />
       </Suspense>
     </ErrorBoundary>
   );

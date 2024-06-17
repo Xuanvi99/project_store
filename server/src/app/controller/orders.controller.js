@@ -4,7 +4,6 @@ const {
   productItemModel,
   inventoryModel,
 } = require("../model");
-const moment = require("moment");
 const mongoose = require("mongoose");
 const connection = mongoose.connection;
 
@@ -41,7 +40,6 @@ class Order {
             populate: {
               path: "productId",
               model: "products",
-              select: "_id name thumbnail",
               populate: {
                 path: "thumbnail",
                 model: "images",
@@ -129,7 +127,6 @@ class Order {
             populate: {
               path: "productId",
               model: "products",
-              select: "_id name thumbnail",
               populate: {
                 path: "thumbnail",
                 model: "images",
@@ -166,6 +163,11 @@ class Order {
           ],
         });
         totalPage = Math.ceil(amountOrder.length / limit);
+      } else if (!search && status) {
+        amountOrder = await orderModel.find({
+          $and: [{ userId }, { status: { $regex: status, $options: "i" } }],
+        });
+        totalPage = Math.ceil(amountOrder / limit);
       } else {
         amountOrder = await orderModel.countDocuments();
         totalPage = Math.ceil(amountOrder / limit);

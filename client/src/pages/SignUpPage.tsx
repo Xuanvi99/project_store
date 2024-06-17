@@ -14,7 +14,6 @@ import LayoutAuth from "../layout/LayoutAuth";
 import { useState } from "react";
 import { ModalNotification } from "../components/modal";
 import LoadingSpinner from "../components/loading";
-import { IconAlert } from "../components/icon";
 
 const validatingSchema = Yup.object({
   phoneOrEmail: Yup.string()
@@ -110,16 +109,12 @@ function SignUpPage() {
 
   return (
     <LayoutAuth>
-      <ModalNotification isOpen={openModal} onClick={handleOpenModal}>
-        <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
-          <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
-          <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
-            <IconAlert size={50}></IconAlert>
-            <span className="text-center">
-              {selectNotifications(statusError)}
-            </span>
-          </div>
-        </div>
+      <ModalNotification
+        type={"warning"}
+        isOpenModal={openModal}
+        onClick={handleOpenModal}
+      >
+        <span className="text-center">{selectNotifications(statusError)}</span>
       </ModalNotification>
       <div className="flex flex-col justify-center w-full px-10 pt-16">
         <div className="flex flex-col items-center gap-y-2">

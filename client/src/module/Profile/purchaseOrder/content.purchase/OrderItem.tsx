@@ -1,12 +1,19 @@
 import { IconAlert, IconShoppingFee } from "@/components/icon";
 import Tooltip from "@/components/tooltip";
-import { IResOrder } from "@/types/order.type";
+import { IResOrder, TProductOrderItem } from "@/types/order.type";
 import { cn, formatPrice } from "@/utils";
 import { Button } from "@/components/button";
 import { useState } from "react";
 import { listHeaderOrder } from "@/constant/order.constant";
-import { ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import ModalReasonCanceled from "../modalReasonCanceled";
+import { IProductRes } from "@/types/product.type";
+import { Link, useNavigate } from "react-router-dom";
+import { useRepurchaseProductToCartMutation } from "@/stores/service/cart.service";
+import { RootState } from "@/stores";
+import { useAppSelector } from "@/hook";
+import { ModalNotification } from "@/components/modal";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 type TProps = {
   data: IResOrder;
@@ -23,10 +30,24 @@ function OrderItem({ data }: TProps) {
     canceled_at,
   } = data;
 
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  const user = useAppSelector((state: RootState) => state.authSlice.user);
 
-  const handleSetOpenModal = () => {
-    setOpenModal(!openModal);
+  const navigate = useNavigate();
+
+  const [repurchaseProductToCart] = useRepurchaseProductToCartMutation();
+
+  const [openModalReasonCanceled, setOpenModalReasonCanceled] =
+    useState<boolean>(false);
+
+  const [openModalNotification, setOpenModalNotification] =
+    useState<boolean>(false);
+
+  const handleOpenModalNotification = () => {
+    setOpenModalNotification(!openModalNotification);
+  };
+
+  const handleOpenModalReasonCanceled = () => {
+    setOpenModalReasonCanceled(!openModalReasonCanceled);
   };
 
   const titleStatusOrder = (status: string) => {
@@ -36,12 +57,38 @@ function OrderItem({ data }: TProps) {
     return listHeaderOrder[indexItem].title;
   };
 
+  const handleRepurchaseOrder = async () => {
+    if (user) {
+      const listProductToCart = listProducts.map((product) => {
+        return {
+          productId: product.productId._id,
+          size: product.size,
+          quantity: product.quantity,
+        };
+      });
+      await repurchaseProductToCart({ id: user._id, listProductToCart })
+        .unwrap()
+        .then((res) => {
+          console.log("res: ", res);
+          if (res) {
+            toast("Đã thêm đơn hàng vào giỏ hàng", { type: "success" });
+            navigate("/cart", {
+              state: { type_Cart: "buy_now", listCartItem: res.listCartItem },
+            });
+          }
+        })
+        .catch(() => {
+          handleOpenModalNotification();
+        });
+    }
+  };
+
   const selectButtonOrder = (status: string) => {
     switch (status) {
       case "pending":
         return (
           <div className="flex items-center justify-end text-sm gap-x-2">
-            <Button variant="default" onClick={handleSetOpenModal}>
+            <Button variant="default" onClick={handleOpenModalReasonCanceled}>
               Hủy đơn hàng
             </Button>
           </div>
@@ -51,7 +98,9 @@ function OrderItem({ data }: TProps) {
       case "completed":
         return (
           <div className="flex items-center justify-end text-sm gap-x-2">
-            <Button variant="default">Mua lại</Button>
+            <Button variant="default" onClick={handleRepurchaseOrder}>
+              Mua lại
+            </Button>
           </div>
         );
 
@@ -63,11 +112,18 @@ function OrderItem({ data }: TProps) {
   return (
     <>
       <ModalReasonCanceled
-        isOpenModal={openModal}
-        onClick={handleSetOpenModal}
+        isOpenModal={openModalReasonCanceled}
+        onClick={handleRepurchaseOrder}
         id={data._id}
       ></ModalReasonCanceled>
-      <ToastContainer />
+      <ModalNotification
+        type="info"
+        isOpenModal={openModalNotification}
+        onClick={handleOpenModalNotification}
+      >
+        Xin lỗi, các sản phẩm của đơn hàng không còn bán hoặc hết hàng nên không
+        thể mua lại
+      </ModalNotification>
       <div className="w-full p-4 bg-white rounded-sm">
         <div className="flex items-center justify-end pb-3 border-dashed gap-x-2 border-b-1 border-b-grayCa">
           {status === "completed" && (
@@ -100,35 +156,8 @@ function OrderItem({ data }: TProps) {
         <div className="border-dashed border-b-1 border-b-grayCa">
           {listProducts &&
             listProducts.map((product) => {
-              const { productId, quantity, price, priceSale } = product;
-              const { thumbnail, name } = productId;
               return (
-                <div key={product._id} className="flex w-full py-2 gap-x-3">
-                  <div className="h-[80px] min-w-[80px]">
-                    <img
-                      alt="Thumbnail order"
-                      srcSet={thumbnail.url}
-                      className="w-full h-full"
-                    />
-                  </div>
-
-                  <span className="flex flex-col w-full">
-                    <h1>{name}</h1>
-                    <span>x{quantity}</span>
-                  </span>
-                  <div className="flex items-center justify-end min-w-[100px] text-sm">
-                    {priceSale > 0 ? (
-                      <span className="flex gap-x-2">
-                        <p className="text-sm line-through text-gray">
-                          {formatPrice(price)}₫
-                        </p>
-                        <p className="text-danger">{formatPrice(priceSale)}₫</p>
-                      </span>
-                    ) : (
-                      <p>{formatPrice(price)}₫</p>
-                    )}
-                  </div>
-                </div>
+                <ProductItem key={product._id} data={product}></ProductItem>
               );
             })}
         </div>
@@ -170,5 +199,50 @@ function OrderItem({ data }: TProps) {
     </>
   );
 }
+
+const ProductItem = ({ data }: { data: TProductOrderItem<IProductRes> }) => {
+  const { productId, quantity, price, priceSale, size } = data;
+  const { thumbnail, name, slug } = productId;
+
+  return (
+    <Link
+      to={`/product_detail/${slug}`}
+      className="flex w-full py-2 cursor-pointer gap-x-3 group"
+    >
+      {/* <img
+          loading="lazy"
+          alt="Thumbnail order"
+          srcSet={thumbnail.url}
+          className="w-full h-full"
+        /> */}
+      <LazyLoadImage
+        alt="order"
+        placeholderSrc={thumbnail.url}
+        srcSet={thumbnail.url}
+        effect="blur"
+        className="h-[80px] min-w-[80px]"
+      />
+      <span className="flex flex-col w-full">
+        <h1 className="group-hover:underline line-clamp-2">{name}</h1>
+        <div className="flex flex-col text-sm text-gray98 gap-x-1">
+          <span>x{quantity}</span>
+          <span>size: {size}</span>
+        </div>
+      </span>
+      <div className="flex items-center justify-end min-w-[100px] text-sm">
+        {priceSale > 0 ? (
+          <span className="flex gap-x-2">
+            <p className="text-sm line-through text-gray">
+              {formatPrice(price)}₫
+            </p>
+            <p className="text-danger">{formatPrice(priceSale)}₫</p>
+          </span>
+        ) : (
+          <p>{formatPrice(price)}₫</p>
+        )}
+      </div>
+    </Link>
+  );
+};
 
 export default OrderItem;

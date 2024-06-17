@@ -7,6 +7,7 @@ import { RootState } from "@/stores";
 import { logOut } from "@/stores/reducer/authReducer";
 import { updateCart } from "@/stores/reducer/cartReducer";
 import Tooltip from "@/components/tooltip";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 type TProps = {
   displayName?: boolean;
@@ -54,10 +55,12 @@ function Profile({ displayName }: TProps) {
           select={
             <div className="flex items-center h-9 tex-sm gap-x-3">
               <span className="overflow-hidden rounded-full w-9 h-9">
-                <img
-                  alt="err"
+                <LazyLoadImage
+                  alt="avatar"
+                  placeholderSrc={user?.avatar?.url || user?.avatarDefault}
                   srcSet={user?.avatar?.url || user?.avatarDefault}
-                  className="w-full h-full bg-cover"
+                  effect="blur"
+                  className="hover:scale-[1.1] duration-500"
                 />
               </span>
               {displayName && (

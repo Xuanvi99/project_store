@@ -1,11 +1,5 @@
 import { Button } from "@/components/button";
-import {
-  IconAlert,
-  IconError,
-  IconShoppingCart,
-  IconStar,
-  IconTick,
-} from "@/components/icon";
+import { IconShoppingCart, IconStar, IconTick } from "@/components/icon";
 import useTestContext from "@/hook/useTestContext";
 import { cn, formatPrice } from "@/utils";
 import { useEffect, useState } from "react";
@@ -14,7 +8,6 @@ import { ModalNotification } from "@/components/modal";
 import { useAddToCartMutation } from "@/stores/service/cart.service";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
-import IconSuccess from "../../../components/icon/IconSuccess";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IUser } from "@/types/user.type";
 
@@ -53,9 +46,9 @@ function InfoShoes() {
   const [openModal, setOpenModal] = useState<boolean>(false);
 
   const [notify, setNotify] = useState<{
-    type: "success" | "error" | "warning";
+    type: "success" | "error" | "info" | "warning" | "default";
     message: string;
-  }>();
+  }>({ type: "default", message: "" });
 
   const handleIncrement = () => {
     let quantityShoes = selectSizeQuantityShoes.size
@@ -157,8 +150,10 @@ function InfoShoes() {
         .unwrap()
         .then((res) => {
           if (res) {
+            const listCartItem = [res.cartItem];
+            console.log("listCartItem: ", listCartItem);
             navigate("/cart", {
-              state: { type_Cart: "buy_now", cartItem: res.cartItem },
+              state: { type_Cart: "buy_now", listCartItem },
             });
           }
         })
@@ -193,29 +188,15 @@ function InfoShoes() {
   return (
     <div className="basis-5/12 max-w-[500px]">
       <ModalNotification
-        isOpen={openModal}
+        type={notify.type}
+        isOpenModal={openModal}
         onClick={() => setOpenModal(false)}
         time={700}
         className={{
-          content:
-            "bg-black w-[350px] h-[200px] rounded-md opacity-75 flex justify-center items-center gap-x-5 text-white font-semibold",
+          content: "bg-black w-[350px] gap-x-5 text-white font-semibold",
         }}
       >
-        <div className="flex flex-col items-center justify-center gap-y-5">
-          <span
-            className={cn(
-              notify?.type === "success" && "text-green66",
-              notify?.type === "warning" && "text-danger"
-            )}
-          >
-            {notify?.type === "success" && (
-              <IconSuccess size={50}></IconSuccess>
-            )}
-            {notify?.type === "error" && <IconError size={50}></IconError>}
-            {notify?.type === "warning" && <IconAlert size={50}></IconAlert>}
-          </span>
-          <span>{notify?.message}</span>
-        </div>
+        <span>{notify.message}</span>
       </ModalNotification>
       <h2
         className={cn(

@@ -6,9 +6,10 @@ import { useDeleteCartOneMutation } from "@/stores/service/cart.service";
 import { ICartItem } from "@/types/cart.type";
 import { cn, formatPrice } from "@/utils";
 import { CartContext, TCartProvider } from "../context.cart";
+import { IProductRes } from "@/types/product.type";
 
 type TCartItemProps = {
-  data: ICartItem;
+  data: ICartItem<IProductRes>;
 };
 
 function CartItemExpired({ data }: TCartItemProps) {

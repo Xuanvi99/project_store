@@ -4,15 +4,16 @@ import CartItem from "./CartItem";
 import { ICartItem } from "@/types/cart.type";
 import { Fragment } from "react";
 import ListProductExpired from "./ListProductExpired";
+import { IProductRes } from "@/types/product.type";
 
 function Content() {
   const {
     listProductActiveToCart,
     listProductInactiveToCart,
     listCheckCart,
-    listSelectItem,
+    listSelectId,
     setListCheckCart,
-    setListSelectItem,
+    setListSelectId,
   } = useTestContext<TCartProvider>(
     CartContext as React.Context<TCartProvider>
   );
@@ -20,17 +21,17 @@ function Content() {
   const handleCheckCart = (checked: boolean, id: string) => {
     const listCheckCartCopy = [...listCheckCart];
     if (checked) {
-      const result: ICartItem[] = listProductActiveToCart.filter(
-        (item: ICartItem) => item._id === id
+      const result: ICartItem<IProductRes>[] = listProductActiveToCart.filter(
+        (item: ICartItem<IProductRes>) => item._id === id
       );
       listCheckCartCopy.push(result[0]);
-      setListSelectItem([...listSelectItem, id]);
+      setListSelectId([...listSelectId, id]);
     } else {
       const indexItem = listCheckCartCopy.findIndex(
-        (item: ICartItem) => item._id === id
+        (item: ICartItem<IProductRes>) => item._id === id
       );
       listCheckCartCopy.splice(indexItem, 1);
-      setListSelectItem((preData) => {
+      setListSelectId((preData) => {
         return preData.filter((value) => id !== value);
       });
     }
@@ -40,7 +41,7 @@ function Content() {
   const handleUpdateCartItem = (id: string, quantity: number) => {
     const listCheckCartCopy = [...listCheckCart];
     const indexItem = listCheckCartCopy.findIndex(
-      (item: ICartItem) => item._id === id
+      (item: ICartItem<IProductRes>) => item._id === id
     );
     if (indexItem > -1) {
       const cartItemUpdate = { ...listCheckCartCopy[indexItem], quantity };
@@ -51,21 +52,21 @@ function Content() {
 
   const handleDeleteItem = (id: string) => {
     const indexItemListCart = listCheckCart.findIndex(
-      (item: ICartItem) => item._id === id
+      (item: ICartItem<IProductRes>) => item._id === id
     );
-    const indexSelectItem = listSelectItem.findIndex((item) => item === id);
+    const indexSelectItem = listSelectId.findIndex((item) => item === id);
     if (indexItemListCart > -1) {
       listCheckCart.splice(indexItemListCart, 1);
     }
     if (indexSelectItem > -1) {
-      listSelectItem.splice(indexSelectItem, 1);
+      listSelectId.splice(indexSelectItem, 1);
     }
   };
 
   return (
     <Fragment>
       <section className="w-full mt-5">
-        {listProductActiveToCart.map((item: ICartItem) => {
+        {listProductActiveToCart.map((item: ICartItem<IProductRes>) => {
           return (
             <CartItem
               key={item._id}
@@ -73,7 +74,7 @@ function Content() {
               handleCheckCart={handleCheckCart}
               handleUpdateCartItem={handleUpdateCartItem}
               handleDeleteItem={handleDeleteItem}
-              isChecked={listSelectItem.includes(item._id) ? true : false}
+              isChecked={listSelectId.includes(item._id) ? true : false}
             ></CartItem>
           );
         })}

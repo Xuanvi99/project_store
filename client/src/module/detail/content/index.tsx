@@ -10,7 +10,7 @@ import LayoutMain from "@/layout/LayoutMain";
 import LoadingSpinner from "../../../components/loading/index";
 
 function DetailContent() {
-  const { status, isFetching } = useTestContext<IProductDetailProvide>(
+  const { status, isLoading } = useTestContext<IProductDetailProvide>(
     PDetailContext as React.Context<IProductDetailProvide>
   );
 
@@ -35,7 +35,7 @@ function DetailContent() {
     );
   }
 
-  if (status === "pending" && isFetching) {
+  if (status === "pending" && isLoading) {
     return (
       <LayoutMain className="flex items-center justify-center h-screen">
         <LoadingSpinner className="w-16 h-16 border-4 border-orangeFe border-r-transparent"></LoadingSpinner>

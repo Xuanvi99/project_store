@@ -1,8 +1,5 @@
 import ReviewsComment from "./ReviewsComment";
 import { IconStar } from "@/components/icon";
-import { useToggle } from "@/hook";
-import Modal from "@/components/modal";
-import FormComment from "./comment";
 import useTestContext from "@/hook/useTestContext";
 import { IProductDetailProvide, PDetailContext } from "../context";
 import { useEffect, useState } from "react";
@@ -13,7 +10,7 @@ function ProductReviews() {
   const { data } = useTestContext<IProductDetailProvide>(
     PDetailContext as React.Context<IProductDetailProvide>
   );
-  const { toggle: showModal, handleToggle: handleShowModal } = useToggle();
+
   const [star, setStar] = useState<string>("0");
 
   useEffect(() => {
@@ -29,18 +26,26 @@ function ProductReviews() {
     }
   }, [data]);
 
-  if (!data) return <></>;
-
   return (
     <section className="w-full mt-5 bg-white rounded-md py-5 px-[10px]">
       <h1 className="text-lg font-bold">ĐÁNH GIÁ - NHẬN XÉT TỪ KHÁCH HÀNG</h1>
       <div className="max-w-[1000px] w-full mx-auto mt-5 ">
-        <div className=" w-full mt-5 grid grid-cols-[200px_600px_200px] border-grayCa border-[1px] py-4">
-          <div className="flex items-center justify-center text-orange gap-x-2">
-            <span className="flex items-end justify-center text-3xl gap-x-2">
-              {star[0] + "." + star[1]}/5.0
+        <div className=" w-full mt-5 grid grid-cols-[200px_800px] border-grayCa border-[1px] py-4">
+          <div className="flex flex-col items-center justify-center text-orange">
+            <div className="flex items-baseline justify-center gap-x-1">
+              <span className="flex items-end justify-center text-3xl gap-x-2">
+                {star[0] + "." + star[1]}
+              </span>
+              <span>trên</span>
+              <span>5</span>
+            </div>
+            <span className="flex">
+              {Array(5)
+                .fill(0)
+                .map((_, index) => (
+                  <IconStar size={20} key={index}></IconStar>
+                ))}
             </span>
-            <IconStar size={20}></IconStar>
           </div>
           <div className="flex justify-center gap-x-3 flex-wrap max-h-[40px] ">
             {listStar.length > 0 &&
@@ -55,7 +60,7 @@ function ProductReviews() {
                 );
               })}
           </div>
-          <div className="flex items-center justify-center">
+          {/* <div className="flex items-center justify-center">
             <button
               onClick={handleShowModal}
               type="button"
@@ -74,7 +79,7 @@ function ProductReviews() {
                 }}
               ></FormComment>
             </Modal>
-          </div>
+          </div> */}
         </div>
         <ReviewsComment></ReviewsComment>
       </div>

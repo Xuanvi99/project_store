@@ -1,12 +1,12 @@
-import { IconChevronRight } from "../icon";
-import { cn } from "../../utils";
-import { Link } from "react-router-dom";
+// import { IconChevronRight } from "../icon";
+// import { cn } from "../../utils";
+// import { Link } from "react-router-dom";
 
 export default function BannerHome() {
   return (
     <section className="w-full h-[620px] banner-Slideshows">
-      <div className="max-w-[1200px] h-full mx-auto px-[30px] pt-[150px]">
-        <div className="flex gap-x-[30px]">
+      <div className="max-w-[1200px] mx-auto max-h-[400px] flex pt-[150px]">
+        {/* <div className="flex gap-x-[30px]">
           <div className="pl-[25px] py-[27px] max-w-[475px] flex flex-col gap-y-[30px] overflow-hidden">
             <h2 className="text-6xl font-bold text-orange">
               Nike New Collection!
@@ -34,11 +34,22 @@ export default function BannerHome() {
           <div className="max-w-[635px] relative w-full h-[450px] z-40">
             <img
               alt=""
+              loading="lazy"
               srcSet="/banner-shoes.png"
               className="absolute w-full h-auto -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 -rotate-3"
             />
           </div>
-        </div>
+        </div> */}
+        <img
+          alt=""
+          srcSet="./Banner1.png"
+          className="h-[400px] w-[800px] object-cover"
+        />
+        <img
+          alt=""
+          srcSet="./banner2.png"
+          className="h-[400px] min-w-[400px] object-cover"
+        />
       </div>
     </section>
   );

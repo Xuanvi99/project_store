@@ -79,6 +79,7 @@ const Gallery = () => {
               <SwiperSlide key={index}>
                 <img
                   alt=""
+                  loading="lazy"
                   srcSet={image.url}
                   data-index={index}
                   className="object-cover"
@@ -149,7 +150,7 @@ const Gallery = () => {
                   return (
                     <SwiperSlide key={index} onClick={handleShowModal}>
                       <div className="flex justify-center h-full">
-                        <img alt="" srcSet={image.url} loading="lazy" />
+                        <img alt="" loading="lazy" srcSet={image.url} />
                       </div>
                     </SwiperSlide>
                   );

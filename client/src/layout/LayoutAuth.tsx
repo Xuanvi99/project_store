@@ -9,7 +9,12 @@ function LayoutAuth({ children }: TProps) {
       <section className="w-full min-h-[600px] bg-orangeLinear flex justify-center items-center">
         <div className="w-[900px] h-[550px] flex rounded-xl shadow-lg shadow-black overflow-hidden">
           <div className="w-1/2 h-full rounded-l-xl">
-            <img alt="" srcSet="/imageLogin.png" className="w-full h-full" />
+            <img
+              alt=""
+              loading="lazy"
+              srcSet="/imageLogin.png"
+              className="w-full h-full"
+            />
           </div>
           <div className="w-1/2 h-full bg-white">{children}</div>
         </div>

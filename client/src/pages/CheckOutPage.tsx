@@ -1,5 +1,3 @@
-import { Fragment } from "react";
-import { BannerCommon } from "../components/banner";
 import LayoutMain from "../layout/LayoutMain";
 import AddressCheckout from "@/module/checkout/address";
 import ListProductOrder from "@/module/checkout/content";
@@ -8,19 +6,13 @@ import InfoOrder from "@/module/checkout/infoOrder";
 
 function CheckOutPage() {
   return (
-    <Fragment>
-      <BannerCommon
-        heading="Đặt hàng"
-        title="Thông tin đơn hàng"
-      ></BannerCommon>
-      <LayoutMain>
-        <CheckoutProvide>
-          <AddressCheckout></AddressCheckout>
-          <ListProductOrder></ListProductOrder>
-          <InfoOrder></InfoOrder>
-        </CheckoutProvide>
-      </LayoutMain>
-    </Fragment>
+    <LayoutMain className="mt-10 CheckOut">
+      <CheckoutProvide>
+        <AddressCheckout></AddressCheckout>
+        <ListProductOrder></ListProductOrder>
+        <InfoOrder></InfoOrder>
+      </CheckoutProvide>
+    </LayoutMain>
   );
 }
 
