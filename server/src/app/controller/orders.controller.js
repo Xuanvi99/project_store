@@ -164,10 +164,12 @@ class Order {
         });
         totalPage = Math.ceil(amountOrder.length / limit);
       } else if (!search && status) {
-        amountOrder = await orderModel.find({
+        const listOrderItem = await orderModel.find({
           $and: [{ userId }, { status: { $regex: status, $options: "i" } }],
         });
+        amountOrder = listOrderItem.length;
         totalPage = Math.ceil(amountOrder / limit);
+        console.log("totalPage: ", totalPage);
       } else {
         amountOrder = await orderModel.countDocuments();
         totalPage = Math.ceil(amountOrder / limit);
@@ -198,17 +200,16 @@ class Order {
   };
 
   getDetailOrder = async (req, res) => {
-    const orderId = req.params.orderId;
-    if (!orderId)
-      return res.status(403).json({ errMessage: "Id order undefine" });
+    const codeOrder = req.params.codeOrder;
+    if (!codeOrder)
+      return res.status(403).json({ errMessage: "Code order undefine" });
     try {
-      const order = await orderModel.findById(orderId).populate([
+      const order = await orderModel.findOne({ codeOrder }).populate([
         {
           path: "listProducts",
           populate: {
             path: "productId",
             model: "products",
-            select: "_id name thumbnail",
             populate: {
               path: "thumbnail",
               model: "images",
@@ -220,11 +221,11 @@ class Order {
       ]);
 
       if (!order) {
-        return res.status(404).json({ errMessage: "Id not exit in Order" });
+        return res
+          .status(404)
+          .json({ errMessage: "Code order not exit in Order" });
       }
       res.status(200).json({ data: order });
-
-      return res.status(400).json({ message: "Item does not exist in cart" });
     } catch (error) {
       return res.status(500).json({ errMessage: "server error" });
     }
@@ -294,9 +295,11 @@ class Order {
         }
       }
       session.endSession();
-      res
-        .status(200)
-        .json({ message: "Create order success", orderId: result._id });
+      res.status(200).json({
+        message: "Create order success",
+        codeOrder: result.codeOrder,
+        orderId: result._id,
+      });
     } catch (error) {
       console.log("error: ", error);
       session.abortTransaction();
@@ -308,10 +311,11 @@ class Order {
   };
 
   cancelledOrder = async (req, res) => {
-    const orderId = req.params.orderId;
+    const codeOrder = req.params.codeOrder;
+    if (!codeOrder)
+      return res.status(403).json({ errMessage: "Code order undefine" });
     try {
-      const order = await orderModel.findById(orderId);
-
+      const order = await orderModel.findOne({ codeOrder });
       if (!order) {
         return res.status(404).json({ errMessage: "Order not found!" });
       }

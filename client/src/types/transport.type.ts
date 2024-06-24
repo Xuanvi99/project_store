@@ -12,6 +12,12 @@ export interface shippingFee {
   width: number;
 }
 
+export interface serviceShip {
+  shop_id: number;
+  from_district: number;
+  to_district: number;
+}
+
 export interface timeShipping {
   service_id: number;
   from_district_id: number;
@@ -33,6 +39,11 @@ export type resShippingFee = {
   pick_station_fee: number;
   coupon_value: number;
   r2s_fee: number;
+};
+
+export type resServiceShip = {
+  service_id: number;
+  short_name: string;
 };
 
 const exampleTimeShipping = {

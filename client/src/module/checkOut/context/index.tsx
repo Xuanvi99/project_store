@@ -83,6 +83,7 @@ const CheckoutProvide = ({ children }: { children: React.ReactNode }) => {
     shippingUnit: "",
     delivery_at: deliveryTime,
   });
+  console.log(reqOrder);
 
   useEffect(() => {
     if (listProductOrder.length > 0) {

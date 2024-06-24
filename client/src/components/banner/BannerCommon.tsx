@@ -4,7 +4,7 @@ import IconChevronRight from "../icon/IconChevronRight";
 function BannerCommon({ heading, title }: { heading: string; title?: string }) {
   return (
     <section className="banner-Common w-full h-[400px] border-b-4 border-b-orange">
-      <div className="max-w-[1200px] h-full mx-auto px-[30px] pt-[130px] text-white font-bold">
+      <div className="w-full max-w-[1200px] h-full mx-auto px-[30px] pt-[130px] text-white font-bold">
         <div className="py-[80px] flex justify-end">
           <div className="flex flex-col w-[40%] gap-y-3">
             <h1 className="text-4xl">{heading}</h1>

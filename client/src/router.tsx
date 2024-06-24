@@ -57,10 +57,6 @@ const router = createBrowserRouter([
             path: "/product_detail/:slug",
             element: <ProductDetailPage></ProductDetailPage>,
           },
-          {
-            path: "*",
-            element: <NotFoundPage></NotFoundPage>,
-          },
         ],
       },
       {
@@ -80,8 +76,12 @@ const router = createBrowserRouter([
             element: <CheckOutPage></CheckOutPage>,
           },
           {
-            path: "/payment/",
+            path: "/payment/:codeOrder",
             element: <PaymentPage></PaymentPage>,
+          },
+          {
+            path: "*",
+            element: <NotFoundPage></NotFoundPage>,
           },
         ],
       },

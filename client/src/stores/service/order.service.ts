@@ -20,24 +20,24 @@ export const orderApi = createApi({
   endpoints: (build) => ({
     getListOrderUser: build.query<
       IGetResponsive,
-      { id: string; params: paramsGetListOrder }
+      { userId: string; params: paramsGetListOrder }
     >({
-      query: ({ id, params }) => ({
-        url: "order/getOrderUser/" + id,
+      query: ({ userId, params }) => ({
+        url: "order/getOrderUser/" + userId,
         method: "GET",
         params: { ...params },
       }),
       keepUnusedDataFor: 0,
       serializeQueryArgs: ({ queryArgs }) => {
-        const { id, params } = queryArgs;
+        const { userId, params } = queryArgs;
         const { limit, status, search } = params;
-        return `order/getOrderUser/${id}?limit=${limit}&search=${status}&status=${search}`;
+        return `order/getOrderUser/${userId}?limit=${limit}&search=${status}&status=${search}`;
       },
 
       merge: (currentCache, newItems, { arg }) => {
-        // console.log("arg: ", arg);
-        // console.log("currentCache: ", currentCache.data.length);
-        // console.log("newItems", newItems.data);
+        console.log("arg: ", arg);
+        console.log("currentCache: ", currentCache.data.length);
+        console.log("newItems", newItems.data);
         const { activePage, status } = arg.params;
         const currentActivePage = Math.ceil(currentCache.data.length / 4);
         const deleteCount =
@@ -67,9 +67,9 @@ export const orderApi = createApi({
       providesTags: (result) =>
         result
           ? [
-              ...result.data.map(({ _id }) => ({
+              ...result.data.map(({ codeOrder }) => ({
                 type: "Orders" as const,
-                id: _id,
+                id: codeOrder,
               })),
               { type: "Orders", id: "ORDER_LOAD_MORE" },
             ]
@@ -77,20 +77,32 @@ export const orderApi = createApi({
     }),
     getAmountOrderUser: build.query<
       { amountOrder: number },
-      { id: string; statusOrder: string }
+      { userId: string; statusOrder: string }
     >({
-      query: ({ id, statusOrder }) => ({
-        url: "order/getAmountOrderUser/" + id,
+      query: ({ userId, statusOrder }) => ({
+        url: "order/getAmountOrderUser/" + userId,
         method: "GET",
         params: { statusOrder },
       }),
       providesTags: (result, error, data) => [
-        { type: "Orders", id: data.id },
+        { type: "Orders", id: data.userId },
         { type: "Orders", id: data.statusOrder },
       ],
     }),
+    getOrderDetail: build.query<{ data: IResOrder }, string>({
+      query: (codeOrder) => ({
+        url: "order/getDetailOrder/" + codeOrder,
+        method: "get",
+      }),
+      providesTags: (result, error, codeOrder) => [
+        {
+          type: "Orders",
+          id: codeOrder,
+        },
+      ],
+    }),
     createOrder: build.mutation<
-      { message: string; orderId: string },
+      { message: string; codeOrder: string; orderId: string },
       IReqOrder
     >({
       query: (body) => ({
@@ -100,17 +112,18 @@ export const orderApi = createApi({
       }),
       invalidatesTags: ["Orders"],
     }),
+
     EditCancelledOrder: build.mutation<
       { message: string; orderId: string },
-      { id: string; body: reqCancelledOrder }
+      { codeOrder: string; body: reqCancelledOrder }
     >({
-      query: ({ id, body }) => ({
-        url: "order/cancelled/" + id,
+      query: ({ codeOrder, body }) => ({
+        url: "order/cancelled/" + codeOrder,
         method: "PUT",
         body,
       }),
       invalidatesTags: (result, error, data) => [
-        { type: "Orders", id: data.id },
+        { type: "Orders", id: data.codeOrder },
         { type: "Orders", id: "pending" },
       ],
     }),
@@ -122,4 +135,6 @@ export const {
   useGetListOrderUserQuery,
   useGetAmountOrderUserQuery,
   useEditCancelledOrderMutation,
+  useLazyGetAmountOrderUserQuery,
+  useLazyGetOrderDetailQuery,
 } = orderApi;

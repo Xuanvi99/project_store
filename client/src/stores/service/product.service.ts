@@ -79,7 +79,7 @@ export const productApi = createApi({
           : [{ type: "Product", id: "LOAD_MORE" }],
     }),
     getOneProduct: build.query<IResProductDetail, string>({
-      query: (slugOrId) => ({ url: "product/" + slugOrId }),
+      query: (id) => ({ url: "product/" + id }),
       providesTags: (result, error, id) => [{ type: "Product", id }],
     }),
     addProduct: build.mutation<{ message: string }, FormData>({

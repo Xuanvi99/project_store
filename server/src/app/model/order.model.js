@@ -61,7 +61,7 @@ const OrderSchema = new Schema(
       default: constants.ORDER.PAYMENT_STATUS.PENDING,
     },
 
-    codePayment: {
+    codeBill: {
       type: String,
       default: function () {
         if (this.paymentMethod !== "cod") {
@@ -73,6 +73,7 @@ const OrderSchema = new Schema(
     },
 
     shippingFee: { type: Number, required: true },
+    subTotal: { type: Number, required: true },
     total: { type: Number, required: true },
 
     shippingUnit: {

@@ -29,7 +29,7 @@ routes.route("/api/product/filter").get(productCtrl.getListProductFilter);
 
 routes.route("/api/product/test").post(productCtrl.updateAbc);
 
-routes.route("/api/product/:slug").get(productCtrl.getOneProduct);
+routes.route("/api/product/:productId").get(productCtrl.getOneProduct);
 
 routes
   .route("/api/product/:productId")

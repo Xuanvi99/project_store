@@ -1,18 +1,8 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { Link } from "react-router-dom";
 
-export default function Thumbnails({
-  src,
-  path,
-}: {
-  src: string;
-  path: string;
-}) {
+export default function Thumbnails({ src }: { src: string }) {
   return (
-    <Link
-      to={path}
-      className="w-full min-h-[250px] overflow-hidden cursor-pointer"
-    >
+    <div className="w-full min-h-[250px] overflow-hidden cursor-pointer">
       <LazyLoadImage
         alt="Thumbnails"
         placeholderSrc={src}
@@ -20,6 +10,6 @@ export default function Thumbnails({
         effect="blur"
         className="hover:scale-[1.1] duration-500"
       />
-    </Link>
+    </div>
   );
 }

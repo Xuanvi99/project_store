@@ -8,14 +8,15 @@ import { formatPrice } from "@/utils";
 import { IconAlert } from "@/components/icon";
 import Tooltip from "@/components/tooltip";
 import { useCreateOrderMutation } from "@/stores/service/order.service";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import { ModalNotification } from "@/components/modal";
 import LoadingSpinner from "../../../components/loading/index";
 import { useDeleteCartMultipleMutation } from "@/stores/service/cart.service";
-import { useAppSelector } from "@/hook";
+import { useAppDispatch, useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
 import { useNavigate } from "react-router-dom";
 import { QueryStatus } from "@reduxjs/toolkit/query";
+import { productApi } from "@/stores/service/product.service";
 
 function InfoOrder() {
   const {
@@ -32,6 +33,7 @@ function InfoOrder() {
   );
 
   const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
 
@@ -45,12 +47,21 @@ function InfoOrder() {
     if (user) {
       await createOrder(reqOrder)
         .unwrap()
-        .then(async () => {
+        .then(async (res) => {
           const listIdProduct = listProductOrder.map((item) => item._id);
           await deleteCartMultiple({ id: user._id, listIdProduct }).unwrap();
-          navigate("/user/account/purchaseOrder?type=2", {
-            replace: true,
-          });
+          localStorage.removeItem("selectProductCart");
+          dispatch(productApi.util.invalidateTags(["Product"]));
+          if (paymentMethod === "cod") {
+            navigate("/user/account/purchaseOrder?type=2", {
+              replace: true,
+            });
+          } else {
+            navigate("/payment/" + res.codeOrder, {
+              replace: true,
+              state: { totalPricePayment: totalPayment },
+            });
+          }
         })
         .catch(() => {
           setOpenModal(true);
@@ -70,8 +81,6 @@ function InfoOrder() {
       return <span>Lỗi đặt đơn hàng</span>;
     }
   };
-
-  useEffect(() => {}, []);
 
   return (
     <Fragment>

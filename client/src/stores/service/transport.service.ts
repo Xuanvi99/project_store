@@ -1,6 +1,8 @@
 import {
+  resServiceShip,
   resShippingFee,
   resTimeShipping,
+  serviceShip,
   shippingFee,
   timeShipping,
 } from "@/types/transport.type";
@@ -38,6 +40,13 @@ export const transportApi = createApi({
     postShippingFee: build.mutation<responsive<resShippingFee>, shippingFee>({
       query: (body) => ({
         url: "v2/shipping-order/fee",
+        method: "POST",
+        body,
+      }),
+    }),
+    postServiceShip: build.mutation<responsive<resServiceShip[]>, serviceShip>({
+      query: (body) => ({
+        url: "v2/shipping-order/available-services",
         method: "POST",
         body,
       }),
@@ -83,4 +92,5 @@ export const {
   usePostDistrictMutation,
   usePostWardMutation,
   usePostTimeShippingMutation,
+  usePostServiceShipMutation,
 } = transportApi;

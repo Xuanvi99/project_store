@@ -6,6 +6,7 @@ import CardSales from "./Sale.card";
 import OutOfStock from "./OutOfStock.card";
 import CardExpired from "./CardExpired";
 import { formatPrice } from "@/utils";
+import { Link } from "react-router-dom";
 
 interface ICardItemProps {
   product: IProductRes;
@@ -13,7 +14,10 @@ interface ICardItemProps {
 
 function Card({ product }: ICardItemProps) {
   return (
-    <div className="relative rounded-sm card-item shadow-shadow77 shadow-grayCa bg-grayF5">
+    <Link
+      to={`/product_detail/${product?.slug}_${product?._id}`}
+      className="relative rounded-sm card-item shadow-shadow77 cursor-pointer shadow-grayCa bg-grayF5"
+    >
       {product.is_sale === "sale" && (
         <CardSales
           discount={Math.ceil(
@@ -22,15 +26,9 @@ function Card({ product }: ICardItemProps) {
         ></CardSales>
       )}
       <div className="flex flex-col">
-        <Card.Thumbnails
-          src={product?.thumbnail.url || ""}
-          path={`/product_detail/${product?.slug}`}
-        ></Card.Thumbnails>
+        <Card.Thumbnails src={product?.thumbnail.url || ""}></Card.Thumbnails>
         <div className="flex flex-col flex-1 text-sm gap-y-4 p-[10px]">
-          <Card.Heading
-            title={product?.name || ""}
-            path={`/product_detail/${product?.slug}`}
-          ></Card.Heading>
+          <Card.Heading title={product?.name || ""}></Card.Heading>
           {!product.inventoryId.stocked && (
             <Card.Info title="Giá">
               <span
@@ -56,7 +54,7 @@ function Card({ product }: ICardItemProps) {
       </div>
       {product.inventoryId.stocked && <Card.OutOfStock />}
       {product.status === "inactive" && <Card.CardExpired />}
-    </div>
+    </Link>
   );
 }
 

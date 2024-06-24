@@ -1,6 +1,6 @@
 import { IconChevronRight } from "@/components/icon";
 import { cn } from "@/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as marked from "marked";
 import useTestContext from "@/hook/useTestContext";
 import { IProductDetailProvide, PDetailContext } from "../context";
@@ -10,7 +10,14 @@ function ProductDesc() {
     PDetailContext as React.Context<IProductDetailProvide>
   );
   const [heightDesc, setHeightDesc] = useState<string>("200px");
-  const [openDesc, setOpenDesc] = useState(true);
+  const [openDesc, setOpenDesc] = useState(false);
+  console.log("openDesc: ", openDesc);
+
+  useEffect(() => {
+    setOpenDesc(false);
+    setHeightDesc("200px");
+  }, [data]);
+
   return (
     <section className="w-full mt-5 bg-white rounded-md py-5 px-[10px]">
       <h1 className="text-lg font-bold">MÔ TẢ SẢN PHẨM</h1>
@@ -18,23 +25,18 @@ function ProductDesc() {
         style={{ height: heightDesc }}
         className="relative w-full mt-5 overflow-hidden"
       >
-        <div className="w-full px-5">
+        <div className="w-full px-5 flex flex-col justify-center items-center">
           <div
             dangerouslySetInnerHTML={{
-              __html: marked
-                .use({
-                  mangle: false,
-                  headerIds: false,
-                })
-                .parse(data && data?.desc ? data?.desc : ""),
+              __html: marked.parse(data && data?.desc ? data?.desc : ""),
             }}
           ></div>
         </div>
-        {openDesc && (
+        {!openDesc && (
           <div
             onClick={() => {
               setHeightDesc("auto");
-              setOpenDesc(false);
+              setOpenDesc(true);
             }}
             className={cn(
               "flex items-center justify-center absolute left-0 bottom-0 bg-white z-30 w-full h-16 ",

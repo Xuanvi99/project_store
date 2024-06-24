@@ -2,7 +2,7 @@ const config = require("config");
 const querystring = require("qs");
 const moment = require("moment");
 const crypto = require("crypto");
-
+const { orderModel } = require("../model");
 function sortObject(obj) {
   let sorted = {};
   let str = [];
@@ -20,8 +20,9 @@ function sortObject(obj) {
 }
 
 class VnPay {
-  createPaymentUrl = (req, res) => {
+  createPaymentUrl = async (req, res) => {
     try {
+      const codeOrder = req.body.codeOrder;
       let date = new Date();
       let createDate = moment(date).format("YYYYMMDDHHmmss");
 
@@ -34,9 +35,9 @@ class VnPay {
       let tmnCode = config.get("vnp_TmnCode");
       let secretKey = config.get("vnp_HashSecret");
       let vnpUrl = config.get("vnp_Url");
-      let returnUrl = config.get("vnp_ReturnUrl");
-      let orderId = moment(date).format("DDHHmmss");
-      let amount = req.body.totalPriceOrder;
+      let returnUrl = config.get("vnp_ReturnUrl") + `${codeOrder}`;
+      let codeBill = moment(date).format("DDHHmmss");
+      let amount = req.body.totalPricePayment;
       let bankCode = req.body.bankCode;
 
       let locale = req.body.language;
@@ -50,8 +51,8 @@ class VnPay {
       vnp_Params["vnp_TmnCode"] = tmnCode;
       vnp_Params["vnp_Locale"] = locale;
       vnp_Params["vnp_CurrCode"] = currCode;
-      vnp_Params["vnp_TxnRef"] = orderId;
-      vnp_Params["vnp_OrderInfo"] = "Thanh toan cho ma HD:" + orderId;
+      vnp_Params["vnp_TxnRef"] = codeBill;
+      vnp_Params["vnp_OrderInfo"] = "Thanh toan cho ma GD:" + codeBill;
       vnp_Params["vnp_OrderType"] = "other";
       vnp_Params["vnp_Amount"] = amount * 100;
       vnp_Params["vnp_ReturnUrl"] = returnUrl;
@@ -77,7 +78,7 @@ class VnPay {
     }
   };
 
-  returnPayment = (req, res) => {
+  returnPayment = async (req, res) => {
     try {
       let vnp_Params = req.query;
 
@@ -108,13 +109,17 @@ class VnPay {
     }
   };
 
-  vnpay_ipn = (req, res) => {
-    console.log("vnpay_ipn");
+  vnpay_ipn = async (req, res) => {
+    const codeOrder = req.params.codeOrder;
+    console.log("codeOrder: ", codeOrder);
+
     let vnp_Params = req.query;
     console.log("vnp_Params: ", vnp_Params);
+
     let secureHash = vnp_Params["vnp_SecureHash"];
 
-    let orderId = vnp_Params["vnp_TxnRef"];
+    let codeBill = vnp_Params["vnp_TxnRef"];
+    let price = vnp_Params["vnp_Amount"];
     let rspCode = vnp_Params["vnp_ResponseCode"];
 
     delete vnp_Params["vnp_SecureHash"];
@@ -129,40 +134,79 @@ class VnPay {
     let hmac = crypto.createHmac("sha512", secretKey);
     let signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
 
-    let paymentStatus = "0";
+    let paymentStatus;
+    let checkOrderId;
+    let checkPrice;
 
-    let checkOrderId = true;
-    let checkAmount = true;
+    const order = await orderModel
+      .findOne({ codeOrder })
+      .populate([
+        {
+          path: "listProducts",
+          populate: {
+            path: "productId",
+            model: "products",
+            select: "_id name thumbnail",
+            populate: {
+              path: "thumbnail",
+              model: "images",
+              select: "url",
+            },
+          },
+        },
+        { path: "canceller", model: "users", select: "_id role" },
+      ])
+      .exec();
+    console.log(order);
+
+    if (order) {
+      paymentStatus = order.paymentStatus;
+      checkOrderId = true;
+      checkPrice = order.total === +price / 100 ? true : false;
+    } else {
+      checkOrderId = false;
+    }
+    console.log(order);
+
     if (secureHash === signed) {
       if (checkOrderId) {
-        if (checkAmount) {
-          if (paymentStatus == "0") {
-            //kiểm tra tình trạng giao dịch trước khi cập nhật tình trạng thanh toán
+        if (checkPrice) {
+          if (paymentStatus == "pending") {
             if (rspCode == "00") {
-              //thanh cong
-              //paymentStatus = '1'
-              // Ở đây cập nhật trạng thái giao dịch thanh toán thành công vào CSDL của bạn
-              res.status(200).json({ RspCode: "00", Message: "Success" });
+              await order.updateOne({ paymentStatus: "paid", codeBill });
+              return res.status(200).json({
+                RspCode: "00",
+                Message: "Success payment",
+                data: order,
+              });
             } else {
-              //that bai
-              //paymentStatus = '2'
-              // Ở đây cập nhật trạng thái giao dịch thanh toán thất bại vào CSDL của bạn
-              res.status(200).json({ RspCode: "00", Message: "Success" });
+              return res.status(200).json({
+                RspCode: rspCode,
+                Message: "error payment",
+                data: order,
+              });
             }
           } else {
-            res.status(200).json({
+            return res.status(200).json({
               RspCode: "02",
               Message: "This order has been updated to the payment status",
+              data: order,
             });
           }
         } else {
-          res.status(200).json({ RspCode: "04", Message: "Amount invalid" });
+          return res
+            .status(200)
+            .json({ RspCode: "04", Message: "Amount invalid" });
         }
       } else {
-        res.status(200).json({ RspCode: "01", Message: "Order not found" });
+        return res
+          .status(200)
+          .json({ RspCode: "01", Message: "Order not found" });
       }
     } else {
-      res.status(200).json({ RspCode: "97", Message: "Checksum failed" });
+      return res
+        .status(200)
+        .json({ RspCode: "97", Message: "Checksum failed" });
     }
   };
 }

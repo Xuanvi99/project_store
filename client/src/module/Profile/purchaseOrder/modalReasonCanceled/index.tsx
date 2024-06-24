@@ -21,7 +21,7 @@ type TProps = {
     overlay?: string;
     content?: string;
   };
-  id: string;
+  codeOrder: string;
 };
 
 const validationSchema = Yup.object({
@@ -30,7 +30,12 @@ const validationSchema = Yup.object({
 
 type FormValues = Yup.InferType<typeof validationSchema>;
 
-function ModalReasonCanceled({ isOpenModal, onClick, className, id }: TProps) {
+function ModalReasonCanceled({
+  isOpenModal,
+  onClick,
+  className,
+  codeOrder,
+}: TProps) {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
 
   const { control, handleSubmit, watch, reset } = useForm<FormValues>({
@@ -49,7 +54,7 @@ function ModalReasonCanceled({ isOpenModal, onClick, className, id }: TProps) {
         reasonCanceled: data.reasonCanceled,
         canceller: user._id,
       };
-      await editCancelledOrder({ id, body })
+      await editCancelledOrder({ codeOrder, body })
         .unwrap()
         .then(() => {
           reset({ reasonCanceled: "" });
@@ -101,17 +106,17 @@ function ModalReasonCanceled({ isOpenModal, onClick, className, id }: TProps) {
           >
             Trở lại
           </Button>
-          <Button
-            variant="default"
-            type="submit"
-            disabled={!watch("reasonCanceled") ? true : false}
-          >
-            {isLoading ? (
-              <LoadingSpinner className="w-10 h-10 max-w-[150px]"></LoadingSpinner>
-            ) : (
+          {isLoading ? (
+            <LoadingSpinner className="w-10 h-10 max-w-[150px]"></LoadingSpinner>
+          ) : (
+            <Button
+              variant="default"
+              type="submit"
+              disabled={!watch("reasonCanceled") ? true : false}
+            >
               "Hủy đơn hàng"
-            )}
-          </Button>
+            </Button>
+          )}
         </div>
       </form>
     </Modal>

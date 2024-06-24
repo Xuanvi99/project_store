@@ -54,22 +54,20 @@ function ListProductOrder() {
         : null,
     []
   );
+  console.log(selectProductToOrder);
 
   useEffect(() => {
     const listSelectProduct: string[] | undefined =
       selectProductToOrder?.listIdProductOrder;
     if (
-      !cart ||
-      cart.listProduct.length === 0 ||
-      !selectProductToOrder ||
-      !orderId ||
-      orderId !== selectProductToOrder.id ||
-      !listSelectProduct ||
-      listSelectProduct?.length === 0
+      cart &&
+      cart.listProduct.length > 0 &&
+      selectProductToOrder &&
+      orderId &&
+      orderId === selectProductToOrder.id &&
+      listSelectProduct &&
+      listSelectProduct?.length > 0
     ) {
-      setOpenModal(true);
-      setCheckOrder(true);
-    } else {
       const array: IOrderItem[] = [];
       for (const idProduct of listSelectProduct) {
         const index = cart.listProduct.findIndex(
@@ -87,6 +85,9 @@ function ListProductOrder() {
         }
       }
       setListProductOrder(array);
+    } else {
+      setOpenModal(true);
+      setCheckOrder(true);
     }
   }, [cart, orderId, selectProductToOrder, setListProductOrder]);
 

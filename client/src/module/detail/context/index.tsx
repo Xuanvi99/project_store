@@ -20,7 +20,7 @@ function ProductDetailProvide({ children }: { children: React.ReactNode }) {
     data: res,
     status,
     isLoading,
-  } = useGetOneProductQuery(slug as string);
+  } = useGetOneProductQuery(slug?.split("_")[1] as string);
 
   return (
     <PDetailContext.Provider

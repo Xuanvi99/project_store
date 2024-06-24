@@ -180,11 +180,11 @@ class Product {
 
   getOneProduct = async (req, res) => {
     try {
-      const slug = req.params.slug;
-      if (!slug)
+      const productId = req.params.productId;
+      if (!productId)
         return res.status(403).json({ errorMessage: "Invalid slug or íd" });
       const product = await productModel
-        .findOne({ slug })
+        .findById(productId)
         .populate([
           { path: "thumbnail", select: "url" },
           { path: "imageIds", select: "url" },

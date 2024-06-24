@@ -27,7 +27,11 @@ function OrderItem({ data }: TProps) {
     status,
     canceller,
     reasonCanceled,
+    paymentMethod,
     canceled_at,
+    paymentStatus,
+    codeBill,
+    codeOrder,
   } = data;
 
   const user = useAppSelector((state: RootState) => state.authSlice.user);
@@ -83,11 +87,23 @@ function OrderItem({ data }: TProps) {
     }
   };
 
+  const handlePayment = () => {
+    navigate("/payment/" + data.codeOrder, {
+      replace: true,
+      state: { totalPricePayment: total },
+    });
+  };
+
   const selectButtonOrder = (status: string) => {
     switch (status) {
       case "pending":
         return (
           <div className="flex items-center justify-end text-sm gap-x-2">
+            {paymentMethod === "vnpay" && paymentStatus !== "paid" && (
+              <Button variant="default" onClick={handlePayment}>
+                Thanh toán
+              </Button>
+            )}
             <Button variant="default" onClick={handleOpenModalReasonCanceled}>
               Hủy đơn hàng
             </Button>
@@ -113,8 +129,8 @@ function OrderItem({ data }: TProps) {
     <>
       <ModalReasonCanceled
         isOpenModal={openModalReasonCanceled}
-        onClick={handleRepurchaseOrder}
-        id={data._id}
+        onClick={handleOpenModalReasonCanceled}
+        codeOrder={data.codeOrder}
       ></ModalReasonCanceled>
       <ModalNotification
         type="info"
@@ -125,35 +141,54 @@ function OrderItem({ data }: TProps) {
         thể mua lại
       </ModalNotification>
       <div className="w-full p-4 bg-white rounded-sm">
-        <div className="flex items-center justify-end pb-3 border-dashed gap-x-2 border-b-1 border-b-grayCa">
-          {status === "completed" && (
-            <>
-              <div className="flex items-center text-xs gap-x-1 text-green ">
-                <IconShoppingFee size={20}></IconShoppingFee>
-                <div className="flex">
-                  <span>Giao hàng thành công</span>
-                  <Tooltip
-                    place="bottom"
-                    select={<IconAlert size={15}></IconAlert>}
-                    className={{
-                      select: "z-40 text-gray",
-                      content: "-translate-x-3/4",
-                    }}
-                  >
-                    <div className="min-w-[150px] h-10 text-xs text-center">
-                      Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
-                    </div>
-                  </Tooltip>
+        <h1 className="py-3 text-xl font-semibold border-dashed border-b-1 border-b-grayCa">
+          + Đơn hàng của bạn{" "}
+          <span className="text-xs font-normal">( id:{codeOrder} )</span>
+        </h1>
+        <div className="flex items-center justify-between py-3 border-dashed gap-x-2 border-b-1 border-b-grayCa">
+          <div>
+            <span>Phương thức thanh toán:</span>
+            <span className=" text-danger">
+              {paymentMethod === "vnpay"
+                ? "Thanh toán qua thẻ (VNPAY)"
+                : "Thanh toán khi nhận hàng (COD)"}
+            </span>
+          </div>
+          <div>
+            {status === "completed" ? (
+              <>
+                <div className="flex items-center text-xs gap-x-1 text-green ">
+                  <IconShoppingFee size={20}></IconShoppingFee>
+                  <div className="flex">
+                    <span>Giao hàng thành công</span>
+                    <Tooltip
+                      place="bottom"
+                      select={<IconAlert size={15}></IconAlert>}
+                      className={{
+                        select: "z-40 text-gray",
+                        content: "-translate-x-3/4",
+                      }}
+                    >
+                      <div className="min-w-[150px] h-10 text-xs text-center">
+                        Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
+                      </div>
+                    </Tooltip>
+                  </div>
                 </div>
-              </div>
-              <div className="bg-grayCa w-[1px] h-[20px]"></div>
-            </>
-          )}
-          <div className=" text-danger">
-            {titleStatusOrder(status).toLocaleUpperCase()}
+                <div className="bg-grayCa w-[1px] h-[20px]"></div>
+              </>
+            ) : (
+              <span>Trạng thái: </span>
+            )}
+            <span className=" text-danger">{titleStatusOrder(status)}</span>
           </div>
         </div>
-        <div className="border-dashed border-b-1 border-b-grayCa">
+        <div
+          className={cn(
+            "border-dashed border-b-1 border-b-grayCa gap-y-2",
+            listProducts.length > 4 && "overflow-y-scroll max-h-[348px]"
+          )}
+        >
           {listProducts &&
             listProducts.map((product) => {
               return (
@@ -163,14 +198,45 @@ function OrderItem({ data }: TProps) {
         </div>
         <div className="flex items-center justify-end p-4 text-sm gap-x-2">
           <span>Phí vận chuyển:</span>
-          <span>{formatPrice(shippingFee)}₫</span>
+          <span
+            className={cn(
+              "flex items-center text-danger",
+              listProducts.length > 2 && "underline"
+            )}
+          >
+            {formatPrice(shippingFee)}₫
+            {listProducts.length > 2 && (
+              <Tooltip
+                place="top"
+                select={<IconAlert size={20}></IconAlert>}
+                className={{
+                  select: "z-40 text-danger",
+                  content: "-translate-x-3/4",
+                }}
+              >
+                <div className="min-w-[150px] h-10 text-xs text-center">
+                  Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
+                </div>
+              </Tooltip>
+            )}
+          </span>
         </div>
-        <div className="border-dashed border-t-1 border-t-grayCa">
-          <div className="flex items-center justify-end p-4 gap-x-2">
-            <span>Thành tiền:</span>
-            <span className="text-xl text-danger">{formatPrice(total)}₫</span>
+        <div className="flex items-center justify-end p-4 gap-x-2 border-dashed border-t-1 border-t-grayCa">
+          <span>Thành tiền:</span>
+          <span className="text-xl text-danger">{formatPrice(total)}₫</span>
+        </div>
+        {paymentMethod === "vnpay" && codeBill && (
+          <div className="flex items-center justify-end p-2 gap-x-2 border-dashed border-t-1 border-t-grayCa">
+            <span>Mã hóa đơn: </span>
+            <span>{codeBill}</span>
           </div>
-        </div>
+        )}
+        {paymentMethod === "vnpay" && (
+          <div className="flex items-center justify-end p-2 gap-x-2 text-danger">
+            {paymentStatus === "paid" ? "(Đã thanh toán)" : "(Chưa thanh toán)"}
+          </div>
+        )}
+
         <div
           className={cn(
             "flex items-center justify-end p-4 gap-x-2",
@@ -202,19 +268,13 @@ function OrderItem({ data }: TProps) {
 
 const ProductItem = ({ data }: { data: TProductOrderItem<IProductRes> }) => {
   const { productId, quantity, price, priceSale, size } = data;
-  const { thumbnail, name, slug } = productId;
+  const { thumbnail, name, slug, _id } = productId;
 
   return (
     <Link
-      to={`/product_detail/${slug}`}
+      to={`/product_detail/${slug}_${_id}`}
       className="flex w-full py-2 cursor-pointer gap-x-3 group"
     >
-      {/* <img
-          loading="lazy"
-          alt="Thumbnail order"
-          srcSet={thumbnail.url}
-          className="w-full h-full"
-        /> */}
       <LazyLoadImage
         alt="order"
         placeholderSrc={thumbnail.url}

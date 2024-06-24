@@ -12,9 +12,11 @@ import { cn } from "@/utils";
 import { CheckoutContext, ICheckoutProvide } from "../context";
 import { useCallback, useEffect, useState } from "react";
 import {
+  usePostServiceShipMutation,
   usePostShippingFeeMutation,
   usePostTimeShippingMutation,
 } from "@/stores/service/transport.service";
+import { resServiceShip } from "@/types/transport.type";
 
 function AddressCheckout() {
   const user: IUser | null = useAppSelector(
@@ -43,6 +45,7 @@ function AddressCheckout() {
 
   const [postShippingFee] = usePostShippingFeeMutation();
   const [postTimeShipping] = usePostTimeShippingMutation();
+  const [postServiceShip] = usePostServiceShipMutation();
 
   const handleShowModal = () => {
     setOpenShowModal(!openShowModal);
@@ -50,39 +53,48 @@ function AddressCheckout() {
 
   const handleCalculateShippingFee = useCallback(async () => {
     if (addressId.districtId > 0) {
-      await postShippingFee({
-        service_id: 53320,
-        insurance_value: 500000,
-        coupon: null,
-        from_district_id: +import.meta.env.VITE_ADDRESS_DISTRICT_STORE,
-        from_ward_code: import.meta.env.VITE_ADDRESS_WARD_STORE,
-        to_district_id: addressId.districtId,
-        to_ward_code: addressId.wardCode,
-        height: 15,
-        length: 15,
-        weight: 1000,
-        width: 15,
+      await postServiceShip({
+        shop_id: +import.meta.env.VITE_SHOP_ID,
+        from_district: +import.meta.env.VITE_ADDRESS_DISTRICT_STORE,
+        to_district: addressId.districtId,
       })
         .unwrap()
-        .then((res) => {
-          setShippingFree(res.data.total);
-        });
-
-      await postTimeShipping({
-        service_id: 53320,
-        from_district_id: +import.meta.env.VITE_ADDRESS_DISTRICT_STORE,
-        from_ward_code: import.meta.env.VITE_ADDRESS_WARD_STORE,
-        to_district_id: addressId.districtId,
-        to_ward_code: addressId.wardCode,
-      })
-        .unwrap()
-        .then((res) => {
-          setDeliveryTime(new Date(res.data.leadtime * 1000));
+        .then(async (res) => {
+          const data: resServiceShip[] = res.data;
+          await postShippingFee({
+            service_id: data[0]?.service_id || 53321,
+            insurance_value: 500000,
+            coupon: null,
+            from_district_id: +import.meta.env.VITE_ADDRESS_DISTRICT_STORE,
+            from_ward_code: import.meta.env.VITE_ADDRESS_WARD_STORE,
+            to_district_id: addressId.districtId,
+            to_ward_code: addressId.wardCode,
+            height: 15,
+            length: 15,
+            weight: 1000,
+            width: 15,
+          })
+            .unwrap()
+            .then((res) => {
+              setShippingFree(res.data.total);
+            });
+          await postTimeShipping({
+            service_id: data[0]?.service_id || 53321,
+            from_district_id: +import.meta.env.VITE_ADDRESS_DISTRICT_STORE,
+            from_ward_code: import.meta.env.VITE_ADDRESS_WARD_STORE,
+            to_district_id: addressId.districtId,
+            to_ward_code: addressId.wardCode,
+          })
+            .unwrap()
+            .then((res) => {
+              setDeliveryTime(new Date(res.data.leadtime * 1000));
+            });
         });
     }
   }, [
     addressId.districtId,
     addressId.wardCode,
+    postServiceShip,
     postShippingFee,
     postTimeShipping,
     setDeliveryTime,

@@ -64,7 +64,7 @@ function PurchaseProvide({ children }: { children: React.ReactNode }) {
     status: statusReq,
   } = useGetListOrderUserQuery(
     {
-      id: user ? user._id : "",
+      userId: user ? user._id : "",
       params,
     },
     { skip: user ? false : true }

@@ -98,7 +98,7 @@ function ContentPurchase() {
         </div>
       )}
       {data.data.length > 0 && (
-        <div className="rounded-sm min-h-[600px] ">
+        <div className="rounded-sm min-h-[600px] mt-5">
           <div className="flex flex-col gap-y-5">
             {data &&
               data.data.map((order, index) => {

@@ -3,6 +3,7 @@ import { IProductRes } from "./product.type";
 export interface IResOrder {
   _id: string;
   userId: string;
+  codeOrder: string;
   customer: {
     name: string;
     phone: string;
@@ -20,7 +21,7 @@ export interface IResOrder {
     | "refund";
   paymentMethod: "cod" | "vnpay";
   paymentStatus: "pending" | "paid" | "cancelled";
-  codePayment?: string;
+  codeBill?: string;
   subTotal: number;
   shippingFee: number;
   total: number;
@@ -44,7 +45,7 @@ export interface IReqOrder {
   status: "pending" | "confirmed" | "shipping" | "completed" | "cancelled";
   paymentMethod: "cod" | "vnpay";
   paymentStatus: "pending" | "paid" | "cancelled";
-  codePayment?: string;
+  codeBill?: string;
   subTotal: number;
   shippingFee: number;
   shippingUnit: string;

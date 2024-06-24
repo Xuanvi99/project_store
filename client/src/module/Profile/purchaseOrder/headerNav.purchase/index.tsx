@@ -55,7 +55,7 @@ const NavItem = ({
 
   const { data: resData, status: statusReq } = useGetAmountOrderUserQuery(
     {
-      id: user ? user._id : "",
+      userId: user ? user._id : "",
       statusOrder: status,
     },
     { skip: user ? (id === 2 || id === 3 || id === 4 ? false : true) : true }
