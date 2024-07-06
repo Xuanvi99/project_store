@@ -1,9 +1,10 @@
 import { lazy } from "react";
-import Navbar from "./navbar";
+import Sidebar from "./sidebar";
 import Header from "./header";
 
 const Product = lazy(() => import("./product"));
 const Comment = lazy(() => import("./comment"));
-const Dashboard = lazy(() => import("./home"));
+const Home = lazy(() => import("./home"));
+const Order = lazy(() => import("./order"));
 
-export { Navbar, Product, Header, Comment, Dashboard };
+export { Sidebar, Product, Header, Comment, Home, Order };

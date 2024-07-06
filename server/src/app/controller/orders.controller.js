@@ -8,44 +8,52 @@ const mongoose = require("mongoose");
 const connection = mongoose.connection;
 
 class Order {
-  getAllOrder = async (req, res) => {
+  getListOrderFilter = async (req, res) => {
+    console.log(req.query);
     try {
       const activePage = +req.query.activePage || 1;
       const search = req.query.search || "";
-      const limit = req.query.limit || 10;
-      const status = req.query.status || "";
+      const limit = +req.query.limit || 10;
       const skip = (activePage - 1) * limit;
+      const paymentMethod = req.query.paymentMethod || "";
+      const paymentStatus = req.query.paymentStatus || "";
+      const statusOrder = req.query.statusOrder || "";
+      const dateStart = req.query.dateStart || null;
+      const dateEnd = req.query.dateEnd || null;
       const listOrder = await orderModel
         .find({
           $and: [
+            { codeOrder: { $regex: search, $options: "i" } },
+            { statusOrder: { $regex: statusOrder, $options: "i" } },
+            { paymentStatus: { $regex: paymentStatus, $options: "i" } },
+            { paymentMethod: { $regex: paymentMethod, $options: "i" } },
             {
-              $or: [
-                { codeOrder: { $regex: search, $options: "i" } },
-                {
-                  nameProducts: {
-                    $elemMatch: {
-                      $regex: search,
-                      $options: "i",
-                    },
-                  },
-                },
-              ],
+              createdAt: {
+                $gte: new Date(dateStart),
+                $lte: new Date(dateEnd),
+              },
             },
-            { status: { $regex: status, $options: "i" } },
           ],
         })
         .populate([
           {
             path: "listProducts",
-            populate: {
-              path: "productId",
-              model: "products",
-              populate: {
-                path: "thumbnail",
-                model: "images",
-                select: "url",
+            populate: [
+              {
+                path: "productId",
+                model: "products",
+                populate: {
+                  path: "thumbnail",
+                  model: "images",
+                  select: "url",
+                },
               },
-            },
+              {
+                path: "userId",
+                model: "users",
+                select: "userName",
+              },
+            ],
           },
           { path: "canceller", model: "users", select: "_id role" },
         ])
@@ -53,30 +61,24 @@ class Order {
         .skip(skip)
         .limit(limit);
 
-      console.log(listOrder);
-
       let totalPage = 0;
       let amountOrder = 0;
       if (search) {
         amountOrder = await orderModel.find({
           $and: [
+            { codeOrder: { $regex: search, $options: "i" } },
+            { statusOrder: { $regex: statusOrder, $options: "i" } },
+            { paymentStatus: { $regex: paymentStatus, $options: "i" } },
             {
-              $or: [
-                { codeOrder: { $regex: search, $options: "i" } },
-                {
-                  nameProducts: {
-                    $elemMatch: {
-                      $regex: search,
-                      $options: "i",
-                    },
-                  },
-                },
-              ],
+              created_at: {
+                $gte: dateStart,
+                $lte: dateEnd,
+              },
             },
-            { status: { $regex: status, $options: "i" } },
           ],
         });
-        totalPage = Math.ceil(amountOrder.length / limit);
+        amountOrder = amountOrder.length;
+        totalPage = Math.ceil(listOrder.length / limit);
       } else {
         amountOrder = await orderModel.countDocuments();
         totalPage = Math.ceil(amountOrder / limit);
@@ -100,7 +102,7 @@ class Order {
       const search = req.query.search || "";
       const limit = req.query.limit || 10;
       const skip = (activePage - 1) * limit;
-      const status = req.query.status || "";
+      const statusOrder = req.query.statusOrder || "";
       const listOrder = await orderModel
         .find({
           $and: [
@@ -118,7 +120,7 @@ class Order {
                 },
               ],
             },
-            { status: { $regex: status, $options: "i" } },
+            { statusOrder: { $regex: statusOrder, $options: "i" } },
           ],
         })
         .populate([
@@ -159,17 +161,20 @@ class Order {
                 },
               ],
             },
-            { status: { $regex: status, $options: "i" } },
+            { statusOrder: { $regex: statusOrder, $options: "i" } },
           ],
         });
+        amountOrder = amountOrder.length;
         totalPage = Math.ceil(amountOrder.length / limit);
-      } else if (!search && status) {
+      } else if (!search && statusOrder) {
         const listOrderItem = await orderModel.find({
-          $and: [{ userId }, { status: { $regex: status, $options: "i" } }],
+          $and: [
+            { userId },
+            { statusOrder: { $regex: statusOrder, $options: "i" } },
+          ],
         });
         amountOrder = listOrderItem.length;
         totalPage = Math.ceil(amountOrder / limit);
-        console.log("totalPage: ", totalPage);
       } else {
         amountOrder = await orderModel.countDocuments();
         totalPage = Math.ceil(amountOrder / limit);
@@ -190,7 +195,7 @@ class Order {
       }
       const statusOrder = req.query.statusOrder || "";
       const listOrder = await orderModel.find({
-        $and: [{ userId }, { status: statusOrder }],
+        $and: [{ userId }, { statusOrder: statusOrder }],
       });
 
       res.status(200).json({ amountOrder: listOrder.length });
@@ -323,7 +328,7 @@ class Order {
       await order
         .updateOne({
           canceled_at: new Date(),
-          status: "cancelled",
+          statusOrder: "cancelled",
           ...req.body,
         })
         .exec()

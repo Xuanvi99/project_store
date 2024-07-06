@@ -6,7 +6,7 @@ import { IconSearch } from "@/components/icon";
 import { useSearchParams } from "react-router-dom";
 import useTestContext from "@/hook/useTestContext";
 import { IPurchaseProvide, PurchaseContext } from "../context";
-import OrderItem from "./OrderItem";
+import OrderItem from "./order";
 
 function ContentPurchase() {
   const { data, isLoading, handleSetParams, params, typePurchase, statusReq } =
@@ -24,9 +24,9 @@ function ContentPurchase() {
     return debounce(
       (event: React.ChangeEvent<HTMLInputElement>) => {
         handleSetParams({
-          search: event.target.value,
+          search: event.target.value.trim(),
           activePage: 1,
-          status: "",
+          statusOrder: "",
         });
         searchParams.set("keyword", event.target.value);
         setSearchParams(searchParams);

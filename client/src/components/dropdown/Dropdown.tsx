@@ -13,6 +13,7 @@ interface IDropdownProps<T> {
   className?: {
     select?: string;
     option?: string;
+    wrap?: string;
   };
   active?: string;
   handleSelect?: (value: string) => void;
@@ -44,13 +45,18 @@ function Dropdown({
   }, [active, title]);
 
   return (
-    <div className={cn("min-w-[150px] bg-white relative rounded-md text-sm")}>
+    <div
+      className={cn(
+        "min-w-[150px] bg-white relative rounded-md text-sm ",
+        className?.wrap
+      )}
+    >
       <Select
         ref={nodeRef}
         onClick={handleShow}
         className={"" + className?.select}
       >
-        <h3>{label}</h3>
+        <h3 className="pr-3">{label}</h3>
         <span className={showOptions ? "rotate-180" : "rotate-0"}>
           <IconDown></IconDown>
         </span>

@@ -8,7 +8,7 @@ import { ModalNotification } from "@/components/modal";
 import { useAddToCartMutation } from "@/stores/service/cart.service";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IUser } from "@/types/user.type";
 
 function InfoShoes() {
@@ -22,6 +22,7 @@ function InfoShoes() {
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { slug } = useParams();
   const redirectUrl = import.meta.env.VITE_DOMAIN_CLIENT + pathname;
 
   const [addToCart] = useAddToCartMutation();
@@ -184,6 +185,17 @@ function InfoShoes() {
       }
     }
   }, [data]);
+
+  useEffect(() => {
+    setSelectSizeQuantityShoes({
+      size: "",
+      quantity: 0,
+    });
+    setSelectSizeQuantityShoes({ size: "", quantity: 0 });
+    setQuantityOrder(1);
+    setOpenModal(false);
+    setNotify({ type: "default", message: "" });
+  }, [slug]);
 
   return (
     <div className="basis-5/12 max-w-[500px]">

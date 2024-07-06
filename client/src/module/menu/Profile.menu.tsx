@@ -60,7 +60,7 @@ function Profile({ displayName }: TProps) {
                   placeholderSrc={user?.avatar?.url || user?.avatarDefault}
                   srcSet={user?.avatar?.url || user?.avatarDefault}
                   effect="blur"
-                  className="hover:scale-[1.1] duration-500"
+                  className="duration-500 "
                 />
               </span>
               {displayName && (

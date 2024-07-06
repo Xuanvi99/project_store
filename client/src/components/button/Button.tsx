@@ -17,7 +17,7 @@ const styleVariant = (variant: string): string => {
     case "outLine":
       return "text-orange border-1 border-orange hover:text-white hover:bg-orangeLinear";
     case "outLine-flex":
-      return "flex justify-center items-center duration-300 gap-x-1 border-1 text-orange border-orange hover:text-white hover:bg-orangeLinear";
+      return "flex justify-center items-center duration-300 gap-x-1 border-1 text-orange border-orange hover:text-white hover:bg-orangeLinear hover:border-none";
     case "outLine-border":
       return "rounded-md cursor-pointer text-gray98 hover:text-orangeFe border-1 text-center";
     default:

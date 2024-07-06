@@ -1,6 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/dist/query/react";
 import { baseQueryWithAuth } from "../baseQueryToken";
-import { IReqOrder, IResOrder, paramsGetListOrder } from "@/types/order.type";
+import {
+  IReqOrder,
+  IResOrder,
+  paramsGetListOrder,
+  paramsGetListOrderFilter,
+} from "@/types/order.type";
 
 interface IGetResponsive {
   data: IResOrder[];
@@ -18,6 +23,23 @@ export const orderApi = createApi({
   tagTypes: ["Orders"],
   baseQuery: baseQueryWithAuth,
   endpoints: (build) => ({
+    getListOrderFilter: build.query<IGetResponsive, paramsGetListOrderFilter>({
+      query: (params) => ({
+        url: "order/getListOrderFilter",
+        method: "GET",
+        params: { ...params },
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ codeOrder }) => ({
+                type: "Orders" as const,
+                id: codeOrder,
+              })),
+              { type: "Orders", id: "ORDER_PAGINATION" },
+            ]
+          : [{ type: "Orders", id: "ORDER_PAGINATION" }],
+    }),
     getListOrderUser: build.query<
       IGetResponsive,
       { userId: string; params: paramsGetListOrder }
@@ -30,18 +52,20 @@ export const orderApi = createApi({
       keepUnusedDataFor: 0,
       serializeQueryArgs: ({ queryArgs }) => {
         const { userId, params } = queryArgs;
-        const { limit, status, search } = params;
-        return `order/getOrderUser/${userId}?limit=${limit}&search=${status}&status=${search}`;
+        const { limit, statusOrder, search } = params;
+        return `order/getOrderUser/${userId}?limit=${
+          limit ? limit : 4
+        }&search=${search}&statusOrder=${statusOrder}`;
       },
 
       merge: (currentCache, newItems, { arg }) => {
-        console.log("arg: ", arg);
-        console.log("currentCache: ", currentCache.data.length);
-        console.log("newItems", newItems.data);
-        const { activePage, status } = arg.params;
+        // console.log("arg: ", arg);
+        // console.log("currentCache: ", currentCache.data.length);
+        // console.log("newItems", newItems.data);
+        const { activePage, statusOrder } = arg.params;
         const currentActivePage = Math.ceil(currentCache.data.length / 4);
         const deleteCount =
-          status === "pending"
+          statusOrder === "pending"
             ? newItems.data.length + 1
             : newItems.data.length;
         if (currentActivePage >= activePage) {
@@ -122,8 +146,8 @@ export const orderApi = createApi({
         method: "PUT",
         body,
       }),
-      invalidatesTags: (result, error, data) => [
-        { type: "Orders", id: data.codeOrder },
+      invalidatesTags: [
+        { type: "Orders", id: "ORDER_LOAD_MORE" },
         { type: "Orders", id: "pending" },
       ],
     }),
@@ -137,4 +161,5 @@ export const {
   useEditCancelledOrderMutation,
   useLazyGetAmountOrderUserQuery,
   useLazyGetOrderDetailQuery,
+  useGetListOrderFilterQuery,
 } = orderApi;

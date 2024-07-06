@@ -41,7 +41,7 @@ const OrderSchema = new Schema(
       },
     ],
     // trang thai don hang
-    status: {
+    statusOrder: {
       type: String,
       enum: Object.values(constants.ORDER.STATUS),
       default: constants.ORDER.STATUS.PENDING,

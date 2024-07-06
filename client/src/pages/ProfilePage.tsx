@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import LayoutProfile from "../layout/LayoutProfile";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import FormAddress from "../module/Profile/address";
@@ -9,14 +9,15 @@ import PurchaseOrder from "@/module/Profile/purchaseOrder";
 
 function ProfilePage() {
   const { slug } = useParams();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
+
+  const navigate = useNavigate();
 
   const user = useAppSelector((state: RootState) => state.authSlice.user);
 
   const redirectUrl = import.meta.env.VITE_DOMAIN_CLIENT + pathname;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!user) {
       const query = encodeURIComponent(redirectUrl);
       navigate("/auth/login?next=" + query, { state: { path: pathname } });

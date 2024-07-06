@@ -23,7 +23,7 @@ import IconDelete from "./IconDelete";
 import IconAlert from "./IconAlert";
 import IconEmail from "./IconEmail";
 import IconUser from "./IconUser";
-import * as IconNavBar from "./IconNavbar";
+import * as IconSidebarDashboard from "./SidebarDashboard";
 import IconPlus from "./IconPlus";
 import IconLocation from "./IconLocation";
 import IconVerifyPw from "./IconVerifyPw";
@@ -60,7 +60,7 @@ export {
   IconAlert,
   IconEmail,
   IconUser,
-  IconNavBar,
+  IconSidebarDashboard,
   IconPlus,
   IconLocation,
   IconVerifyPw,

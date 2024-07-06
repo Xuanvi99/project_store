@@ -16,7 +16,7 @@ import {
 } from "./pages";
 import LayoutRoot from "./layout/LayoutRoot";
 import LayoutRequireAuth from "./layout/LayoutRequireAuth";
-import { Comment, Dashboard, Product } from "./module/dashboard";
+import * as Dashboard from "./module/dashboard";
 
 // async function loader() {
 //   await store
@@ -110,9 +110,19 @@ const router = createBrowserRouter([
     path: "/dashboard",
     element: <DashboardPage></DashboardPage>,
     children: [
-      { path: "/dashboard/home", element: <Dashboard></Dashboard> },
-      { path: "/dashboard/product/", element: <Product></Product> },
-      { path: "/dashboard/comment", element: <Comment></Comment> },
+      { path: "/dashboard/home", element: <Dashboard.Home></Dashboard.Home> },
+      {
+        path: "/dashboard/product/",
+        element: <Dashboard.Product></Dashboard.Product>,
+      },
+      {
+        path: "/dashboard/comment",
+        element: <Dashboard.Comment></Dashboard.Comment>,
+      },
+      {
+        path: "/dashboard/order/:slug",
+        element: <Dashboard.Order></Dashboard.Order>,
+      },
     ],
   },
   {

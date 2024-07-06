@@ -13,6 +13,7 @@ export type IPurchaseProvide = {
     totalPage: number;
     amountOrder: number;
   };
+
   isLoading: boolean;
 
   typePurchase: number;
@@ -49,7 +50,7 @@ function PurchaseProvide({ children }: { children: React.ReactNode }) {
     activePage: 1,
     limit: limitOrder,
     search: "",
-    status: "",
+    statusOrder: "",
   });
 
   const [data, setData] = useState<IPurchaseProvide["data"]>({
@@ -100,7 +101,7 @@ function PurchaseProvide({ children }: { children: React.ReactNode }) {
       activePage: 1,
       limit: 4,
       search: searchParams.get("keyword") || "",
-      status: listHeaderOrder[typePurchase - 1].status || "",
+      statusOrder: listHeaderOrder[typePurchase - 1].status || "",
     });
     setData({ data: [], totalPage: 0, amountOrder: 0 });
   }, [searchParams, typePurchase]);

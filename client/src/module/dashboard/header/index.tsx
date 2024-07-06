@@ -1,33 +1,7 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../../hook";
+import { Link } from "react-router-dom";
 import Profile from "../../menu/Profile.menu";
-import { logOut } from "../../../stores/reducer/authReducer";
-import { useLogOutAuthMutation } from "../../../stores/service/auth.service";
-import Search from "../../menu/Search.menu";
 
 function Header() {
-  const { user, isLogin } = useAppSelector((state) => state.authSlice);
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-
-  const redirectUrl = import.meta.env.VITE_DOMAIN_CLIENT + pathname;
-
-  const [logOutAuth] = useLogOutAuthMutation();
-
-  const handleLogin = async () => {
-    const query = encodeURIComponent(redirectUrl);
-    navigate("/auth/login?next=" + query);
-  };
-
-  const handleLogOut = async () => {
-    dispatch(logOut());
-    await logOutAuth()
-      .unwrap()
-      .then((res) => console.log("logout", res.message));
-    const query = encodeURIComponent(redirectUrl);
-    navigate("/auth/login?next=" + query);
-  };
   return (
     <header className="w-full h-[80px] fixed top-0 left-0 bg-white z-50  flex justify-between items-center border-b-1 border-orange">
       <Link
@@ -39,15 +13,11 @@ function Header() {
           XVStore
         </span>
       </Link>
-      <Search></Search>
+      <div className="w-full text-2xl font-semibold text-center">
+        Quản Lý Cửa Hàng
+      </div>
       <div className="flex items-center justify-center w-[20%] ">
-        <Profile
-          isLogin={isLogin}
-          user={user}
-          handleLogin={handleLogin}
-          handleLogOut={handleLogOut}
-          displayName={true}
-        ></Profile>
+        <Profile displayName={true}></Profile>
       </div>
     </header>
   );

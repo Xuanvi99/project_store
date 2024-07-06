@@ -2,6 +2,7 @@ const config = require("config");
 const querystring = require("qs");
 const moment = require("moment");
 const crypto = require("crypto");
+const axios = require("axios");
 const { orderModel } = require("../model");
 function sortObject(obj) {
   let sorted = {};
@@ -78,40 +79,8 @@ class VnPay {
     }
   };
 
-  returnPayment = async (req, res) => {
-    try {
-      let vnp_Params = req.query;
-
-      let secureHash = vnp_Params["vnp_SecureHash"];
-
-      delete vnp_Params["vnp_SecureHash"];
-      delete vnp_Params["vnp_SecureHashType"];
-
-      vnp_Params = sortObject(vnp_Params);
-
-      let tmnCode = config.get("vnp_TmnCode");
-      let secretKey = config.get("vnp_HashSecret");
-
-      let signData = querystring.stringify(vnp_Params, { encode: false });
-
-      let hmac = crypto.createHmac("sha512", secretKey);
-      let signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
-
-      if (secureHash === signed) {
-        //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
-
-        res.render("success", { code: vnp_Params["vnp_ResponseCode"] });
-      } else {
-        res.render("success", { code: "97" });
-      }
-    } catch (error) {
-      res.status(500).json({ errMessage: "server error" });
-    }
-  };
-
   vnpay_ipn = async (req, res) => {
     const codeOrder = req.params.codeOrder;
-    console.log("codeOrder: ", codeOrder);
 
     let vnp_Params = req.query;
     console.log("vnp_Params: ", vnp_Params);
@@ -208,6 +177,94 @@ class VnPay {
         .status(200)
         .json({ RspCode: "97", Message: "Checksum failed" });
     }
+  };
+
+  vnpay_refund = async (req, res) => {
+    console.log("req: ", req.body);
+    let date = new Date();
+
+    let vnp_TmnCode = config.get("vnp_TmnCode");
+    let secretKey = config.get("vnp_HashSecret");
+    let vnp_Api = config.get("vnp_Api");
+
+    let vnp_TxnRef = req.body.codeBill;
+    let vnp_Amount = req.body.amount * 100;
+    let vnp_CreateBy = req.body.userId;
+
+    let vnp_TransactionType = "02";
+    let vnp_TransactionDate = moment(date).format("YYYYMMDDHHmmss");
+    let vnp_RequestId = moment(date).format("HHmmss");
+    let vnp_Version = "2.1.0";
+    let vnp_Command = "refund";
+    let vnp_OrderInfo = "Hoan tien GD ma:" + vnp_TxnRef;
+
+    let vnp_IpAddr =
+      req.headers["x-forwarded-for"] ||
+      req.connection.remoteAddress ||
+      req.socket.remoteAddress ||
+      req.connection.socket.remoteAddress;
+
+    let vnp_CreateDate = moment(date).format("YYYYMMDDHHmmss");
+
+    let vnp_TransactionNo = "0";
+
+    let data =
+      vnp_RequestId +
+      "|" +
+      vnp_Version +
+      "|" +
+      vnp_Command +
+      "|" +
+      vnp_TmnCode +
+      "|" +
+      vnp_TransactionType +
+      "|" +
+      vnp_TxnRef +
+      "|" +
+      vnp_Amount +
+      "|" +
+      vnp_TransactionNo +
+      "|" +
+      vnp_TransactionDate +
+      "|" +
+      vnp_CreateBy +
+      "|" +
+      vnp_CreateDate +
+      "|" +
+      vnp_IpAddr +
+      "|" +
+      vnp_OrderInfo;
+    let hmac = crypto.createHmac("sha512", secretKey);
+    let vnp_SecureHash = hmac.update(Buffer.from(data, "utf-8")).digest("hex");
+
+    let dataObj = {
+      vnp_RequestId: vnp_RequestId,
+      vnp_Version: vnp_Version,
+      vnp_Command: vnp_Command,
+      vnp_TmnCode: vnp_TmnCode,
+      vnp_TransactionType: vnp_TransactionType,
+      vnp_TxnRef: vnp_TxnRef,
+      vnp_Amount: vnp_Amount,
+      vnp_TransactionNo: vnp_TransactionNo,
+      vnp_CreateBy: vnp_CreateBy,
+      vnp_OrderInfo: vnp_OrderInfo,
+      vnp_TransactionDate: vnp_TransactionDate,
+      vnp_CreateDate: vnp_CreateDate,
+      vnp_IpAddr: vnp_IpAddr,
+      vnp_SecureHash: vnp_SecureHash,
+    };
+    console.log(dataObj);
+
+    // await axios
+    //   .request({
+    //     url: vnp_Api,
+    //     method: "POST",
+    //     responseType: "json",
+    //     body: {...dataObj},
+    //   })
+    //   .then(function (response) {
+    //     console.log("response", response);
+    //   });
   };
 }
 

@@ -5,7 +5,7 @@ type TProps = {
   value: { icon: React.ReactElement; title: string; path: string };
 };
 
-function NavbarItem({ value }: TProps) {
+function SidebarItem({ value }: TProps) {
   const { icon, path, title } = value;
   return (
     <NavLink
@@ -23,4 +23,4 @@ function NavbarItem({ value }: TProps) {
   );
 }
 
-export default NavbarItem;
+export default SidebarItem;

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Header, Navbar } from "../module/dashboard";
+import { Header, Sidebar } from "../module/dashboard";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../hook";
 import { RootState } from "@/stores";
@@ -20,13 +20,18 @@ function DashboardPage() {
 
   return (
     <div className="w-full min-h-screen max-w-screen-2xl bg-light ">
-      <Header></Header>
+      <DashboardPage.Header></DashboardPage.Header>
       <main className="min-h-[calc(100vh-80px)] content-page">
-        <Navbar></Navbar>
-        <Outlet></Outlet>
+        <DashboardPage.SideBar></DashboardPage.SideBar>
+        <section className="px-6 pt-[100px] min-h-full ml-auto w-[calc(100%-200px)] pb-[80px]">
+          <Outlet></Outlet>
+        </section>
       </main>
     </div>
   );
 }
+
+DashboardPage.Header = Header;
+DashboardPage.SideBar = Sidebar;
 
 export default DashboardPage;

@@ -47,7 +47,7 @@ function Search({ className }: TProps) {
           input: "w-full px-[10px] outline-none text-sm py-2 border-none",
         }}
       />
-      <Button variant="default" type="submit" className="px-5 py-2 ">
+      <Button variant="default" type="submit" className="px-5 py-2 text-white">
         <IconSearch size={20}></IconSearch>
       </Button>
     </form>
