@@ -1,7 +1,7 @@
-import { Fragment, useLayoutEffect } from "react";
+import { Fragment, useEffect, useLayoutEffect } from "react";
 import Header from "./headerOrder";
 import { useNavigate, useParams } from "react-router-dom";
-import DetailOrder from "./detaiOrder";
+import OrderDetail from "./orderDetail";
 import HomeOrder from "./homeOrder";
 
 function Order() {
@@ -14,7 +14,7 @@ function Order() {
         return <HomeOrder></HomeOrder>;
 
       case "detail":
-        return <DetailOrder></DetailOrder>;
+        return <OrderDetail></OrderDetail>;
 
       default:
         break;
@@ -27,12 +27,18 @@ function Order() {
     }
   }, [navigate, slug]);
 
+  useEffect(() => {
+    if (slug) {
+      window.scrollTo({ top: 0 });
+    }
+  }, [slug]);
+
   if (!slug) return <></>;
 
   return (
     <Fragment>
       <Header></Header>
-      {selectPathOrderDashboard(slug)}
+      <div className="px-6 mt-5">{selectPathOrderDashboard(slug)}</div>
     </Fragment>
   );
 }

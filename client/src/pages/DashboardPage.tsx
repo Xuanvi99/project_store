@@ -23,7 +23,7 @@ function DashboardPage() {
       <DashboardPage.Header></DashboardPage.Header>
       <main className="min-h-[calc(100vh-80px)] content-page">
         <DashboardPage.SideBar></DashboardPage.SideBar>
-        <section className="px-6 pt-[100px] min-h-full ml-auto w-[calc(100%-200px)] pb-[80px]">
+        <section className="pt-[80px] min-h-full ml-auto w-[calc(100%-200px)] pb-10">
           <Outlet></Outlet>
         </section>
       </main>

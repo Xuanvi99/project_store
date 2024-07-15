@@ -1,4 +1,3 @@
-import { Button } from "@/components/button";
 import ShowListOrder from "./ShowListOrder";
 import useTestContext from "@/hook/useTestContext";
 import { IListOrderFilterProvider, ListOrderFilterContext } from "../context";
@@ -11,16 +10,7 @@ function Content() {
 
   return (
     <div className="bg-white rounded-md min-h-[200px] p-5 mt-5">
-      <div className="flex items-center justify-between">
-        <h1 className="font-semibold">Danh sách đơn hàng</h1>
-        <Button
-          variant="default"
-          type="button"
-          className="text-sm whitespace-nowrap"
-        >
-          Xuất danh sách đơn hàng
-        </Button>
-      </div>
+      <h1 className="font-semibold">Danh sách đơn hàng</h1>
       {status === "pending" ? (
         <div className="flex justify-center w-full mt-10">
           <div className="relative w-16 h-16">

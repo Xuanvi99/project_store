@@ -113,15 +113,15 @@ function Filter() {
             active={active}
             title="Thứ tự theo giá"
             options={OptionPrice}
-            handleSelect={(value) => {
+            handleSelect={(option) => {
               handleActive("price");
               searchParams.set("sortBy", "price");
-              searchParams.set("order", value);
+              searchParams.set("order", option.value);
               setSearchParams(searchParams);
               handleSetFilter({
                 activePage: 1,
                 sortBy: "price",
-                order: value as "" | "desc" | "asc" | undefined,
+                order: option.value as "" | "desc" | "asc" | undefined,
               });
               handleSetData({
                 data: [],

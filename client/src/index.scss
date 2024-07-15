@@ -240,4 +240,21 @@
             padding: 12px 8px;
         }
     }
+
+    .table_product {
+        border-collapse: collapse;
+        tr {
+            @apply border-1 border-grayCa;
+        }
+        th,
+        td {
+            padding: 10px 10px;
+        }
+
+        .tr_product {
+            td {
+                text-align: center;
+            }
+        }
+    }
 }

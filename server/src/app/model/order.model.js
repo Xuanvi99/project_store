@@ -72,6 +72,8 @@ const OrderSchema = new Schema(
       },
     },
 
+    quantityOrder:{ type: Number, required: true },
+
     shippingFee: { type: Number, required: true },
     subTotal: { type: Number, required: true },
     total: { type: Number, required: true },
@@ -83,9 +85,10 @@ const OrderSchema = new Schema(
       default: constants.ORDER.SHIPPING_UNIT.GHN,
     },
 
+    shippingCode: { type: String },
+
     reasonCanceled: { type: String },
     canceller: { type: Schema.Types.ObjectId, ref: "users" },
-
     delivery_at: { type: Date },
     canceled_at: { type: Date },
     complete_at: { type: Date },

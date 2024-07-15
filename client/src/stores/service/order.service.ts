@@ -3,6 +3,7 @@ import { baseQueryWithAuth } from "../baseQueryToken";
 import {
   IReqOrder,
   IResOrder,
+  IResStatisticsOrder,
   paramsGetListOrder,
   paramsGetListOrderFilter,
 } from "@/types/order.type";
@@ -13,9 +14,12 @@ interface IGetResponsive {
   amountOrder: number;
 }
 
-type reqCancelledOrder = {
+type TReqCancelledOrder = {
   reasonCanceled: string;
   canceller: string;
+};
+type TReqUpdateOrder = {
+  [P in keyof IReqOrder]?: IReqOrder[P];
 };
 
 export const orderApi = createApi({
@@ -25,7 +29,7 @@ export const orderApi = createApi({
   endpoints: (build) => ({
     getListOrderFilter: build.query<IGetResponsive, paramsGetListOrderFilter>({
       query: (params) => ({
-        url: "order/getListOrderFilter",
+        url: "orders/getListOrderFilter",
         method: "GET",
         params: { ...params },
       }),
@@ -45,7 +49,7 @@ export const orderApi = createApi({
       { userId: string; params: paramsGetListOrder }
     >({
       query: ({ userId, params }) => ({
-        url: "order/getOrderUser/" + userId,
+        url: "orders/getOrderUser/" + userId,
         method: "GET",
         params: { ...params },
       }),
@@ -104,7 +108,7 @@ export const orderApi = createApi({
       { userId: string; statusOrder: string }
     >({
       query: ({ userId, statusOrder }) => ({
-        url: "order/getAmountOrderUser/" + userId,
+        url: "orders/getAmountOrderUser/" + userId,
         method: "GET",
         params: { statusOrder },
       }),
@@ -113,9 +117,9 @@ export const orderApi = createApi({
         { type: "Orders", id: data.statusOrder },
       ],
     }),
-    getOrderDetail: build.query<{ data: IResOrder }, string>({
+    getOrderDetail: build.query<{ order: IResOrder }, string>({
       query: (codeOrder) => ({
-        url: "order/getDetailOrder/" + codeOrder,
+        url: "orders/getDetailOrder/" + codeOrder,
         method: "get",
       }),
       providesTags: (result, error, codeOrder) => [
@@ -125,12 +129,23 @@ export const orderApi = createApi({
         },
       ],
     }),
+    getStatisticsOrder: build.query<IResStatisticsOrder, void>({
+      query: () => ({
+        url: "orders/getStatisticsOrder",
+        method: "get",
+      }),
+      providesTags: [
+        {
+          type: "Orders",
+        },
+      ],
+    }),
     createOrder: build.mutation<
       { message: string; codeOrder: string; orderId: string },
       IReqOrder
     >({
       query: (body) => ({
-        url: "order/create",
+        url: "orders/create",
         method: "POST",
         body,
       }),
@@ -139,17 +154,29 @@ export const orderApi = createApi({
 
     EditCancelledOrder: build.mutation<
       { message: string; orderId: string },
-      { codeOrder: string; body: reqCancelledOrder }
+      { codeOrder: string; body: TReqCancelledOrder }
     >({
       query: ({ codeOrder, body }) => ({
-        url: "order/cancelled/" + codeOrder,
+        url: "orders/cancelled/" + codeOrder,
         method: "PUT",
         body,
       }),
-      invalidatesTags: [
+      invalidatesTags: (result, error, data) => [
         { type: "Orders", id: "ORDER_LOAD_MORE" },
         { type: "Orders", id: "pending" },
+        { type: "Orders", id: data.codeOrder },
       ],
+    }),
+    updateOrder: build.mutation<
+      { message: string },
+      { codeOrder: string; body: TReqUpdateOrder }
+    >({
+      query: ({ codeOrder, body }) => ({
+        url: "orders/update/" + codeOrder,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: [{ type: "Orders" }],
     }),
   }),
 });
@@ -161,5 +188,8 @@ export const {
   useEditCancelledOrderMutation,
   useLazyGetAmountOrderUserQuery,
   useLazyGetOrderDetailQuery,
+  useGetOrderDetailQuery,
   useGetListOrderFilterQuery,
+  useGetStatisticsOrderQuery,
+  useUpdateOrderMutation,
 } = orderApi;

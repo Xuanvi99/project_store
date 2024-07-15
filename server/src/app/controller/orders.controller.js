@@ -18,8 +18,15 @@ class Order {
       const paymentMethod = req.query.paymentMethod || "";
       const paymentStatus = req.query.paymentStatus || "";
       const statusOrder = req.query.statusOrder || "";
-      const dateStart = req.query.dateStart || null;
-      const dateEnd = req.query.dateEnd || null;
+
+      const dateStart = req.query.dateStart
+        ? new Date(req.query.dateStart)
+        : new Date(0);
+
+      const dateEnd = req.query.dateEnd
+        ? new Date(req.query.dateEnd)
+        : new Date();
+
       const listOrder = await orderModel
         .find({
           $and: [
@@ -29,8 +36,8 @@ class Order {
             { paymentMethod: { $regex: paymentMethod, $options: "i" } },
             {
               createdAt: {
-                $gte: new Date(dateStart),
-                $lte: new Date(dateEnd),
+                $gte: dateStart,
+                $lte: dateEnd,
               },
             },
           ],
@@ -69,8 +76,9 @@ class Order {
             { codeOrder: { $regex: search, $options: "i" } },
             { statusOrder: { $regex: statusOrder, $options: "i" } },
             { paymentStatus: { $regex: paymentStatus, $options: "i" } },
+            { paymentMethod: { $regex: paymentMethod, $options: "i" } },
             {
-              created_at: {
+              createdAt: {
                 $gte: dateStart,
                 $lte: dateEnd,
               },
@@ -230,7 +238,35 @@ class Order {
           .status(404)
           .json({ errMessage: "Code order not exit in Order" });
       }
-      res.status(200).json({ data: order });
+      res.status(200).json({ order });
+    } catch (error) {
+      return res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  getStatisticsOrder = async (req, res) => {
+    try {
+      const listStatistics = [
+        "all",
+        "shipping",
+        "completed",
+        "pending",
+        "cancelled",
+      ];
+      let data = {};
+      for (const statistic of listStatistics) {
+        let ojb = {};
+        const ListOrder = await orderModel.find({
+          statusOrder: {
+            $regex: statistic === "all" ? "" : statistic,
+            $options: "i",
+          },
+        });
+        data[statistic] = ListOrder.length;
+      }
+      console.log(data);
+
+      res.status(200).json({ ...data });
     } catch (error) {
       return res.status(500).json({ errMessage: "server error" });
     }
@@ -377,9 +413,21 @@ class Order {
     }
   };
 
-  updateOrderByUser = async (req, res) => {
+  updateOrder = async (req, res) => {
     try {
-      return res.status(400).json({ message: "Item does not exist in cart" });
+      const codeOrder = req.params.codeOrder;
+      if (!codeOrder)
+        return res.status(403).json({ errMessage: "Code order undefine" });
+
+      const order = await orderModel.findOne({ codeOrder });
+      if (!order) {
+        return res
+          .status(404)
+          .json({ errMessage: "Code order not exit in Order" });
+      } else {
+        await order.updateOne({ ...req.body });
+      }
+      return res.status(200).json({ message: "Cập nhật đơn hàng thành công" });
     } catch (error) {
       return res.status(500).json({ errMessage: "server error" });
     }

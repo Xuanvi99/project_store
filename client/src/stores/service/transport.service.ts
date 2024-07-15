@@ -1,4 +1,6 @@
 import {
+  reqCreateOrder,
+  resCreateOrder,
   resServiceShip,
   resShippingFee,
   resTimeShipping,
@@ -83,6 +85,31 @@ export const transportApi = createApi({
         body,
       }),
     }),
+    postCreateOrder: build.mutation<responsive<resCreateOrder>, reqCreateOrder>(
+      {
+        query: (body) => ({
+          url: "v2/shipping-order/create",
+          method: "POST",
+          body,
+        }),
+      }
+    ),
+    canceledOrderTransport: build.mutation<
+      responsive<
+        {
+          order_code: string;
+          result: boolean;
+          message: string;
+        }[]
+      >,
+      { order_codes: string[] }
+    >({
+      query: (body) => ({
+        url: "v2/switch-status/cancel",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -93,4 +120,6 @@ export const {
   usePostWardMutation,
   usePostTimeShippingMutation,
   usePostServiceShipMutation,
+  usePostCreateOrderMutation,
+  useCanceledOrderTransportMutation,
 } = transportApi;

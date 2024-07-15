@@ -33,6 +33,8 @@ function ListProductOrder() {
     CheckoutContext as React.Context<ICheckoutProvide>
   );
 
+  console.log("ca", deliveryTime.getTime() - new Date().getTime());
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -54,7 +56,6 @@ function ListProductOrder() {
         : null,
     []
   );
-  console.log(selectProductToOrder);
 
   useEffect(() => {
     const listSelectProduct: string[] | undefined =
@@ -167,7 +168,13 @@ function ListProductOrder() {
             </div>
             <div className="flex gap-x-2">
               <span className="font-semibold">Thời gian dự kiến giao:</span>
-              <span>{deliveryTime.toLocaleDateString()}</span>
+              <span>
+                {(
+                  (deliveryTime.getTime() - new Date().getTime()) /
+                  (1000 * 60 * 60 * 24)
+                ).toFixed(0)}{" "}
+                ngày
+              </span>
             </div>
             <div className="flex gap-x-2">
               <span className="font-semibold">Phí vận chuyển:</span>

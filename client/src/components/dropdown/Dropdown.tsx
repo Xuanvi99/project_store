@@ -5,7 +5,11 @@ import { IconDown } from "../icon";
 import Option from "./Option";
 import Select from "./Select";
 
-export type option = { label: string; value: string; id: string | number };
+export type optionDropdown = {
+  label: string;
+  value: string;
+  id: string | number;
+};
 
 interface IDropdownProps<T> {
   title: string;
@@ -16,7 +20,7 @@ interface IDropdownProps<T> {
     wrap?: string;
   };
   active?: string;
-  handleSelect?: (value: string) => void;
+  handleSelect?: (option: optionDropdown) => void;
 }
 
 function Dropdown({
@@ -25,17 +29,18 @@ function Dropdown({
   className,
   handleSelect,
   active,
-}: IDropdownProps<option>) {
+}: IDropdownProps<optionDropdown>) {
   const {
     show: showOptions,
     handleShow,
     nodeRef,
   } = useClickOutSide<HTMLUListElement>();
+
   const [label, setLabel] = useState<string>(title as string);
 
-  const handleClickOptions = (options: option) => {
+  const handleClickOptions = (options: optionDropdown) => {
     setLabel(options.label);
-    if (handleSelect) handleSelect(options.value);
+    if (handleSelect) handleSelect(options);
   };
 
   useEffect(() => {
@@ -73,7 +78,7 @@ function Dropdown({
             options.map((item) => {
               return (
                 <Option
-                  key={item.value}
+                  key={item.id}
                   optionData={item}
                   onClick={handleClickOptions}
                 ></Option>

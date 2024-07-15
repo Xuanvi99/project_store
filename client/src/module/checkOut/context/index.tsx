@@ -74,16 +74,15 @@ const CheckoutProvide = ({ children }: { children: React.ReactNode }) => {
     nameProducts: [],
     note: "",
     listProducts: [],
-    status: "pending",
+    quantityOrder: 0,
+    statusOrder: "pending",
     paymentMethod: "cod",
     paymentStatus: "pending",
     subTotal: 0,
     shippingFee: 0,
     total: 0,
     shippingUnit: "",
-    delivery_at: deliveryTime,
   });
-  console.log(reqOrder);
 
   useEffect(() => {
     if (listProductOrder.length > 0) {
@@ -129,14 +128,14 @@ const CheckoutProvide = ({ children }: { children: React.ReactNode }) => {
         nameProducts: nameProducts,
         note: "",
         listProducts: listProductReq,
-        status: "pending",
+        quantityOrder:quantityProductOrder,
+        statusOrder: "pending",
         paymentMethod,
         paymentStatus: "pending",
         subTotal: totalPriceOrder,
         shippingFee: quantityProductOrder > 1 ? 0 : shippingFree,
         total: totalPayment,
         shippingUnit: "giaohangnhanh",
-        delivery_at: deliveryTime,
       });
     }
   }, [

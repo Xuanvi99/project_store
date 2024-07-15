@@ -53,7 +53,7 @@ const NavItem = ({
 
   const [amountOrder, setAmountOrder] = useState<number>(0);
 
-  const { data: resData, status: statusReq } = useGetAmountOrderUserQuery(
+  const { data: dataRes, status: statusReq } = useGetAmountOrderUserQuery(
     {
       userId: user ? user._id : "",
       statusOrder: status,
@@ -62,10 +62,10 @@ const NavItem = ({
   );
 
   useEffect(() => {
-    if (resData && statusReq === "fulfilled") {
-      setAmountOrder(resData.amountOrder);
+    if (dataRes && statusReq === "fulfilled") {
+      setAmountOrder(dataRes.amountOrder);
     }
-  }, [resData, statusReq]);
+  }, [dataRes, statusReq]);
 
   return (
     <div

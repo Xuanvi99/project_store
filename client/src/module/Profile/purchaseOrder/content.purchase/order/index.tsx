@@ -11,11 +11,20 @@ type TProps = {
 };
 
 function OrderItem({ data }: TProps) {
-  const { listProducts, total, codeOrder, statusOrder } = data;
+  const { listProducts, total, codeOrder, statusOrder, createdAt } = data;
 
   return (
     <div className="w-full p-4 bg-white rounded-sm">
-      <HeaderPurchase id={codeOrder} statusOrder={statusOrder}></HeaderPurchase>
+      <HeaderPurchase id={codeOrder} statusOrder={statusOrder}></HeaderPurchase>{" "}
+      <div className="flex text-sm gap-x-2 mt-5">
+        <span>Thời gian đặt hàng:</span>
+        <span>
+          {"" +
+            new Date(createdAt).toLocaleTimeString() +
+            ", " +
+            new Date(createdAt).toLocaleDateString()}
+        </span>
+      </div>
       <PaymentMethod data={data}></PaymentMethod>
       <ListProduct data={listProducts}></ListProduct>
       <ShippingFee data={data}></ShippingFee>

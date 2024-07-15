@@ -12,7 +12,7 @@ function SidebarItem({ value }: TProps) {
       to={path}
       className={({ isActive }) =>
         cn(
-          "flex items-center gap-x-5 justify-start px-3  py-2 rounded-lg ",
+          "flex items-center gap-x-5 justify-start px-3 py-2 rounded-lg ",
           isActive ? "bg-orangeLinear text-white" : ""
         )
       }

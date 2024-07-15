@@ -12,6 +12,7 @@ export interface IResOrder {
   nameProducts: string[];
   note: string;
   listProducts: TProductOrderItem<IProductRes>[];
+  quantityOrder: number;
   statusOrder:
     | "pending"
     | "confirmed"
@@ -24,6 +25,8 @@ export interface IResOrder {
   codeBill?: string;
   subTotal: number;
   shippingFee: number;
+  shippingUnit: string;
+  shippingCode?: string;
   total: number;
   reasonCanceled?: string;
   canceller?: { _id: string; role: "admin" | "user" };
@@ -43,6 +46,7 @@ export interface IReqOrder {
   nameProducts: string[];
   note: string;
   listProducts: Omit<TProductOrderItem<string>, "_id">[];
+  quantityOrder: number;
   statusOrder:
     | "pending"
     | "confirmed"
@@ -53,6 +57,7 @@ export interface IReqOrder {
   paymentMethod: "cod" | "vnpay";
   paymentStatus: "pending" | "paid" | "cancelled";
   codeBill?: string;
+  shippingCode?: string;
   subTotal: number;
   shippingFee: number;
   shippingUnit: string;
@@ -90,8 +95,14 @@ export interface paramsGetListOrderFilter {
   limit: number | 10;
   search: string;
   statusOrder: string;
-  paymentStatus: string;
-  paymentMethod: string;
   dateStart: Date | string;
   dateEnd: Date | string;
+}
+
+export interface IResStatisticsOrder {
+  all: number;
+  shipping: number;
+  completed: number;
+  pending: number;
+  cancelled: number;
 }

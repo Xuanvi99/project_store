@@ -59,7 +59,9 @@ function OrderItem({ data, index }: { data: IResOrder; index: number }) {
 
   return (
     <div className="grid w-full grid-cols-[70px_150px_200px_150px_200px_150px_100px] text-sm grid-rows-1 border-t-1 border-t-grayCa ">
-      <span className="flex items-center justify-center">{index}</span>
+      <span className="flex items-center justify-center font-semibold">
+        {index + 1}
+      </span>
       <span>{codeOrder}</span>
       <span>{customer.name}</span>
       <span>{handleFormatDate(createdAt)}</span>
@@ -68,7 +70,12 @@ function OrderItem({ data, index }: { data: IResOrder; index: number }) {
       </span>
       <span className="text-danger">{formatPrice(total)}₫</span>
       <span>
-        <Link to="/dashboard/order/detail">Xem chi tiết</Link>
+        <Link
+          to={`/dashboard/order/detail?codeOrder=${codeOrder}`}
+          className="font-semibold italic hover:text-blue hover:underline "
+        >
+          Xem chi tiết
+        </Link>
       </span>
     </div>
   );

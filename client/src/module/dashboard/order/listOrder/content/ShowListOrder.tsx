@@ -6,9 +6,10 @@ import { IListOrderFilterProvider, ListOrderFilterContext } from "../context";
 import OrderItem from "./OrderItem";
 
 function ShowListOrder() {
-  const { res, status } = useTestContext<IListOrderFilterProvider>(
-    ListOrderFilterContext as React.Context<IListOrderFilterProvider>
-  );
+  const { res, status, handleSetParams, params } =
+    useTestContext<IListOrderFilterProvider>(
+      ListOrderFilterContext as React.Context<IListOrderFilterProvider>
+    );
   const { data, totalPage, amountOrder } = res;
 
   if (data.length === 0 && status === "fulfilled") {
@@ -39,7 +40,7 @@ function ShowListOrder() {
                 <OrderItem
                   key={order._id}
                   data={order}
-                  index={index}
+                  index={index + (params.activePage - 1) * 10}
                 ></OrderItem>
               );
             })}
@@ -53,8 +54,8 @@ function ShowListOrder() {
           <ReactPaginate
             breakLabel="..."
             nextLabel={<IconChevronRight size={12}></IconChevronRight>}
-            onPageChange={() => {
-              console.log("abc");
+            onPageChange={(selectedItem) => {
+              handleSetParams({ activePage: selectedItem.selected + 1 });
             }}
             pageRangeDisplayed={3}
             pageCount={totalPage}

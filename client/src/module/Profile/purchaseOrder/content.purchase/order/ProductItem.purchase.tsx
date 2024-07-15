@@ -36,7 +36,7 @@ function ProductItem({ data }: { data: TProductOrderItem<IProductRes> }) {
             <p className="text-danger">{formatPrice(priceSale)}₫</p>
           </span>
         ) : (
-          <p>{formatPrice(price)}₫</p>
+          <p className="text-danger">{formatPrice(price)}₫</p>
         )}
       </div>
     </Link>

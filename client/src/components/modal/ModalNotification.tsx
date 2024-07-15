@@ -44,7 +44,7 @@ function ModalNotification({
     switch (type) {
       case "success":
         return (
-          <span className={"text-green66"}>
+          <span className={"text-green66 z-50"}>
             <IconSuccess size={50}></IconSuccess>
           </span>
         );

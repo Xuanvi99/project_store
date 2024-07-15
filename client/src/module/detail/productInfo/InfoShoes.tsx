@@ -205,7 +205,7 @@ function InfoShoes() {
         onClick={() => setOpenModal(false)}
         time={700}
         className={{
-          content: "bg-black w-[350px] gap-x-5 text-white font-semibold",
+          content: "w-[350px] gap-x-5 text-white font-semibold opacity-50",
         }}
       >
         <span>{notify.message}</span>

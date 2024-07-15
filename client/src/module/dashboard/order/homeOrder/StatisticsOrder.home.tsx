@@ -1,28 +1,64 @@
+import LoadingSpinner from "@/components/loading";
+import { useGetStatisticsOrderQuery } from "@/stores/service/order.service";
+
 function StatisticsOrder() {
+  const { data, isFetching } = useGetStatisticsOrderQuery();
+
   return (
-    <div className="grid grid-cols-4 mt-5 gap-x-10">
+    <div className="grid grid-cols-5 gap-x-5">
       <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
-        <span>TẤT CẢ</span>
+        <span>TỔNG ĐƠN</span>
         <span className="flex items-center gap-x-1">
-          999 <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
+          {isFetching ? (
+            <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
+          ) : (
+            <span>{data?.all}</span>
+          )}
+          <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
+        </span>
+      </div>
+      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
+        <span>ĐƠN CHỜ DUYỆT</span>
+        <span className="flex items-center gap-x-1">
+          {isFetching ? (
+            <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
+          ) : (
+            <span>{data?.pending}</span>
+          )}
+          <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
         </span>
       </div>
       <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
         <span>ĐƠN ĐANG GIAO</span>
         <span className="flex items-center gap-x-1">
-          999 <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
+          {isFetching ? (
+            <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
+          ) : (
+            <span>{data?.shipping}</span>
+          )}
+          <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
         </span>
       </div>
       <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
         <span>ĐƠN HOÀN THÀNH</span>
         <span className="flex items-center gap-x-1">
-          999 <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
+          {isFetching ? (
+            <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
+          ) : (
+            <span>{data?.completed}</span>
+          )}
+          <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
         </span>
       </div>
       <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
         <span>ĐƠN HỦY</span>
         <span className="flex items-center gap-x-1">
-          999 <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
+          {isFetching ? (
+            <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
+          ) : (
+            <span>{data?.cancelled}</span>
+          )}
+          <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
         </span>
       </div>
     </div>

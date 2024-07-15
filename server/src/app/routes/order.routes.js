@@ -3,15 +3,22 @@ const { orderCtrl } = require("../controller");
 
 const routes = express.Router();
 
-routes.route("/api/order/getListOrderFilter").get(orderCtrl.getListOrderFilter);
-routes.route("/api/order/getOrderUser/:userId").get(orderCtrl.getOrderUser);
 routes
-  .route("/api/order/getAmountOrderUser/:userId")
+  .route("/api/orders/getListOrderFilter")
+  .get(orderCtrl.getListOrderFilter);
+routes.route("/api/orders/getOrderUser/:userId").get(orderCtrl.getOrderUser);
+routes
+  .route("/api/orders/getAmountOrderUser/:userId")
   .get(orderCtrl.getAmountOrderUser);
 routes
-  .route("/api/order/getDetailOrder/:codeOrder")
+  .route("/api/orders/getDetailOrder/:codeOrder")
   .get(orderCtrl.getDetailOrder);
-routes.route("/api/order/create").post(orderCtrl.createOrder);
-routes.route("/api/order/cancelled/:codeOrder").put(orderCtrl.cancelledOrder);
+routes
+  .route("/api/orders/getStatisticsOrder")
+  .get(orderCtrl.getStatisticsOrder);
+routes.route("/api/orders/create").post(orderCtrl.createOrder);
+routes.route("/api/orders/cancelled/:codeOrder").put(orderCtrl.cancelledOrder);
+
+routes.route("/api/orders/update/:codeOrder").put(orderCtrl.updateOrder);
 
 module.exports = routes;

@@ -1,11 +1,11 @@
 import { useEffect, useLayoutEffect } from "react";
 import LayoutProfile from "../layout/LayoutProfile";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import FormAddress from "../module/Profile/address";
+import FormAddress from "../module/profile/address";
 import { useAppSelector } from "../hook";
-import { ChangePassword, ProfileInfo } from "../module/Profile";
+import { ChangePassword, ProfileInfo } from "../module/profile";
 import { RootState } from "@/stores";
-import PurchaseOrder from "@/module/Profile/purchaseOrder";
+import PurchaseOrder from "@/module/profile/purchaseOrder";
 
 function ProfilePage() {
   const { slug } = useParams();

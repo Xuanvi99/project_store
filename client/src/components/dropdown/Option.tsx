@@ -1,11 +1,11 @@
-import { option } from "./Dropdown";
+import { optionDropdown } from "./Dropdown";
 
 function Option({
   optionData,
   onClick,
 }: {
-  optionData: option;
-  onClick: (option: option) => void;
+  optionData: optionDropdown;
+  onClick: (option: optionDropdown) => void;
 }) {
   return (
     <option

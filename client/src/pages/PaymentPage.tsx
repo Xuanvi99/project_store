@@ -28,14 +28,14 @@ function PaymentPage() {
   const { state, search } = useLocation();
   const [searchParams] = useSearchParams();
 
-  const { data: resData, status } = useVnPayIpnQuery(
+  const { data: dataRes, status } = useVnPayIpnQuery(
     { codeOrder: codeOrder, params: search },
     {
       skip:
         !search || !codeOrder || searchParams.get("vnp_ResponseCode") !== "00",
     }
   );
-  console.log(resData);
+  console.log(dataRes);
 
   const [createPayment] = useCreatePaymentMutation();
 
@@ -76,7 +76,7 @@ function PaymentPage() {
         .unwrap()
         .then(async (res) => {
           await createPayment({
-            totalPricePayment: res.data.total,
+            totalPricePayment: res.order.total,
             bankCode: "",
             language: "vn",
             codeOrder: codeOrder,
@@ -110,7 +110,7 @@ function PaymentPage() {
     window.scrollTo({ top: 0 });
   }, []);
 
-  if (!resData && !searchParams.get("vnp_ResponseCode"))
+  if (!dataRes && !searchParams.get("vnp_ResponseCode"))
     return (
       <div
         className={cn(
@@ -150,7 +150,7 @@ function PaymentPage() {
     );
   }
 
-  if (!resData && searchParams.get("vnp_ResponseCode") === "24") {
+  if (!dataRes && searchParams.get("vnp_ResponseCode") === "24") {
     return (
       <main className="w-full min-h-[500px] flex justify-center items-center">
         <div className="w-[400px] rounded-sm my-10 mx-auto bg-white min-h-[300px] p-5 flex flex-col gap-y-5 justify-center items-center ">
@@ -167,15 +167,15 @@ function PaymentPage() {
     );
   }
 
-  if (resData && status === "fulfilled" && resData.RspCode !== "00") {
+  if (dataRes && status === "fulfilled" && dataRes.RspCode !== "00") {
     return (
       <main className="w-full min-h-[500px] flex justify-center items-center">
         <div className="w-[400px] rounded-sm my-10 mx-auto bg-white min-h-[300px] p-5 flex flex-col gap-y-5 justify-center items-center ">
           <IconError size={50}></IconError>
           <h1 className="text-lg font-semibold">Thông báo</h1>
-          <p className="text-center">{handleSetMessage(resData.RspCode)}</p>
+          <p className="text-center">{handleSetMessage(dataRes.RspCode)}</p>
           <div className="text-sm flex gap-x-2">
-            {resData.RspCode !== "02" && (
+            {dataRes.RspCode !== "02" && (
               <Button variant="default" onClick={handleRepayment}>
                 Thanh toán lại
               </Button>
@@ -213,32 +213,32 @@ function PaymentPage() {
             <div>
               <span>Người nhận: </span>
               <span className="font-semibold">
-                {resData?.data.customer.name}
+                {dataRes?.data.customer.name}
               </span>
             </div>
             <div>
               <span>Số điện thoại: </span>
               <span className="font-semibold">
-                {resData?.data.customer.phone}
+                {dataRes?.data.customer.phone}
               </span>
             </div>
             <div>
               <span>Địa chỉ nhận hàng: </span>
               <span className="font-semibold">
-                {resData?.data.customer.address}
+                {dataRes?.data.customer.address}
               </span>
             </div>
             <div>
               <span>Thời gian giao hàng dự kiến: </span>
               <span className="font-semibold">
-                {resData &&
-                  new Date(resData?.data.delivery_at).toLocaleDateString()}
+                {dataRes &&
+                  new Date("" + dataRes?.data.delivery_at).toLocaleDateString()}
               </span>
             </div>
             <div>
               <span>Tổng tiền: </span>
               <span className="text-danger font-semibold">
-                {resData && formatPrice(resData?.data.total)}₫
+                {dataRes && formatPrice(dataRes?.data.total)}₫
               </span>
             </div>
             <div>
@@ -253,15 +253,15 @@ function PaymentPage() {
             <div
               className={cn(
                 " flex flex-col gap-y-5 mt-2 px-2",
-                resData &&
-                  resData?.data.listProducts.length >= 2 &&
+                dataRes &&
+                  dataRes?.data.listProducts.length >= 2 &&
                   "overflow-y-scroll h-[150px]",
-                resData &&
-                  resData?.data.listProducts.length > 2 &&
+                dataRes &&
+                  dataRes?.data.listProducts.length > 2 &&
                   "overflow-y-scroll"
               )}
             >
-              {resData?.data.listProducts.map((product, index) => {
+              {dataRes?.data.listProducts.map((product, index) => {
                 const { size, productId, quantity, priceSale, price } = product;
                 return (
                   <div key={index} className="h-[60px] flex text-sm gap-x-2">

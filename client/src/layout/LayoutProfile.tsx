@@ -1,4 +1,4 @@
-import { SidebarProfile } from "../module/Profile";
+import { SidebarProfile } from "../module/profile";
 import LayoutMain from "./LayoutMain";
 
 function LayoutProfile({

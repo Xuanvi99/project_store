@@ -2,6 +2,7 @@ import { useGetListOrderFilterQuery } from "@/stores/service/order.service";
 import { IResOrder, paramsGetListOrderFilter } from "@/types/order.type";
 import { QueryStatus } from "@reduxjs/toolkit/query";
 import React, { createContext, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export interface IListOrderFilterProvider {
   res: {
@@ -9,6 +10,8 @@ export interface IListOrderFilterProvider {
     totalPage: number;
     amountOrder: number;
   };
+
+  params: paramsGetListOrderFilter;
 
   status: QueryStatus;
 
@@ -24,15 +27,14 @@ const ListOrderFilterContext = createContext<IListOrderFilterProvider | null>(
 );
 
 function ListOrderProvide({ children }: { children: React.ReactNode }) {
+  const [searchParams] = useSearchParams();
   const [params, setParams] = useState<paramsGetListOrderFilter>({
     activePage: 1,
     limit: 10,
-    search: "",
-    statusOrder: "",
-    paymentStatus: "",
-    paymentMethod: "",
-    dateStart: "",
-    dateEnd: "",
+    search: searchParams.get("search") || "",
+    statusOrder: searchParams.get("statusOrder") || "",
+    dateStart: searchParams.get("dateStart") || "",
+    dateEnd: searchParams.get("dateEnd") || "",
   });
 
   const { data: fetchData, status } = useGetListOrderFilterQuery(params);
@@ -55,7 +57,9 @@ function ListOrderProvide({ children }: { children: React.ReactNode }) {
   }, [fetchData, status]);
 
   return (
-    <ListOrderFilterContext.Provider value={{ res, handleSetParams, status }}>
+    <ListOrderFilterContext.Provider
+      value={{ res, handleSetParams, status, params }}
+    >
       {children}
     </ListOrderFilterContext.Provider>
   );
