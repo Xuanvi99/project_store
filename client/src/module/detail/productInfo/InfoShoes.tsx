@@ -261,7 +261,7 @@ function InfoShoes() {
           </span>
         </div>
       </div>
-      {data && data.is_sale === "sale" && (
+      {data && data.is_sale && (
         <div className="w-full bg-redLinear rounded mt-5 p-[10px] grid grid-cols-2">
           <div className="grid grid-cols-1 grid-rows-3 text-white gap-y-2">
             <span>
@@ -288,7 +288,7 @@ function InfoShoes() {
           </div>
         </div>
       )}
-      {data && data.is_sale === "normal" && (
+      {data && !data.is_sale && (
         <div className="flex items-end mt-5 gap-x-3">
           <span className="text-lg font-bold">Giá:</span>
           <span className="text-2xl font-bold text-red-600">

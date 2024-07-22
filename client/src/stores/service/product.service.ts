@@ -8,12 +8,12 @@ import {
 } from "@/types/product.type";
 
 interface IResponsive {
-  data: IProductRes[];
+  listProduct: IProductRes[];
   totalPage: number;
 }
 
 interface IResponsiveFilter extends IResponsive {
-  result_filter: number;
+  amount_filter: number;
   result_search: IProductRes[];
 }
 
@@ -38,7 +38,7 @@ export const productApi = createApi({
       providesTags: (result) =>
         result
           ? [
-              ...result.data.map(({ _id }) => ({
+              ...result.listProduct.map(({ _id }) => ({
                 type: "Product" as const,
                 id: _id,
               })),
@@ -46,7 +46,27 @@ export const productApi = createApi({
             ]
           : [{ type: "Product", id: "LIST" }],
     }),
-    getLoadMoreData: build.query<
+    getListProductFilter: build.query<
+      IResponsiveFilter,
+      request<paramsFilterProduct>
+    >({
+      query: (params) => ({
+        url: "product/filter",
+        method: "GET",
+        params: { ...params },
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.listProduct.map(({ _id }) => ({
+                type: "Product" as const,
+                id: _id,
+              })),
+              { type: "Product", id: "LIST" },
+            ]
+          : [{ type: "Product", id: "LIST" }],
+    }),
+    getProductLoadMoreData: build.query<
       IResponsiveFilter,
       request<paramsFilterProduct>
     >({
@@ -61,7 +81,7 @@ export const productApi = createApi({
       },
       // Always merge incoming data to the cache entry
       merge: (currentCache, newItems) => {
-        currentCache.data.push(...newItems.data);
+        currentCache.listProduct.push(...newItems.listProduct);
       },
       //Refetch when the page arg changes
       forceRefetch({ currentArg, previousArg }) {
@@ -70,7 +90,7 @@ export const productApi = createApi({
       providesTags: (result) =>
         result
           ? [
-              ...result.data.map(({ _id }) => ({
+              ...result.listProduct.map(({ _id }) => ({
                 type: "Product" as const,
                 id: _id,
               })),
@@ -114,6 +134,7 @@ export const {
   useCheckNameMutation,
   useGetListProductQuery,
   useGetOneProductQuery,
-  useGetLoadMoreDataQuery,
+  useGetProductLoadMoreDataQuery,
   useGetProductItemQuery,
+  useGetListProductFilterQuery,
 } = productApi;

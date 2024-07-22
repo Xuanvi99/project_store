@@ -18,12 +18,8 @@ const ProductSchema = new Schema(
     desc: { type: String, required: true, default: "" },
     brand: { type: String, required: true },
     thumbnail: { type: Schema.Types.ObjectId, ref: "images" },
+    is_sale: { type: Boolean, default: false },
     price: { type: Number, required: true, default: 0 },
-    is_sale: {
-      type: String,
-      enum: ["sale", "normal"],
-      default: "normal",
-    },
     priceSale: { type: Number, require: true, default: 0 },
     sold: { type: Number, default: 0 },
     status: {

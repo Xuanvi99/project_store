@@ -76,7 +76,7 @@ function Footer() {
 
   useEffect(() => {
     const totalPriceOrder = listCheckCart.reduce((a, b) => {
-      if (b.productId.is_sale === "sale") {
+      if (b.productId.is_sale) {
         return a + b.productId.priceSale * b.quantity;
       } else {
         return a + b.productId.price * b.quantity;
@@ -91,7 +91,7 @@ function Footer() {
         return a + b.productId.price * b.quantity;
       }, 0);
       const totalDiscount = listCheckCart.reduce((a, b) => {
-        if (b.productId.is_sale === "sale") {
+        if (b.productId.is_sale) {
           return a + (b.productId.price - b.productId.priceSale) * b.quantity;
         } else {
           return 0;

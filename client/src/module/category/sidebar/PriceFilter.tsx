@@ -22,8 +22,10 @@ function PriceFilter() {
   });
 
   useEffect(() => {
-    const start = filter.min_price == 0 ? minPrice : filter.min_price;
-    const end = filter.max_price === 0 ? maxPrice : filter.max_price;
+    const start =
+      filter.min_price === 0 || !filter.min_price ? minPrice : filter.min_price;
+    const end =
+      filter.max_price === 0 || !filter.max_price ? maxPrice : filter.max_price;
     setPriceFilter({ start, end });
   }, [filter.max_price, filter.min_price, maxPrice, minPrice]);
 

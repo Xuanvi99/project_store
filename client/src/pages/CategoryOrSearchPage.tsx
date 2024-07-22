@@ -16,7 +16,7 @@ function CategoryOrSearchPage() {
   return (
     <Fragment>
       <BannerCommon
-        heading={slug ? "Danh mục sản phẩm" : "Tìm kiếm sản phẩm"}
+        heading={slug ? "Danh Mục Sản Phẩm" : "Tìm Kiếm Sản Phẩm"}
         title={slug ? "Giày " + slug : "Tìm kiếm sản phẩm"}
       ></BannerCommon>
       <LayoutMain>

@@ -1,4 +1,4 @@
-import { useGetLoadMoreDataQuery } from "@/stores/service/product.service";
+import { useGetProductLoadMoreDataQuery } from "@/stores/service/product.service";
 import { IProductRes, paramsFilterProduct } from "@/types/product.type";
 import { QueryStatus } from "@reduxjs/toolkit/query";
 import { createContext, useEffect, useState } from "react";
@@ -7,14 +7,12 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 export type ICategoryProvide = {
   filter: paramsFilterProduct;
 
-  data:
-    | {
-        data: IProductRes[];
-        totalPage: number;
-        result_filter: number;
-        result_search: IProductRes[];
-      }
-    | undefined;
+  data: {
+    listProduct: IProductRes[];
+    totalPage: number;
+    amount_filter: number;
+    result_search: IProductRes[];
+  };
 
   maxPrice: number;
 
@@ -66,12 +64,12 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
     data: resProduct,
     isFetching,
     status,
-  } = useGetLoadMoreDataQuery(filter);
+  } = useGetProductLoadMoreDataQuery(filter);
 
   const [data, setData] = useState<ICategoryProvide["data"]>({
-    data: [],
+    listProduct: [],
     totalPage: 0,
-    result_filter: 0,
+    amount_filter: 0,
     result_search: [],
   });
 
@@ -93,34 +91,22 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
     if (
       pathname &&
       data &&
-      data.result_filter > 0 &&
+      data.amount_filter > 0 &&
       data.result_search &&
       data.result_search.length > 0
     ) {
       const product = [...data.result_search];
       const priceProduct = product.sort((a, b) => {
-        let a_price = 0,
-          b_price = 0;
-        if (a.is_sale === "sale") {
-          a_price = a.priceSale;
-        } else {
-          a_price = a.price;
-        }
-        if (b.is_sale === "sale") {
-          b_price = b.priceSale;
-        } else {
-          b_price = b.price;
-        }
+        const a_price = a.is_sale ? a.priceSale : a.price;
+        const b_price = b.is_sale ? b.priceSale : b.price;
         return a_price - b_price;
       });
-      const min_price =
-        priceProduct[0].is_sale === "sale"
-          ? priceProduct[0].priceSale
-          : priceProduct[0].price;
-      const max_price =
-        priceProduct[priceProduct.length - 1].is_sale === "sale"
-          ? priceProduct[priceProduct.length - 1].priceSale
-          : priceProduct[priceProduct.length - 1].price;
+      const min_price = priceProduct[0].is_sale
+        ? priceProduct[0].priceSale
+        : priceProduct[0].price;
+      const max_price = priceProduct[priceProduct.length - 1].is_sale
+        ? priceProduct[priceProduct.length - 1].priceSale
+        : priceProduct[priceProduct.length - 1].price;
       setMinPrice(min_price);
       setMaxPrice(max_price);
     } else {

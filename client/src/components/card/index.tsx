@@ -18,7 +18,7 @@ function Card({ product }: ICardItemProps) {
       to={`/product_detail/${product?.slug}_${product?._id}`}
       className="relative rounded-sm card-item shadow-shadow77 cursor-pointer shadow-grayCa bg-grayF5"
     >
-      {product.is_sale === "sale" && (
+      {product.is_sale && (
         <CardSales
           discount={Math.ceil(
             ((product.price - product.priceSale) * 100) / product.price
@@ -33,14 +33,14 @@ function Card({ product }: ICardItemProps) {
             <Card.Info title="Giá">
               <span
                 className={
-                  product.is_sale === "sale"
+                  product.is_sale
                     ? "line-through text-xs"
                     : "text-red-600 text-lg"
                 }
               >
                 {formatPrice(product.price)}₫
               </span>
-              {product.is_sale === "sale" && (
+              {product.is_sale && (
                 <span className="text-lg text-red-600">
                   {formatPrice(product.priceSale)}₫
                 </span>

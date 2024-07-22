@@ -9,8 +9,13 @@ export const productCategory = [
 ];
 
 export const OptionPrice = [
-  { id: "1", label: "Giá thấp đến cao", value: "asc" },
-  { id: "2", label: "Giá cao đến thấp", value: "desc" },
+  { id: "1", label: "Giá: thấp đến cao", value: "asc" },
+  { id: "2", label: "Giá: cao đến thấp", value: "desc" },
+];
+
+export const optionLimit = [
+  { id: "1", label: "5", value: "5" },
+  { id: "2", label: "10", value: "10" },
 ];
 
 export const OptionSearch: {

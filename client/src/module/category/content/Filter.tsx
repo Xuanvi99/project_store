@@ -15,8 +15,10 @@ function Filter() {
     useTestContext<ICategoryProvide>(
       CategoryContext as React.Context<ICategoryProvide>
     );
+  console.log(filter);
 
   const [active, setActive] = useState<string>(filter.sortBy);
+  console.log("active: ", active);
 
   const handleActive = (id: string) => {
     setActive(id);
@@ -33,7 +35,7 @@ function Filter() {
       {pathname === "/search" && (
         <>
           <div className="flex items-center justify-center w-full text-xl font-bold">
-            Tìm Kiếm sản phẩm
+            Tìm Kiếm Sản Phẩm
           </div>
           <div className="flex items-center justify-between w-full font-bold">
             <div className="flex basis-5/6 gap-x-2">
@@ -94,9 +96,9 @@ function Filter() {
                       order: "",
                     });
                     handleSetData({
-                      data: [],
+                      listProduct: [],
                       totalPage: 0,
-                      result_filter: 0,
+                      amount_filter: 0,
                       result_search: [],
                     });
                   }}
@@ -108,10 +110,14 @@ function Filter() {
           </div>
           <Dropdown
             className={{
-              select: "max-h-7 " + `${active === "price" && "text-danger"}`,
+              select:
+                "max-h-7 " +
+                `${
+                  filter.sortBy === "price" && filter.order ? "text-danger" : ""
+                }`,
             }}
-            active={active}
             title="Thứ tự theo giá"
+            value={filter.order}
             options={OptionPrice}
             handleSelect={(option) => {
               handleActive("price");
@@ -124,9 +130,9 @@ function Filter() {
                 order: option.value as "" | "desc" | "asc" | undefined,
               });
               handleSetData({
-                data: [],
+                listProduct: [],
                 totalPage: 0,
-                result_filter: 0,
+                amount_filter: 0,
                 result_search: [],
               });
             }}
@@ -134,7 +140,7 @@ function Filter() {
         </div>
         <div className="flex items-center text-sm gap-x-2">
           <span className="font-bold text-orange">Kết quả:</span>
-          <span>{data?.result_filter}</span>
+          <span>{data?.amount_filter}</span>
           <span>sản phẩm</span>
         </div>
       </div>

@@ -1,10 +1,7 @@
-import { lazy } from "react";
 import Sidebar from "./sidebar";
 import Header from "./header";
+import * as Product from "./product";
+import * as Order from "./order";
+import Home from "./home";
 
-const Product = lazy(() => import("./product"));
-const Comment = lazy(() => import("./comment"));
-const Home = lazy(() => import("./home"));
-const Order = lazy(() => import("./order"));
-
-export { Sidebar, Product, Header, Comment, Home, Order };
+export { Sidebar, Header, Home, Product, Order };

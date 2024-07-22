@@ -15,6 +15,8 @@ routes.route("/api/product/").post(
   productCtrl.addProduct
 );
 
+routes.route("/api/product/sale").get(productCtrl.getListProductSale);
+
 routes
   .route("/api/product/checkName")
   .post(

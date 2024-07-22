@@ -112,17 +112,39 @@ const router = createBrowserRouter([
     children: [
       { path: "/dashboard/home", element: <Dashboard.Home></Dashboard.Home> },
       {
-        path: "/dashboard/product/",
-        element: <Dashboard.Product></Dashboard.Product>,
+        path: "/dashboard/product",
+        children: [
+          {
+            path: "/dashboard/product/list",
+            element: <Dashboard.Product.List></Dashboard.Product.List>,
+          },
+          {
+            path: "/dashboard/product/create",
+            element: <Dashboard.Product.Create></Dashboard.Product.Create>,
+          },
+        ],
       },
       {
-        path: "/dashboard/comment",
-        element: <Dashboard.Comment></Dashboard.Comment>,
+        path: "/dashboard/order",
+        children: [
+          {
+            path: "/dashboard/order/home",
+            element: <Dashboard.Order.Home></Dashboard.Order.Home>,
+          },
+          {
+            path: "/dashboard/order/detail/:slug",
+            element: <Dashboard.Order.Detail></Dashboard.Order.Detail>,
+          },
+          {
+            path: "/dashboard/order/print",
+            element: <Dashboard.Order.Print></Dashboard.Order.Print>,
+          },
+        ],
       },
-      {
-        path: "/dashboard/order/:slug",
-        element: <Dashboard.Order></Dashboard.Order>,
-      },
+      // {
+      //   path: "/dashboard/comment",
+      //   element: <Dashboard.Comment></Dashboard.Comment>,
+      // },
     ],
   },
   {

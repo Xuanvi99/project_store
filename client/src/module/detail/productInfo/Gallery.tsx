@@ -91,7 +91,7 @@ const Gallery = () => {
             );
           })}
         </SlideSwiper>
-        {data.is_sale === "sale" && (
+        {data.is_sale && (
           <CardSales
             discount={Math.ceil(
               ((data.price - data.priceSale) * 100) / data.price

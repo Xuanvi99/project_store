@@ -14,12 +14,13 @@ interface IProps {
 
 export default function ProductSlideshow({ name = "" }: IProps) {
   const { data: resProduct, isLoading } = useGetListProductQuery({
-    search: name,
+    search: name === "sale" ? "" : name,
     activePage: 1,
     limit: 10,
+    is_sale: name === "sale" ? true : false,
   });
 
-  if ((!resProduct || resProduct.data.length === 0) && !isLoading) {
+  if ((!resProduct || resProduct.listProduct.length === 0) && !isLoading) {
     return <></>;
   }
 
@@ -45,7 +46,7 @@ export default function ProductSlideshow({ name = "" }: IProps) {
               alt=""
               loading="lazy"
               srcSet="/flashSales.png"
-              className=" h-[50px] absolute left-[105%] top-1/2 -translate-y-1/2"
+              className="h-[50px] absolute left-[105%] top-1/2 -translate-y-1/2"
             />
           )}
         </div>
@@ -53,7 +54,7 @@ export default function ProductSlideshow({ name = "" }: IProps) {
           to={`/category/${name}`}
           className={cn(
             "flex items-center text-base duration-500 gap-x-1 ",
-            name === "flashSale" ? "hover:text-white" : "hover:text-black"
+            name === "sale" ? "hover:text-white" : "hover:text-black"
           )}
         >
           <span>Xem thêm</span>
@@ -63,21 +64,24 @@ export default function ProductSlideshow({ name = "" }: IProps) {
       {!isLoading && (
         <SlideSwiper
           optionSwiper={{
-            quantitySlide: resProduct?.data.length || 10,
+            quantitySlide: resProduct?.listProduct.length || 10,
             slidesPerView: 5,
             spaceBetween: 10,
             slidesPerGroup: 1,
             lazyPreloadPrevNext: 1,
             grabCursor: true,
-            loop: resProduct && resProduct?.data.length > 5 ? true : false,
+            loop:
+              resProduct && resProduct?.listProduct.length > 5 ? true : false,
             speed: 100,
           }}
           slideHover={
-            resProduct?.data && resProduct?.data.length > 5 ? true : false
+            resProduct?.listProduct && resProduct?.listProduct.length > 5
+              ? true
+              : false
           }
           className={{ container: "mt-5" }}
         >
-          {resProduct?.data.map((product, index) => {
+          {resProduct?.listProduct.map((product, index) => {
             return (
               <SwiperSlide key={index}>
                 <Card product={product}></Card>

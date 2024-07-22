@@ -5,7 +5,7 @@ import Header from "./Header.create";
 function CreateProduct() {
   return (
     <CreatePdProvide>
-      <div className="w-full h-full text-dark px-6 mt-5">
+      <div className="w-full h-full text-dark">
         <div className="flex items-center justify-between w-full">
           <div className="text-xl font-semibold ">Tạo sản phẩm</div>
           <Button variant="default">Xem danh sách</Button>

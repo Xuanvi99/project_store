@@ -20,7 +20,7 @@ function OrderItem({ data }: { data: ICartItem<IProductRes> }) {
       <div className="grid w-1/2 grid-cols-3 text-sm text-center text-grayDark gap-x-5">
         <span>
           {formatPrice(
-            productId.is_sale === "sale" ? productId.priceSale : productId.price
+            productId.is_sale ? productId.priceSale : productId.price
           )}
           ₫
         </span>
@@ -28,11 +28,7 @@ function OrderItem({ data }: { data: ICartItem<IProductRes> }) {
         <span className="text-danger">
           {formatPrice(
             quantity *
-              Number(
-                productId.is_sale === "sale"
-                  ? productId.priceSale
-                  : productId.price
-              )
+              Number(productId.is_sale ? productId.priceSale : productId.price)
           )}
           ₫
         </span>

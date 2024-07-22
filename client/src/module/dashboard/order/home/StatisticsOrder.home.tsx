@@ -5,9 +5,9 @@ function StatisticsOrder() {
   const { data, isFetching } = useGetStatisticsOrderQuery();
 
   return (
-    <div className="grid grid-cols-5 gap-x-5">
+    <div className="grid grid-cols-4 grid-rows-2 gap-x-5 gap-y-5">
       <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
-        <span>TỔNG ĐƠN</span>
+        <span>TỔNG ĐƠN HÀNG</span>
         <span className="flex items-center gap-x-1">
           {isFetching ? (
             <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
@@ -24,6 +24,17 @@ function StatisticsOrder() {
             <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
           ) : (
             <span>{data?.pending}</span>
+          )}
+          <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
+        </span>
+      </div>
+      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
+        <span>ĐƠN CHỜ VẬN CHUYỂN</span>
+        <span className="flex items-center gap-x-1">
+          {isFetching ? (
+            <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
+          ) : (
+            <span>{data?.confirmed}</span>
           )}
           <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
         </span>

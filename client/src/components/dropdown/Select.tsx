@@ -7,14 +7,14 @@ type TSelectProps = {
   onClick: () => void;
 };
 
-type TSelectRef = HTMLUListElement;
+type TSelectRef = HTMLDivElement;
 
 const Select = forwardRef<TSelectRef, TSelectProps>(function Select(
   { children, className, ...props },
   ref
 ) {
   return (
-    <ul
+    <div
       ref={ref}
       {...props}
       className={cn(
@@ -23,7 +23,7 @@ const Select = forwardRef<TSelectRef, TSelectProps>(function Select(
       )}
     >
       {children}
-    </ul>
+    </div>
   );
 });
 

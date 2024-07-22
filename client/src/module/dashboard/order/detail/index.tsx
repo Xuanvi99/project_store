@@ -3,7 +3,7 @@ import {
   useGetOrderDetailQuery,
   useUpdateOrderMutation,
 } from "@/stores/service/order.service";
-import { useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import InfoProductOrder from "./InfoProductOrder";
 import { IconShoppingFee } from "@/components/icon";
 import {
@@ -19,10 +19,11 @@ import {
 import { useGetAddressQuery } from "@/stores/service/address.service";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { reqCreateOrder } from "@/types/transport.type";
 import { ModalNotification } from "@/components/modal";
 import LoadingSpinner, { LoadingCallApi } from "@/components/loading";
+import HeaderOrder from "../header";
 
 type TParams = {
   [P in keyof reqCreateOrder]?: reqCreateOrder[P];
@@ -31,24 +32,9 @@ type TParams = {
 function OrderDetail() {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
 
-  const [searchParams] = useSearchParams();
-  const codeOrder = searchParams.get("codeOrder") || "";
+  const { slug } = useParams();
 
-  const { data: dataOrderDetail, status: statusOrderDetail } =
-    useGetOrderDetailQuery(codeOrder);
-
-  console.log(dataOrderDetail);
-
-  const id = user ? user._id : "";
-  const { data: dataAddress, status: statusAddress } = useGetAddressQuery(id, {
-    skip: !id,
-  });
-
-  const [postCreateOrder] = usePostCreateOrderMutation();
-  const [updateOrder] = useUpdateOrderMutation();
-  const [canceledOrderTransport] = useCanceledOrderTransportMutation();
-  const [EditCancelledOrder, { isLoading: isLoadingCancelledOrder }] =
-    useEditCancelledOrderMutation();
+  const [codeOrder, setCodeOrder] = useState<string>("");
 
   const [reqCreateOrder, setReqCreateOrder] = useState<reqCreateOrder>({
     payment_type_id: 2,
@@ -92,6 +78,20 @@ function OrderDetail() {
     type: "success" | "error" | "info" | "warning" | "default";
     message: string;
   }>({ type: "default", message: "" });
+
+  const [postCreateOrder] = usePostCreateOrderMutation();
+  const [updateOrder] = useUpdateOrderMutation();
+  const [canceledOrderTransport] = useCanceledOrderTransportMutation();
+  const [EditCancelledOrder, { isLoading: isLoadingCancelledOrder }] =
+    useEditCancelledOrderMutation();
+
+  const { data: dataOrderDetail, status: statusOrderDetail } =
+    useGetOrderDetailQuery(codeOrder);
+
+  const id = user ? user._id : "";
+  const { data: dataAddress, status: statusAddress } = useGetAddressQuery(id, {
+    skip: !id,
+  });
 
   const handleSetReqCreateOrder = useCallback((value: TParams) => {
     setReqCreateOrder((reqCreateOrder) => ({
@@ -180,6 +180,12 @@ function OrderDetail() {
   };
 
   useEffect(() => {
+    if (slug) {
+      setCodeOrder(slug);
+    }
+  }, [slug]);
+
+  useEffect(() => {
     if (dataAddress && statusAddress === "fulfilled") {
       handleSetReqCreateOrder({
         to_ward_code: dataAddress.address.wardCode + "",
@@ -246,7 +252,7 @@ function OrderDetail() {
   }
 
   return (
-    <div className="detail-order">
+    <Fragment>
       <ModalNotification
         type={notify.type}
         isOpenModal={openModal}
@@ -258,155 +264,158 @@ function OrderDetail() {
       >
         <span>{notify.message}</span>
       </ModalNotification>
-      <div className="w-full p-5 bg-white border-b-1 border-b-grayCa">
-        <div className="pb-5 border-b-1 border-b-grayCa">
-          <h1 className="text-lg font-semibold">
-            Đơn hàng{" "}
-            <span className="underline text-blue">
-              #{searchParams.get("codeOrder")}
-            </span>
-          </h1>
-          <span className="mt-2 text-sm text-gray98">
-            Thông tin chi tiết đơn hàng và xác nhận đơn hàng tại đây
-          </span>
-        </div>
-        <div className="flex flex-col mt-5 gap-y-3">
-          <div className="flex gap-x-2">
-            <span>Trạng thái:</span>
-            <span className="font-semibold text-danger">
-              {FormatStatusOrder(dataOrderDetail.order.statusOrder)}
+      <HeaderOrder></HeaderOrder>
+      <div className="detail-order px-6 mt-5">
+        <div className="w-full p-5 bg-white border-b-1 border-b-grayCa">
+          <div className="pb-5 border-b-1 border-b-grayCa">
+            <h1 className="text-lg font-semibold">
+              Đơn hàng <span className="underline text-blue">#{codeOrder}</span>
+            </h1>
+            <span className="mt-2 text-sm text-gray98">
+              Thông tin chi tiết đơn hàng và xác nhận đơn hàng tại đây
             </span>
           </div>
-          <div className="flex text-sm gap-x-2">
-            <span>Thời gian đặt hàng:</span>
-            <span>
-              {"" + new Date(dataOrderDetail.order.createdAt).toLocaleString()}
-            </span>
-          </div>
-          {dataOrderDetail.order.statusOrder !== "cancelled" && (
+          <div className="flex flex-col mt-5 gap-y-3">
+            <div className="flex gap-x-2">
+              <span>Trạng thái:</span>
+              <span className="font-semibold text-danger">
+                {FormatStatusOrder(dataOrderDetail.order.statusOrder)}
+              </span>
+            </div>
             <div className="flex text-sm gap-x-2">
-              <span>Thời gian dự kiến:</span>
+              <span>Thời gian đặt hàng:</span>
               <span>
                 {"" +
-                  new Date(
-                    dataOrderDetail.order.delivery_at
-                  ).toLocaleDateString()}
+                  new Date(dataOrderDetail.order.createdAt).toLocaleString()}
               </span>
             </div>
-          )}
-          {dataOrderDetail.order.statusOrder === "cancelled" && (
-            <>
-              <div className="flex gap-x-2">
-                <span>Thời gian hủy:</span>
+            {dataOrderDetail.order.statusOrder !== "cancelled" && (
+              <div className="flex text-sm gap-x-2">
+                <span>Thời gian dự kiến giao:</span>
                 <span>
-                  {new Date(
-                    dataOrderDetail.order.canceled_at
-                  ).toLocaleTimeString()}
-                  ,{" "}
-                  {new Date(
-                    dataOrderDetail.order.canceled_at
-                  ).toLocaleDateString()}
+                  {"" +
+                    new Date(
+                      dataOrderDetail.order.delivery_at
+                    ).toLocaleDateString()}
                 </span>
               </div>
-              <div className="flex gap-x-2">
-                <span>Lý do:</span>
-                <span className="text-sm italic font-semibold">
-                  {dataOrderDetail.order.reasonCanceled}
+            )}
+            {dataOrderDetail.order.statusOrder === "cancelled" && (
+              <>
+                <div className="flex gap-x-2">
+                  <span>Thời gian hủy:</span>
+                  <span>
+                    {new Date(
+                      dataOrderDetail.order.canceled_at
+                    ).toLocaleTimeString()}
+                    ,{" "}
+                    {new Date(
+                      dataOrderDetail.order.canceled_at
+                    ).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex gap-x-2">
+                  <span>Lý do:</span>
+                  <span className="text-sm italic font-semibold">
+                    {dataOrderDetail.order.reasonCanceled}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+          <div className="flex mt-5 gap-x-2">
+            <div className="basis-1/3">
+              <h2 className="font-semibold text-start">Thông tin người đặt </h2>
+              <div className="grid grid-cols-[70px_auto] grid-rows-[40px_40px_40px] mt-2 text-sm border-1 border-orange rounded-md p-5">
+                <span>Tên:</span>
+                <span className={"font-semibold"}>
+                  {dataOrderDetail.order.customer.name}
+                </span>
+                <span>Số đt:</span>
+                <span className={"font-semibold"}>
+                  {dataOrderDetail.order.customer.phone}
+                </span>
+                <span>Địa chỉ:</span>
+                <span className={"font-semibold"}>
+                  {dataOrderDetail.order.customer.address}
                 </span>
               </div>
-            </>
-          )}
-        </div>
-        <div className="flex mt-5 gap-x-2">
-          <div className="basis-1/3">
-            <h2 className="font-semibold text-start">Thông tin người đặt </h2>
-            <div className="grid grid-cols-[70px_auto] grid-rows-[40px_40px_40px] mt-2 text-sm border-1 border-orange rounded-md p-5">
-              <span>Tên:</span>
-              <span className={"font-semibold"}>
-                {dataOrderDetail.order.customer.name}
-              </span>
-              <span>Số đt:</span>
-              <span className={"font-semibold"}>
-                {dataOrderDetail.order.customer.phone}
-              </span>
-              <span>Địa chỉ:</span>
-              <span className={"font-semibold"}>
-                {dataOrderDetail.order.customer.address}
-              </span>
+            </div>
+            <div className="basis-1/3">
+              <h2 className="font-semibold text-start">Thông tin thanh toán</h2>
+              <div className="grid grid-cols-[100px_auto] grid-rows-[40px_40px_40px] mt-2 text-sm border-1 border-orange rounded-md p-5">
+                <span>Hình thức:</span>
+                <span className={"font-semibold"}>
+                  {dataOrderDetail.order.paymentMethod === "cod"
+                    ? "Thanh toán khi nhận(COD)"
+                    : "Thanh toán Vnpay"}
+                </span>
+                <span>Mã hóa đơn:</span>
+                <span className={"font-semibold"}>
+                  {dataOrderDetail.order.codeBill || "Không"}
+                </span>
+                <span>Trạng thái:</span>
+                <span className={"font-semibold"}>
+                  {"" +
+                    FormatPaymentStatusOrder(
+                      dataOrderDetail.order.paymentStatus
+                    )}
+                </span>
+              </div>
+            </div>
+            <div className="basis-1/3">
+              <h2 className="font-semibold text-start">Thông tin vận chuyển</h2>
+              <div className="grid grid-cols-[100px_auto] grid-rows-[40px_40px_40px] mt-2 text-sm border-1 border-orange rounded-md p-5">
+                <span className="col-span-2">
+                  <IconShoppingFee size={40}></IconShoppingFee>
+                </span>
+                <span> Đơn vị:</span>
+                <span className={"font-semibold"}>
+                  {FormatShippingUnit(dataOrderDetail.order.shippingUnit)}
+                </span>
+                <span>Mã đơn hàng:</span>
+                <span className={"font-semibold"}>
+                  {dataOrderDetail.order.shippingCode || "Chưa đăng ký"}
+                </span>
+              </div>
             </div>
           </div>
-          <div className="basis-1/3">
-            <h2 className="font-semibold text-start">Thông tin thanh toán</h2>
-            <div className="grid grid-cols-[100px_auto] grid-rows-[40px_40px_40px] mt-2 text-sm border-1 border-orange rounded-md p-5">
-              <span>Hình thức:</span>
-              <span className={"font-semibold"}>
-                {dataOrderDetail.order.paymentMethod === "cod"
-                  ? "Thanh toán khi nhận(COD)"
-                  : "Thanh toán Vnpay"}
-              </span>
-              <span>Mã hóa đơn:</span>
-              <span className={"font-semibold"}>
-                {dataOrderDetail.order.codeBill || "Không"}
-              </span>
-              <span>Trạng thái:</span>
-              <span className={"font-semibold"}>
-                {"" +
-                  FormatPaymentStatusOrder(dataOrderDetail.order.paymentStatus)}
-              </span>
-            </div>
+          <InfoProductOrder data={dataOrderDetail?.order}></InfoProductOrder>
+          <div className="flex items-center justify-end mt-10 text-sm gap-x-4">
+            {dataOrderDetail.order.statusOrder === "pending" ||
+            dataOrderDetail.order.statusOrder === "confirmed" ? (
+              <Button
+                variant="default"
+                type="button"
+                onClick={handleCanceledOrder}
+                className={
+                  isLoadingCancelledOrder
+                    ? "min-w-[80px] flex justify-center"
+                    : ""
+                }
+              >
+                {isLoadingCancelledOrder ? (
+                  <LoadingSpinner className=""></LoadingSpinner>
+                ) : (
+                  "Hủy đơn"
+                )}
+              </Button>
+            ) : (
+              <></>
+            )}
+            {dataOrderDetail.order.statusOrder === "pending" && (
+              <Button
+                variant="default"
+                type="button"
+                onClick={handleCreateOrderShipping}
+              >
+                Xác nhận
+              </Button>
+            )}
           </div>
-          <div className="basis-1/3">
-            <h2 className="font-semibold text-start">Thông tin vận chuyển</h2>
-            <div className="grid grid-cols-[100px_auto] grid-rows-[40px_40px_40px] mt-2 text-sm border-1 border-orange rounded-md p-5">
-              <span className="col-span-2">
-                <IconShoppingFee size={40}></IconShoppingFee>
-              </span>
-              <span> Đơn vị:</span>
-              <span className={"font-semibold"}>
-                {FormatShippingUnit(dataOrderDetail.order.shippingUnit)}
-              </span>
-              <span>Mã đơn hàng:</span>
-              <span className={"font-semibold"}>
-                {dataOrderDetail.order.shippingCode || "Chưa đăng ký"}
-              </span>
-            </div>
-          </div>
-        </div>
-        <InfoProductOrder data={dataOrderDetail?.order}></InfoProductOrder>
-        <div className="flex items-center justify-end mt-10 text-sm gap-x-4">
-          {dataOrderDetail.order.statusOrder === "pending" ||
-          dataOrderDetail.order.statusOrder === "confirmed" ? (
-            <Button
-              variant="default"
-              type="button"
-              onClick={handleCanceledOrder}
-              className={
-                isLoadingCancelledOrder
-                  ? "min-w-[80px] flex justify-center"
-                  : ""
-              }
-            >
-              {isLoadingCancelledOrder ? (
-                <LoadingSpinner className=""></LoadingSpinner>
-              ) : (
-                "Hủy đơn"
-              )}
-            </Button>
-          ) : (
-            <></>
-          )}
-          {dataOrderDetail.order.statusOrder === "pending" && (
-            <Button
-              variant="default"
-              type="button"
-              onClick={handleCreateOrderShipping}
-            >
-              Xác nhận
-            </Button>
-          )}
         </div>
       </div>
-    </div>
+    </Fragment>
   );
 }
 

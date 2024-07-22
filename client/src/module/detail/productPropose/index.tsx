@@ -7,6 +7,8 @@ import SlideSwiper from "@/components/slideshows";
 import Card from "@/components/card";
 import { cn } from "@/utils";
 import CartSkeleton from "@/components/card/card-skeleton";
+import { Link } from "react-router-dom";
+import { IconChevronRight } from "@/components/icon";
 
 export default function ProductPropose() {
   const { data } = useTestContext<IProductDetailProvide>(
@@ -28,9 +30,16 @@ export default function ProductPropose() {
           "bg-white text-orange"
         )}
       >
-        <div className="relative flex items-center text-2xl gap-x-2">
-          <span>Khám phá thêm</span>
-        </div>
+        <span className="text-2xl">Khám phá thêm</span>
+        <Link
+          to={`/category/${data?.brand}?page=1`}
+          className={cn(
+            "flex items-center text-base duration-500 gap-x-1 hover:text-black"
+          )}
+        >
+          <span>Xem thêm</span>
+          <IconChevronRight size={14}></IconChevronRight>
+        </Link>
       </div>
       <SlideSwiper
         optionSwiper={{

@@ -12,6 +12,7 @@ function Header() {
       <Button
         variant={activeStep === "1" ? "default" : "outLine-flex"}
         onClick={() => handleActiveStep("1")}
+        disabled={activeStep === "1" ? false : true}
         className="flex items-center justify-start basis-1/3 gap-x-3"
       >
         <span>1.</span>
@@ -20,6 +21,7 @@ function Header() {
       <Button
         variant={activeStep === "2" ? "default" : "outLine-flex"}
         onClick={() => handleActiveStep("2")}
+        disabled={activeStep === "2" ? false : true}
         className="flex items-center justify-start basis-1/3 gap-x-3"
       >
         <span>2.</span>
@@ -28,6 +30,7 @@ function Header() {
       <Button
         variant={activeStep === "3" ? "default" : "outLine-flex"}
         onClick={() => handleActiveStep("3")}
+        disabled={activeStep === "3" ? false : true}
         className="flex items-center justify-start basis-1/3 gap-x-3"
       >
         <span>3.Size - Số lượng</span>

@@ -226,7 +226,7 @@ function CartItem({
       </div>
       <div className="grid w-[560px] grid-cols-3 gap-x-2">
         <span className="flex items-center justify-center gap-x-2">
-          {product && product.is_sale === "sale" ? (
+          {product && product.is_sale ? (
             <>
               <p className="text-sm line-through text-gray">
                 {formatPrice(product.price)}₫
@@ -268,7 +268,7 @@ function CartItem({
             +
           </button>
         </div>
-        {product && product.is_sale === "sale" ? (
+        {product && product.is_sale ? (
           <span className="flex items-center justify-center text-red-600">
             {formatPrice(product.priceSale * quantityOrder)}₫
           </span>

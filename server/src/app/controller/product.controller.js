@@ -14,9 +14,13 @@ class Product {
     const search = req.query.search || "";
     const limit = +req.query.limit;
     const productId = req.query.productId || null;
+    const is_sale = req.query.is_sale || false;
+    console.log("is_sale: ", is_sale);
     const skip = (activePage - 1) * limit;
 
     try {
+      let sale = is_sale === "true" ? [true] : [true, false];
+      console.log("sale: ", sale);
       const listProduct = await productModel
         .find({
           $and: [
@@ -25,8 +29,10 @@ class Product {
                 { name: { $regex: search, $options: "i" } },
                 { brand: { $regex: search, $options: "i" } },
                 { slug: { $regex: search, $options: "i" } },
-                { is_sale: { $regex: search, $options: "i" } },
               ],
+            },
+            {
+              is_sale: { $in: sale },
             },
             { _id: { $ne: productId } },
           ],
@@ -50,8 +56,10 @@ class Product {
                 { name: { $regex: search, $options: "i" } },
                 { brand: { $regex: search, $options: "i" } },
                 { slug: { $regex: search, $options: "i" } },
-                { is_sale: { $regex: search, $options: "i" } },
               ],
+            },
+            {
+              is_sale: { $in: sale },
             },
             { _id: { $ne: productId } },
           ],
@@ -59,10 +67,10 @@ class Product {
         countProduct = findProduct.length;
         totalPage = Math.ceil(findProduct.length / limit);
       } else {
-        countProduct = await productModel.countDocuments();
-        totalPage = Math.ceil(countProduct / limit);
+        const findProduct = await productModel.find({ is_sale: { $in: sale } });
+        totalPage = Math.ceil(findProduct.length / limit);
       }
-      res.status(200).json({ data: listProduct, totalPage });
+      res.status(200).json({ listProduct, totalPage });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
@@ -73,8 +81,8 @@ class Product {
     const search = req.query.search || "";
     const limit = +req.query.limit;
     const { sortBy, order } = req.query;
-    const min_price = +req.query.min_price;
-    const max_price = +req.query.max_price;
+    const min_price = +req.query.min_price || 0;
+    const max_price = +req.query.max_price || 0;
     const skip = (activePage - 1) * limit;
     try {
       const customSort = () => {
@@ -98,7 +106,6 @@ class Product {
                 { name: { $regex: search, $options: "i" } },
                 { brand: { $regex: search, $options: "i" } },
                 { slug: { $regex: search, $options: "i" } },
-                { is_sale: { $regex: search, $options: "i" } },
               ],
             },
           ],
@@ -106,6 +113,7 @@ class Product {
         .populate([
           { path: "thumbnail", select: "url" },
           { path: "inventoryId", select: "_id sold total stocked" },
+          { path: "categoryId", select: "_id name" },
         ])
         .sort(customSort());
 
@@ -134,19 +142,8 @@ class Product {
 
       if (order) {
         listProductFilter = listProductFilter.sort((a, b) => {
-          let a_price = 0,
-            b_price = 0;
-          if (a.is_sale === "sale") {
-            a_price = a.priceSale;
-          } else {
-            a_price = a.price;
-          }
-
-          if (b.is_sale === "sale") {
-            b_price = b.priceSale;
-          } else {
-            b_price = b.price;
-          }
+          const a_price = a.is_sale ? a.priceSale : a.price;
+          const b_price = b.is_sale ? b.priceSale : b.price;
 
           if (order === "asc") {
             return a_price - b_price;
@@ -168,11 +165,59 @@ class Product {
       const totalPage = Math.ceil(listFindProduct.length / limit);
 
       res.status(200).json({
-        data: listResultProduct,
+        listProduct: listResultProduct,
         totalPage,
-        result_filter: listProductFilter.length,
+        amount_filter: listProductFilter.length,
         result_search: listFindProduct,
       });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  getListProductSale = async (req, res) => {
+    const activePage = +req.query.activePage;
+    const limit = +req.query.limit;
+    const productId = req.query.productId || null;
+    const skip = (activePage - 1) * limit;
+
+    try {
+      const listProduct = await productModel
+        .find({
+          $and: [
+            {
+              is_sale: true,
+            },
+            { _id: { $ne: productId } },
+          ],
+        })
+        .populate([
+          { path: "thumbnail", select: "url" },
+          { path: "imageIds", select: "url" },
+          { path: "inventoryId", select: "_id sold total stocked" },
+        ])
+        .sort({ $natural: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      let totalPage = 0;
+      let countProduct = 0;
+      if (search) {
+        const findProduct = await productModel.find({
+          $and: [
+            {
+              is_sale: true,
+            },
+            { _id: { $ne: productId } },
+          ],
+        });
+        countProduct = findProduct.length;
+        totalPage = Math.ceil(findProduct.length / limit);
+      } else {
+        countProduct = await productModel.countDocuments();
+        totalPage = Math.ceil(countProduct / limit);
+      }
+      res.status(200).json({ data: listProduct, totalPage });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }

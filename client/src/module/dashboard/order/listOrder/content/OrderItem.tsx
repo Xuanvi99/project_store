@@ -71,7 +71,7 @@ function OrderItem({ data, index }: { data: IResOrder; index: number }) {
       <span className="text-danger">{formatPrice(total)}₫</span>
       <span>
         <Link
-          to={`/dashboard/order/detail?codeOrder=${codeOrder}`}
+          to={`/dashboard/order/detail/${codeOrder}`}
           className="font-semibold italic hover:text-blue hover:underline "
         >
           Xem chi tiết

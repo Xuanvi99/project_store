@@ -76,7 +76,7 @@ function ProductLoadMore() {
     });
   };
 
-  if (data?.data.length === 0 && !isFetching) {
+  if (data?.listProduct.length === 0 && !isFetching) {
     return (
       <div className="flex flex-col items-center justify-center mt-10">
         <img
@@ -109,7 +109,7 @@ function ProductLoadMore() {
   return (
     <Fragment>
       <div className="grid w-full grid-cols-4 gap-5">
-        {data?.data.map((product, index) => {
+        {data?.listProduct.map((product, index) => {
           return <Card key={index} product={product}></Card>;
         })}
       </div>

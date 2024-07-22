@@ -105,4 +105,5 @@ export interface IResStatisticsOrder {
   completed: number;
   pending: number;
   cancelled: number;
+  confirmed: number;
 }

@@ -60,9 +60,9 @@ const CategoryItem = ({ data }: { data: ICategory }) => {
         max_price: 0,
       });
       handleSetData({
-        data: [],
+        listProduct: [],
         totalPage: 0,
-        result_filter: 0,
+        amount_filter: 0,
         result_search: [],
       });
       navigate(`/category/${name.toLowerCase()}?page=1`);

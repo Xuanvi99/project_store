@@ -45,6 +45,7 @@ function LoginPage() {
   const { toggle: showPW, handleToggle: handleShowPW } = useToggle();
 
   const [statusError, setStatusError] = useState<number>(0);
+  console.log("statusError: ", statusError);
 
   const {
     control,
@@ -94,7 +95,7 @@ function LoginPage() {
     <LayoutAuth>
       <ModalNotification
         type={"warning"}
-        isOpenModal={!openModal}
+        isOpenModal={openModal}
         onClick={handleOpenModal}
       >
         <span className="text-center">

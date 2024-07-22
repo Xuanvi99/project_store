@@ -1,10 +1,11 @@
 import { IResOrder } from "@/types/order.type";
 import { formatPrice } from "@/utils";
-import ShippingFee from "./ShippingFee.purchase";
-import ListProduct from "./ListProduct.purchase";
 import HeaderPurchase from "./Header.purchase";
 import PaymentMethod from "./PaymentMethod.purchase";
+import ListProduct from "./ListProduct.purchase";
+import ShippingFee from "./ShippingFee.purchase";
 import BottomPurchase from "./Bottom.purchase";
+
 
 type TProps = {
   data: IResOrder;
@@ -16,7 +17,7 @@ function OrderItem({ data }: TProps) {
   return (
     <div className="w-full p-4 bg-white rounded-sm">
       <HeaderPurchase id={codeOrder} statusOrder={statusOrder}></HeaderPurchase>{" "}
-      <div className="flex text-sm gap-x-2 mt-5">
+      <div className="flex mt-5 text-sm gap-x-2">
         <span>Thời gian đặt hàng:</span>
         <span>
           {"" +

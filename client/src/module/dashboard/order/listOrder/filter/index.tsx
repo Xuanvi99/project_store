@@ -163,6 +163,7 @@ function FilterOrder() {
           <span className="whitespace-nowrap">Trạng thái:</span>
           <Dropdown
             title={statusOrder.label}
+            value={statusOrder.value}
             options={listOptionStatusOrder}
             className={{
               wrap: "min-w-[200px]",
@@ -200,7 +201,7 @@ function FilterOrder() {
           ></Input>
         </div>
       </div>
-      <div className="w-full flex justify-center mt-4 gap-x-4 text-xs ">
+      <div className="flex justify-center w-full mt-4 text-xs gap-x-4 ">
         <Button variant="default" onClick={handleSubmitFilter}>
           Tìm kiém
         </Button>

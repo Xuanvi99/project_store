@@ -1,7 +1,4 @@
-import CreateProduct from "./create";
+import Create from "./create";
+import List from "./list";
 
-function Product() {
-  return <CreateProduct></CreateProduct>;
-}
-
-export default Product;
+export { Create, List };

@@ -6,20 +6,20 @@ import Option from "./Option";
 import Select from "./Select";
 
 export type optionDropdown = {
+  id: string | number;
   label: string;
   value: string;
-  id: string | number;
 };
 
 interface IDropdownProps<T> {
   title: string;
+  value: string;
   options: T[];
   className?: {
     select?: string;
     option?: string;
     wrap?: string;
   };
-  active?: string;
   handleSelect?: (option: optionDropdown) => void;
 }
 
@@ -28,40 +28,46 @@ function Dropdown({
   options,
   className,
   handleSelect,
-  active,
+  value,
 }: IDropdownProps<optionDropdown>) {
   const {
     show: showOptions,
     handleShow,
     nodeRef,
-  } = useClickOutSide<HTMLUListElement>();
+  } = useClickOutSide<HTMLDivElement>();
 
-  const [label, setLabel] = useState<string>(title as string);
+  const [option, setOption] = useState<{ label: string; value: string }>({
+    label: title,
+    value: value,
+  });
 
   const handleClickOptions = (options: optionDropdown) => {
-    setLabel(options.label);
+    setOption({ label: options.label, value: options.value });
     if (handleSelect) handleSelect(options);
   };
 
   useEffect(() => {
-    if (active !== "4") {
-      setLabel(title);
+    const index = options.findIndex((option) => option.value === value);
+    if (index > -1) {
+      setOption({ label: options[index].label, value: options[index].value });
+    } else {
+      setOption({ label: title, value: value });
     }
-  }, [active, title]);
+  }, [options, title, value]);
 
   return (
     <div
       className={cn(
-        "min-w-[150px] bg-white relative rounded-md text-sm ",
+        "min-w-[150px] bg-white relative rounded-lg text-sm",
         className?.wrap
       )}
     >
       <Select
         ref={nodeRef}
         onClick={handleShow}
-        className={"" + className?.select}
+        className={"rounded-md " + className?.select}
       >
-        <h3 className="pr-3">{label}</h3>
+        <h3 className="pr-3">{option.label}</h3>
         <span className={showOptions ? "rotate-180" : "rotate-0"}>
           <IconDown></IconDown>
         </span>
@@ -69,7 +75,7 @@ function Dropdown({
       {showOptions && (
         <div
           className={cn(
-            "w-full absolute left-0 top-[102%] rounded-b-md bg-white z-20 shadow-md shadow-black drop-shadow-dropdown",
+            "w-full absolute left-0 top-[102%] rounded-b-md bg-white z-20 shadow-shadowButton drop-shadow-dropdown",
             className?.option
           )}
         >

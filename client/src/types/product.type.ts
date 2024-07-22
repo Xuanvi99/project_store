@@ -1,6 +1,10 @@
 import { IComment } from "./comment.type";
 import { IImage } from "./commonType";
 
+export type TParams<T> = {
+  [P in keyof T]?: T[P];
+};
+
 export interface IProductReq {
   name: string;
   summary: string;
@@ -34,8 +38,8 @@ export interface IProductRes {
   commentIds: IComment[];
   categoryId: { _id: string; name: string };
   inventoryId: IInventory;
-  is_sale: "sale" | "normal";
-  is_delete: boolean;
+  is_sale: boolean;
+  deleted: boolean;
 }
 
 export type paramsListProduct = {
@@ -43,20 +47,21 @@ export type paramsListProduct = {
   limit: number | 10;
   search: string;
   productId?: string;
+  is_sale?: boolean;
 };
 
 export interface paramsFilterProduct
   extends Omit<paramsListProduct, "productId"> {
   sortBy: "news" | "sales" | "price" | "relevancy" | "";
   order: "asc" | "desc" | "";
-  min_price: number;
-  max_price: number;
+  min_price?: number;
+  max_price?: number;
 }
 
 export type paramsListSale = {
   activePage: number | 1;
   limit: number | 10;
-  is_sale: "flashSale" | "sale";
+  is_sale: boolean;
 };
 
 export type productItem = {

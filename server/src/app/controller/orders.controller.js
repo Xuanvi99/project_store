@@ -252,6 +252,7 @@ class Order {
         "completed",
         "pending",
         "cancelled",
+        "confirmed",
       ];
       let data = {};
       for (const statistic of listStatistics) {

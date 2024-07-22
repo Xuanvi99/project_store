@@ -87,7 +87,7 @@ const CheckoutProvide = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (listProductOrder.length > 0) {
       const totalPriceOrder = listProductOrder.reduce((a, b) => {
-        if (b.productId.is_sale === "sale") {
+        if (b.productId.is_sale) {
           return a + b.priceSale * b.quantity;
         } else {
           return a + b.price * b.quantity;
@@ -128,7 +128,7 @@ const CheckoutProvide = ({ children }: { children: React.ReactNode }) => {
         nameProducts: nameProducts,
         note: "",
         listProducts: listProductReq,
-        quantityOrder:quantityProductOrder,
+        quantityOrder: quantityProductOrder,
         statusOrder: "pending",
         paymentMethod,
         paymentStatus: "pending",
