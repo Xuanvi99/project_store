@@ -6,17 +6,20 @@ import CardSales from "./Sale.card";
 import OutOfStock from "./OutOfStock.card";
 import CardExpired from "./CardExpired";
 import { formatPrice } from "@/utils";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface ICardItemProps {
   product: IProductRes;
 }
 
 function Card({ product }: ICardItemProps) {
+  const navigate = useNavigate();
   return (
-    <Link
-      to={`/product_detail/${product?.slug}_${product?._id}`}
-      className="relative rounded-sm card-item shadow-shadow77 cursor-pointer shadow-grayCa bg-grayF5"
+    <div
+      onClick={() =>
+        navigate(`/product_detail/${product?.slug}_${product?._id}`)
+      }
+      className="relative rounded-sm card-item shadow-shadow77 cursor-pointer bg-grayF5 "
     >
       {product.is_sale && (
         <CardSales
@@ -54,7 +57,7 @@ function Card({ product }: ICardItemProps) {
       </div>
       {product.inventoryId.stocked && <Card.OutOfStock />}
       {product.status === "inactive" && <Card.CardExpired />}
-    </Link>
+    </div>
   );
 }
 

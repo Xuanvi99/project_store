@@ -45,7 +45,6 @@ function LoginPage() {
   const { toggle: showPW, handleToggle: handleShowPW } = useToggle();
 
   const [statusError, setStatusError] = useState<number>(0);
-  console.log("statusError: ", statusError);
 
   const {
     control,
@@ -79,9 +78,9 @@ function LoginPage() {
         dispatch(updateAuth({ ...data, isLogin: true }));
       })
       .catch((error) => {
+        console.log("error: ", error);
         setOpenModal(true);
         reset({ password: "" });
-        setStatusError(error.status);
       });
     navigate(pathname, { replace: true });
   };
@@ -112,7 +111,7 @@ function LoginPage() {
           className="flex flex-col mt-5 gap-y-5"
         >
           <Field variant="flex-col">
-            <Label htmlFor="phoneOrEmail">Email/Số điện thoại:</Label>
+            <Label name="phoneOrEmail">Email/Số điện thoại:</Label>
             <InputForm
               control={control}
               type="text"
@@ -124,7 +123,7 @@ function LoginPage() {
             <ErrorInput text={errors["phoneOrEmail"]?.message} />
           </Field>
           <Field variant="flex-col">
-            <Label htmlFor="password"> Mật khẩu:</Label>
+            <Label name="password"> Mật khẩu:</Label>
             <InputForm
               control={control}
               type={showPW ? "text" : "password"}

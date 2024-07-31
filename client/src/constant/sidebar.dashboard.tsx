@@ -18,6 +18,10 @@ const listNavBarItem = [
         title: "Thêm Sản Phẩm",
         path: "/dashboard/product/create",
       },
+      {
+        title: "Khôi Phục Sản Phẩm",
+        path: "/dashboard/product/restore",
+      },
     ],
   },
   {

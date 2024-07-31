@@ -3,7 +3,6 @@ import Portal from "../portal";
 import { cn } from "../../utils";
 
 type IModalBaseProps = {
-  title?: string;
   children: React.ReactNode;
   className?: {
     overlay?: string;

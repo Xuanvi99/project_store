@@ -1,16 +1,16 @@
 import { useGetProductLoadMoreDataQuery } from "@/stores/service/product.service";
-import { IProductRes, paramsFilterProduct } from "@/types/product.type";
+import { IProductRes, TParamsFilterProduct } from "@/types/product.type";
 import { QueryStatus } from "@reduxjs/toolkit/query";
 import { createContext, useEffect, useState } from "react";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 
 export type ICategoryProvide = {
-  filter: paramsFilterProduct;
+  filter: TParamsFilterProduct;
 
   data: {
     listProduct: IProductRes[];
     totalPage: number;
-    amount_filter: number;
+    amountProductFound: number;
     result_search: IProductRes[];
   };
 
@@ -18,7 +18,7 @@ export type ICategoryProvide = {
 
   minPrice: number;
 
-  handleSetFilter: (value: valueFilter<paramsFilterProduct>) => void;
+  handleSetFilter: (value: valueFilter<TParamsFilterProduct>) => void;
 
   handleSetData: (data: ICategoryProvide["data"]) => void;
 
@@ -47,11 +47,11 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
     limit: 12,
     search: slug || (searchParams.get("s") as string) || "",
     sortBy: ["news", "sales", "price", "relevancy", ""].includes(
-      searchParams.get("sortBy") as paramsFilterProduct["sortBy"]
+      searchParams.get("sortBy") as TParamsFilterProduct["sortBy"]
     )
-      ? (searchParams.get("sortBy") as paramsFilterProduct["sortBy"])
+      ? (searchParams.get("sortBy") as TParamsFilterProduct["sortBy"])
       : "relevancy",
-    order: (searchParams.get("order") as paramsFilterProduct["order"]) || "",
+    order: (searchParams.get("order") as TParamsFilterProduct["order"]) || "",
     min_price: Number(searchParams.get("min_price"))
       ? Number(searchParams.get("min_price"))
       : minPrice || 0,
@@ -69,7 +69,7 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<ICategoryProvide["data"]>({
     listProduct: [],
     totalPage: 0,
-    amount_filter: 0,
+    amountProductFound: 0,
     result_search: [],
   });
 
@@ -83,7 +83,7 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
     }
   }, [resProduct, status]);
 
-  const handleSetFilter = (value: valueFilter<paramsFilterProduct>) => {
+  const handleSetFilter = (value: valueFilter<TParamsFilterProduct>) => {
     setFilter({ ...filter, ...value });
   };
 
@@ -91,7 +91,7 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
     if (
       pathname &&
       data &&
-      data.amount_filter > 0 &&
+      data.amountProductFound > 0 &&
       data.result_search &&
       data.result_search.length > 0
     ) {
@@ -140,17 +140,19 @@ function CategoryProvide({ children }: { children: React.ReactNode }) {
       searchParams.delete("min_price");
       searchParams.delete("max_price");
       setSearchParams(searchParams);
-      setFilter({
-        ...filter,
-        search: (searchParams.get("s") as string) ? state.s : "",
-        sortBy: "relevancy",
-        order: "",
-        min_price: 0,
-        max_price: 0,
-        activePage: Number(searchParams.get("page")) || 1,
+      setFilter((filter) => {
+        return {
+          ...filter,
+          search: (searchParams.get("s") as string) ? state.s : "",
+          sortBy: "relevancy",
+          order: "",
+          min_price: 0,
+          max_price: 0,
+          activePage: Number(searchParams.get("page")) || 1,
+        };
       });
     }
-  }, [filter, pathname, searchParams, setSearchParams, state]);
+  }, [filter.search, pathname, searchParams, setSearchParams, state]);
 
   return (
     <CategoryContext.Provider

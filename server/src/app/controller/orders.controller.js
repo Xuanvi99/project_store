@@ -256,7 +256,6 @@ class Order {
       ];
       let data = {};
       for (const statistic of listStatistics) {
-        let ojb = {};
         const ListOrder = await orderModel.find({
           statusOrder: {
             $regex: statistic === "all" ? "" : statistic,

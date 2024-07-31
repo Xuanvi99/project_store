@@ -1,4 +1,4 @@
-import { paramsFilterProduct } from "@/types/product.type";
+import { TParamsFilterProduct } from "@/types/product.type";
 
 export const productCategory = [
   { id: "1", label: "Sale", value: "sale" },
@@ -21,7 +21,7 @@ export const optionLimit = [
 export const OptionSearch: {
   id: string;
   label: string;
-  value: paramsFilterProduct["sortBy"];
+  value: TParamsFilterProduct["sortBy"];
 }[] = [
   { id: "1", label: "liên quan", value: "relevancy" },
   { id: "2", label: "Mới Nhất", value: "news" },

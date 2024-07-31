@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const {
   productModel,
   imageModel,
@@ -15,12 +16,13 @@ class Product {
     const limit = +req.query.limit;
     const productId = req.query.productId || null;
     const is_sale = req.query.is_sale || false;
-    console.log("is_sale: ", is_sale);
+    const status = req.query.status || "";
     const skip = (activePage - 1) * limit;
 
     try {
-      let sale = is_sale === "true" ? [true] : [true, false];
-      console.log("sale: ", sale);
+      const saleProduct = is_sale === "true" ? [true] : [true, false];
+      const statusProduct = status ? [status] : ["active", "inactive"];
+
       const listProduct = await productModel
         .find({
           $and: [
@@ -32,7 +34,10 @@ class Product {
               ],
             },
             {
-              is_sale: { $in: sale },
+              status: { $in: statusProduct },
+            },
+            {
+              is_sale: { $in: saleProduct },
             },
             { _id: { $ne: productId } },
           ],
@@ -47,7 +52,7 @@ class Product {
         .limit(limit);
 
       let totalPage = 0;
-      let countProduct = 0;
+      let amountProductFound = 0;
       if (search) {
         const findProduct = await productModel.find({
           $and: [
@@ -59,19 +64,26 @@ class Product {
               ],
             },
             {
-              is_sale: { $in: sale },
+              status: { $in: statusProduct },
+            },
+            {
+              is_sale: { $in: saleProduct },
             },
             { _id: { $ne: productId } },
           ],
         });
-        countProduct = findProduct.length;
-        totalPage = Math.ceil(findProduct.length / limit);
+        amountProductFound = findProduct.length;
+        totalPage = Math.ceil(amountProductFound / limit);
       } else {
-        const findProduct = await productModel.find({ is_sale: { $in: sale } });
-        totalPage = Math.ceil(findProduct.length / limit);
+        const findProduct = await productModel.find({
+          is_sale: { $in: saleProduct },
+        });
+        amountProductFound = findProduct.length;
+        totalPage = Math.ceil(amountProductFound / limit);
       }
-      res.status(200).json({ listProduct, totalPage });
+      res.status(200).json({ listProduct, totalPage, amountProductFound });
     } catch (error) {
+      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -107,6 +119,9 @@ class Product {
                 { brand: { $regex: search, $options: "i" } },
                 { slug: { $regex: search, $options: "i" } },
               ],
+            },
+            {
+              deleted: { $eq: false },
             },
           ],
         })
@@ -154,12 +169,10 @@ class Product {
       }
 
       const listResultProduct = [];
-      let i = 0;
-      for (const item of listProductFilter) {
+      for (let i = 0; i < listProductFilter.length; i++) {
         if (i >= skip && i < skip + limit) {
-          listResultProduct.push(item);
+          listResultProduct.push(listProductFilter[i]);
         }
-        i++;
       }
 
       const totalPage = Math.ceil(listFindProduct.length / limit);
@@ -175,50 +188,151 @@ class Product {
     }
   };
 
-  getListProductSale = async (req, res) => {
+  getListProductFilterDashboard = async (req, res) => {
     const activePage = +req.query.activePage;
+    const search = req.query.search || "";
     const limit = +req.query.limit;
-    const productId = req.query.productId || null;
-    const skip = (activePage - 1) * limit;
+    const { sortBy, order } = req.query;
+    const status = req.query.status || "";
 
+    const skip = (activePage - 1) * limit;
     try {
-      const listProduct = await productModel
+      const customSort = () => {
+        switch (sortBy) {
+          case "news":
+            return { createdAt: -1 };
+
+          case "sales":
+            return { sold: -1 };
+
+          default:
+            return {};
+        }
+      };
+
+      const statusProduct = status ? [status] : ["active", "inactive"];
+
+      let listFindProduct = await productModel
         .find({
           $and: [
             {
-              is_sale: true,
+              $or: [
+                { name: { $regex: search, $options: "i" } },
+                { brand: { $regex: search, $options: "i" } },
+                { slug: { $regex: search, $options: "i" } },
+              ],
             },
-            { _id: { $ne: productId } },
+            {
+              status: { $in: statusProduct },
+            },
           ],
         })
         .populate([
           { path: "thumbnail", select: "url" },
-          { path: "imageIds", select: "url" },
           { path: "inventoryId", select: "_id sold total stocked" },
+          { path: "categoryId", select: "_id name" },
         ])
-        .sort({ $natural: -1 })
+        .sort(customSort());
+
+      let listProductFilter = [...listFindProduct];
+
+      if (order) {
+        listProductFilter = listProductFilter.sort((a, b) => {
+          const a_price = a.is_sale ? a.priceSale : a.price;
+          const b_price = b.is_sale ? b.priceSale : b.price;
+
+          if (order === "asc") {
+            return a_price - b_price;
+          } else {
+            return b_price - a_price;
+          }
+        });
+      }
+
+      const listResultProduct = [];
+      for (let i = 0; i < listProductFilter.length; i++) {
+        if (i >= skip && i < skip + limit) {
+          listResultProduct.push(listProductFilter[i]);
+        }
+      }
+
+      const totalPage = Math.ceil(listFindProduct.length / limit);
+
+      res.status(200).json({
+        listProduct: listResultProduct,
+        totalPage,
+        amountProductFound: listProductFilter.length,
+      });
+    } catch (error) {
+      console.log("error: ", error);
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  getListProductDeleted = async (req, res) => {
+    const activePage = +req.query.activePage | 1;
+    const search = req.query.search || "";
+    const limit = +req.query.limit || 10;
+    const skip = (activePage - 1) * limit;
+    try {
+      let listFindProduct = await productModel
+        .findDeleted({
+          $and: [
+            {
+              $or: [
+                { name: { $regex: search, $options: "i" } },
+                { brand: { $regex: search, $options: "i" } },
+                { slug: { $regex: search, $options: "i" } },
+              ],
+            },
+            {
+              deleted: true,
+            },
+          ],
+        })
+        .populate([
+          { path: "thumbnail", select: "url" },
+          { path: "inventoryId", select: "_id sold total stocked" },
+          { path: "categoryId", select: "_id name" },
+          { path: "deletedBy", select: "_id userName role" },
+        ])
+        .sort({ updateAt: -1 })
         .skip(skip)
         .limit(limit);
 
       let totalPage = 0;
-      let countProduct = 0;
+      let amountProductFound = 0;
       if (search) {
-        const findProduct = await productModel.find({
+        const findProductDeleted = await productModel.findDeleted({
           $and: [
             {
-              is_sale: true,
+              $or: [
+                { name: { $regex: search, $options: "i" } },
+                { brand: { $regex: search, $options: "i" } },
+                { slug: { $regex: search, $options: "i" } },
+              ],
             },
-            { _id: { $ne: productId } },
+            {
+              deleted: true,
+            },
           ],
         });
-        countProduct = findProduct.length;
-        totalPage = Math.ceil(findProduct.length / limit);
+        amountProductFound = findProductDeleted.length;
+        totalPage = Math.ceil(amountProductFound / limit);
       } else {
-        countProduct = await productModel.countDocuments();
-        totalPage = Math.ceil(countProduct / limit);
+        const findProductDeleted = await productModel.findDeleted({
+          deleted: { $exists: true, $in: [true] },
+        });
+        amountProductFound = findProductDeleted.length;
+        totalPage = Math.ceil(amountProductFound / limit);
       }
-      res.status(200).json({ data: listProduct, totalPage });
+      res.status(200).json({
+        listProduct: listFindProduct,
+        totalPage,
+        amountProductFound,
+      });
     } catch (error) {
+      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -269,6 +383,31 @@ class Product {
       res.status(200).json({ data: productItem });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  getStatisticsProduct = async (req, res) => {
+    try {
+      const listStatistics = ["all", "active", "inactive", "deleted"];
+      let data = {};
+      for (const statistic of listStatistics) {
+        const ListProduct = await productModel.findWithDeleted({
+          status:
+            statistic === "all"
+              ? {
+                  $regex: "",
+                  $options: "i",
+                }
+              : statistic,
+        });
+        data[statistic] = ListProduct.length;
+      }
+      console.log(data);
+
+      res.status(200).json({ ...data });
+    } catch (error) {
+      console.log("error: ", error);
+      return res.status(500).json({ errMessage: "server error" });
     }
   };
 
@@ -400,8 +539,9 @@ class Product {
     }
   };
 
-  deleteProduct = async (req, res) => {
+  deleteOneProduct = async (req, res) => {
     const productId = req.params.productId;
+    const userId = req.body.userId;
     if (!productId)
       return res.status(403).json({ message: "Invalid productId" });
     try {
@@ -410,20 +550,55 @@ class Product {
         return res.status(404).json({ errMessage: "Không tìm thấy sản phẩm" });
       }
       await productModel
-        .delete({ _id: productId })
+        .updateOneDeleted(
+          { _id: productId },
+          {
+            status: "deleted",
+            deletedBy: userId,
+          }
+        )
         .exec()
-        .then(() => {
+        .then(async () => {
+          await product.delete();
           return res.status(200).json({ message: "Xóa sản phẩm thành công" });
         })
         .catch(() => {
           return res.status(400).json({ message: "Xóa sản phẩm thất bại" });
         });
     } catch (error) {
+      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };
 
-  restoreProduct = async (req, res) => {
+  deleteMultipleProduct = async (req, res) => {
+    const userId = req.body.userId;
+    const listProductId = req.body.listProductId;
+    try {
+      for (const productId of listProductId) {
+        await productModel
+          .updateOneDeleted(
+            { _id: productId },
+            {
+              status: "deleted",
+              deletedBy: userId,
+            }
+          )
+          .exec()
+          .then(async () => {
+            await productModel.delete({ _id: productId });
+          })
+          .catch(() => {
+            return res.status(400).json({ message: "Lỗi xóa nhiều sản phẩm" });
+          });
+      }
+      res.status(200).json({ message: "Xóa nhiều sản phẩm thành công" });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  restoreOneProduct = async (req, res) => {
     const productId = req.params.productId;
     if (!productId)
       return res.status(403).json({ message: "Invalid productId" });
@@ -433,9 +608,15 @@ class Product {
         return res.status(404).json({ errMessage: "Không tìm thấy sản phẩm" });
       }
       await productModel
-        .restore({ _id: productId })
+        .updateOneDeleted(
+          { _id: productId },
+          {
+            status: "inactive",
+          }
+        )
         .exec()
-        .then(() => {
+        .then(async () => {
+          await productModel.restore({ _id: productId });
           return res
             .status(200)
             .json({ message: "khôi phục sản phẩm thành công" });
@@ -445,6 +626,35 @@ class Product {
             .status(400)
             .json({ message: "khôi phục sản phẩm thất bại" });
         });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  restoreMultipleProduct = async (req, res) => {
+    const listProductId = req.body.listProductId;
+    try {
+      for (const productId of listProductId) {
+        await productModel
+          .updateOneDeleted(
+            { _id: productId },
+            {
+              status: "inactive",
+            }
+          )
+          .exec()
+          .then(async () => {
+            await productModel.restore({ _id: productId });
+          })
+          .catch(() => {
+            return res
+              .status(400)
+              .json({ message: "khôi phục sản phẩm thất bại" });
+          });
+      }
+      return res
+        .status(200)
+        .json({ message: "Nhiều sản phẩm khôi phục thành công" });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }

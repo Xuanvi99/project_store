@@ -51,16 +51,20 @@ function SidebarItem({ value }: TProps) {
                 to={item.path}
                 key={index}
                 className={cn(
-                  "grid grid-cols-[20px_auto] gap-x-2 px-3  hover:text-orange hover:underline",
+                  "grid grid-cols-[20px_auto] gap-x-2 px-3 hover:text-orange hover:underline place-items-center",
                   pathname.includes(item.path) && "text-orange underline"
                 )}
               >
-                {pathname.includes(item.path) && (
+                {pathname.includes(item.path) ? (
                   <span className="flex items-center">
                     <IconRightArrow size={14}></IconRightArrow>
                   </span>
+                ) : (
+                  <span className="w-1 h-1 rounded-full bg-gray"></span>
                 )}
-                <span className="col-start-2 col-end-3">{item.title}</span>
+                <span className="w-full col-start-2 col-end-3">
+                  {item.title}
+                </span>
               </Link>
             );
           })}

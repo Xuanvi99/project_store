@@ -44,6 +44,7 @@ function App() {
       dispatch(updateCart(cart));
     }
   }, [cart, dispatch, status]);
+
   return (
     <ErrorBoundary FallbackComponent={fallbackRender}>
       <Suspense

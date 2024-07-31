@@ -13,9 +13,7 @@ routes
 routes
   .route("/api/orders/getDetailOrder/:codeOrder")
   .get(orderCtrl.getDetailOrder);
-routes
-  .route("/api/orders/getStatisticsOrder")
-  .get(orderCtrl.getStatisticsOrder);
+routes.route("/api/orders/statistics").get(orderCtrl.getStatisticsOrder);
 routes.route("/api/orders/create").post(orderCtrl.createOrder);
 routes.route("/api/orders/cancelled/:codeOrder").put(orderCtrl.cancelledOrder);
 

@@ -40,15 +40,14 @@ function ButtonGoogle({ text, className, pathname, handleErrorLogin }: TProps) {
                 dispatch(updateAuth({ ...res, isLogin: true }));
                 navigate(pathname, { replace: true });
               })
-              .catch((error) => {
-                if (handleErrorLogin) handleErrorLogin(error.status);
+              .catch(() => {
+                if (handleErrorLogin) handleErrorLogin(500);
               });
           })
           .catch((error) => {
             throw new Error(error);
           });
       } catch (error) {
-        console.log("error: ", error);
         if (handleErrorLogin) handleErrorLogin(400);
       }
     },

@@ -122,6 +122,10 @@ const router = createBrowserRouter([
             path: "/dashboard/product/create",
             element: <Dashboard.Product.Create></Dashboard.Product.Create>,
           },
+          {
+            path: "/dashboard/product/restore",
+            element: <Dashboard.Product.Restore></Dashboard.Product.Restore>,
+          },
         ],
       },
       {

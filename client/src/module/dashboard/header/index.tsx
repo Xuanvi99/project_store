@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Profile from "../../menu/Profile.menu";
 
-function Header() {
+function HeaderDashboard() {
   return (
     <header className="w-full h-[80px] fixed top-0 left-0 bg-white z-50  flex justify-between items-center border-b-1 border-orange">
       <Link
@@ -23,4 +23,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default HeaderDashboard;

@@ -18,6 +18,7 @@ export default function ProductSlideshow({ name = "" }: IProps) {
     activePage: 1,
     limit: 10,
     is_sale: name === "sale" ? true : false,
+    status: "active",
   });
 
   if ((!resProduct || resProduct.listProduct.length === 0) && !isLoading) {
@@ -83,7 +84,7 @@ export default function ProductSlideshow({ name = "" }: IProps) {
         >
           {resProduct?.listProduct.map((product, index) => {
             return (
-              <SwiperSlide key={index}>
+              <SwiperSlide key={index} className="p-[2px]">
                 <Card product={product}></Card>
               </SwiperSlide>
             );

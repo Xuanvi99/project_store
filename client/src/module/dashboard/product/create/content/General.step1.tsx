@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { Editor } from "@tinymce/tinymce-react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { CreatePdContext, ICreatePdProvide } from "./CreatePdContext";
+import { CreatePdContext, ICreatePdProvide } from "../context";
 import { useEffect, useState } from "react";
 import useTestContext from "@/hook/useTestContext";
 import { useRemoveWithUrlMutation } from "@/stores/service/image.service";
@@ -35,7 +35,6 @@ const validationSchema = Yup.object({
     .min(8, "Tên sản phẩm ít nhất 8 ký tự"),
   brand: Yup.string().required("Vui lòng điền vào mục này."),
   desc: Yup.string().required("Vui lòng điền vào mục này."),
-  summary: Yup.string().required("Vui lòng điền vào mục này."),
   price: Yup.number()
     .required("Vui lòng điền thông tin")
     .typeError("Giá sản phẩm không hợp lệ")
@@ -94,7 +93,6 @@ function General() {
       name: data.name,
       brand: data.brand,
       desc: data.desc,
-      summary: data.summary,
       price: data.price,
       status: data.status,
     },
@@ -111,7 +109,6 @@ function General() {
       !watch("name") ||
       !watch("brand") ||
       !watch("desc") ||
-      !watch("summary") ||
       !watch("price") ||
       !watch("status")
     ) {
@@ -330,96 +327,50 @@ function General() {
         </Field>
         <div className="flex w-full gap-x-7">
           <Field variant="flex-col" className="basis-1/2 gap-y-2">
-            <Label htmlFor="" className="font-semibold text-secondary">
-              Thông số sản phẩm<strong className="text-danger">*</strong>
+            <Label htmlFor="price" className="font-semibold text-secondary">
+              Giá sản phẩm (vnđ)<strong className="text-danger">*</strong>
             </Label>
-            <Editor
-              apiKey="upnnupf3dq8wz66922756jw4v2w241nvoxv3hvhnmqhng63w"
-              onEditorChange={(_, editor) => {
-                setValue("summary", editor.getContent());
-                if (editor.getContent() === "") {
-                  setError("summary", {
-                    message: "Vui lòng điền vào mục này.",
-                  });
-                } else {
-                  clearErrors("summary");
-                }
+            <InputForm
+              control={control}
+              type="number"
+              name="price"
+              id="price"
+              onFocus={() => handleFocusInput("price")}
+              onBlur={handleBLurInput}
+              onChange={() => {
+                clearErrors("price");
               }}
-              initialValue={data.summary || ""}
-              init={{
-                height: 300,
-                width: "100%",
-                menubar: false,
-                plugins: [
-                  "advlist",
-                  "anchor",
-                  "autolink",
-                  "charmap",
-                  "code",
-                  "fullscreen",
-                  "help",
-                  "lists",
-                  "media",
-                  "preview",
-                  "table",
-                  "visualblocks",
-                  "accordion",
-                ],
-                toolbar1:
-                  "bold italic underline strikethrough| backcolor forecolor | align table |",
-                content_style:
-                  "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-              }}
+              error={errors["price"] ? true : false}
             />
-            <ErrorInput text={errors["summary"]?.message} />
+            <ErrorInput text={errors["price"]?.message} />
           </Field>
-          <div className="flex flex-col gap-y-3 basis-1/2 max-h-[300px] ">
-            <Field variant="flex-col" className="basis-1/2 gap-y-2">
-              <Label htmlFor="price" className="font-semibold text-secondary">
-                Giá sản phẩm (vnđ)<strong className="text-danger">*</strong>
-              </Label>
-              <InputForm
-                control={control}
-                type="number"
-                name="price"
-                id="price"
-                onFocus={() => handleFocusInput("price")}
-                onBlur={handleBLurInput}
-                onChange={() => {
-                  clearErrors("price");
-                }}
-                error={errors["price"] ? true : false}
-              />
-              <ErrorInput text={errors["price"]?.message} />
-            </Field>
-            <Field variant="flex-col" className="basis-1/2 gap-y-3">
-              <Label htmlFor="" className="font-semibold text-secondary">
-                Trạng thái<strong className="text-danger">*</strong>
-              </Label>
-              <div className="flex items-center gap-x-5">
-                <span className="flex items-center gap-x-2">
-                  <InputRadio
-                    control={control}
-                    name="status"
-                    id="active"
-                    value="active"
-                    checked={watch("status") === "active"}
-                  ></InputRadio>
-                  <label htmlFor="active">Bán</label>
-                </span>
-                <span className="flex items-center gap-x-2">
-                  <InputRadio
-                    control={control}
-                    name="status"
-                    id="deActive"
-                    value="deActive"
-                    checked={watch("status") === "deActive"}
-                  ></InputRadio>
-                  <label htmlFor="deActive">Chưa bán</label>
-                </span>
-              </div>
-            </Field>
-          </div>
+          <Field variant="flex-col" className="basis-1/2 gap-y-3">
+            <Label htmlFor="" className="font-semibold text-secondary">
+              Trạng thái<strong className="text-danger">*</strong>
+            </Label>
+            <div className="flex items-center gap-x-5">
+              <span className="flex items-center gap-x-2">
+                <InputRadio
+                  control={control}
+                  name="status"
+                  id="active"
+                  value="active"
+                  checked={watch("status") === "active"}
+                ></InputRadio>
+                <label htmlFor="active">Bán</label>
+              </span>
+              <span className="flex items-center gap-x-2">
+                <InputRadio
+                  control={control}
+                  name="status"
+                  id="deActive"
+                  value="deActive"
+                  checked={watch("status") === "deActive"}
+                ></InputRadio>
+                <label htmlFor="deActive">Chưa bán</label>
+              </span>
+            </div>
+          </Field>
         </div>
         <Button
           variant="default"

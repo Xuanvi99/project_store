@@ -26,7 +26,7 @@ function Profile({ displayName }: TProps) {
 
   const [logOutAuth] = useLogOutAuthMutation();
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     const query = encodeURIComponent(redirectUrl);
     navigate("/auth/login?next=" + query, { state: { path: pathname } });
   };
@@ -55,13 +55,15 @@ function Profile({ displayName }: TProps) {
           select={
             <div className="flex items-center h-9 tex-sm gap-x-3">
               <span className="overflow-hidden rounded-full w-9 h-9">
-                <LazyLoadImage
-                  alt="avatar"
-                  placeholderSrc={user?.avatar?.url || user?.avatarDefault}
-                  srcSet={user?.avatar?.url || user?.avatarDefault}
-                  effect="blur"
-                  className="duration-500 "
-                />
+                {user && (
+                  <LazyLoadImage
+                    alt="avatar"
+                    placeholderSrc={user?.avatar?.url || user?.avatarDefault}
+                    srcSet={user?.avatar?.url || user?.avatarDefault}
+                    effect="blur"
+                    className="duration-500 "
+                  />
+                )}
               </span>
               {displayName && (
                 <div className="flex flex-col items-center justify-center text-sm">

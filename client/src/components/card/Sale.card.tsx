@@ -11,7 +11,7 @@ export default function CardSales({
   return (
     <div
       className={cn(
-        "absolute left-0 top-0 text-white font-bold w-full h-[30px] text-sm rounded-r-2xl z-10",
+        "absolute -left-1 top-1 text-white font-bold w-full h-[30px] text-sm rounded-r-2xl z-10",
         className
       )}
     >
@@ -21,7 +21,7 @@ export default function CardSales({
           - {discount}%
         </span>
       </div>
-      <div className="absolute top-0 right-0 z-20 inline-block px-2 py-1 text-xs font-normal bg-orangeLinear rounded-xl">
+      <div className="absolute top-0 -right-1 z-20 inline-block px-2 py-1 text-xs font-normal bg-orangeLinear rounded-xl">
         Deal giá sốc
       </div>
     </div>

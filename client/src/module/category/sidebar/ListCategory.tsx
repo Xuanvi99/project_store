@@ -62,7 +62,7 @@ const CategoryItem = ({ data }: { data: ICategory }) => {
       handleSetData({
         listProduct: [],
         totalPage: 0,
-        amount_filter: 0,
+        amountProductFound: 0,
         result_search: [],
       });
       navigate(`/category/${name.toLowerCase()}?page=1`);

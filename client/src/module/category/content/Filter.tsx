@@ -98,7 +98,7 @@ function Filter() {
                     handleSetData({
                       listProduct: [],
                       totalPage: 0,
-                      amount_filter: 0,
+                      amountProductFound: 0,
                       result_search: [],
                     });
                   }}
@@ -132,7 +132,7 @@ function Filter() {
               handleSetData({
                 listProduct: [],
                 totalPage: 0,
-                amount_filter: 0,
+                amountProductFound: 0,
                 result_search: [],
               });
             }}
@@ -140,7 +140,7 @@ function Filter() {
         </div>
         <div className="flex items-center text-sm gap-x-2">
           <span className="font-bold text-orange">Kết quả:</span>
-          <span>{data?.amount_filter}</span>
+          <span>{data?.amountProductFound}</span>
           <span>sản phẩm</span>
         </div>
       </div>

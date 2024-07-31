@@ -131,14 +131,10 @@ export const orderApi = createApi({
     }),
     getStatisticsOrder: build.query<IResStatisticsOrder, void>({
       query: () => ({
-        url: "orders/getStatisticsOrder",
+        url: "orders/statistics",
         method: "get",
       }),
-      providesTags: [
-        {
-          type: "Orders",
-        },
-      ],
+      providesTags: [{ type: "Orders" }],
     }),
     createOrder: build.mutation<
       { message: string; codeOrder: string; orderId: string },

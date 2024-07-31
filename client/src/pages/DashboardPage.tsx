@@ -1,22 +1,33 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Header, Sidebar } from "../module/dashboard";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../hook";
 import { RootState } from "@/stores";
 
 function DashboardPage() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const user = useAppSelector((state: RootState) => state.authSlice.user);
+
+  const handleLogin = useCallback(
+    (pathname: string) => {
+      const query = encodeURIComponent(
+        import.meta.env.VITE_DOMAIN_CLIENT + pathname
+      );
+      navigate("/auth/login?next=" + query, { state: { path: pathname } });
+    },
+    [navigate]
+  );
 
   useEffect(() => {
     if (!user) {
-      navigate("/auth/login");
+      handleLogin(pathname);
     } else {
       if (user.role !== "admin") {
         navigate("/", { replace: true });
       }
     }
-  }, [navigate, user]);
+  }, [handleLogin, navigate, pathname, user]);
 
   return (
     <div className="w-full min-h-screen max-w-screen-2xl bg-light ">

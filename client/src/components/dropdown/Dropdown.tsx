@@ -75,7 +75,7 @@ function Dropdown({
       {showOptions && (
         <div
           className={cn(
-            "w-full absolute left-0 top-[102%] rounded-b-md bg-white z-20 shadow-shadowButton drop-shadow-dropdown",
+            "w-full absolute left-0 top-[110%] rounded-b-md border-1 border-grayCa bg-white z-20 shadow-shadowButton drop-shadow-dropdown",
             className?.option
           )}
         >

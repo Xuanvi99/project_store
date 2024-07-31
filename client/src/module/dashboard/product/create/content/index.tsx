@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { CreatePdContext, ICreatePdProvide } from "./CreatePdContext";
+import { CreatePdContext, ICreatePdProvide } from "../context";
 import General from "./General.step1";
-import Specs from "./Specs.step3";
 import useTestContext from "@/hook/useTestContext";
 import { ModalNotification } from "@/components/modal";
 import UpLoadImages from "./UpLoadImages.step2";
+import Specs from "./Specs.step3";
 
 function Content() {
   const { activeStep, isSuccess, isError } = useTestContext<ICreatePdProvide>(

@@ -1,15 +1,14 @@
 import { Fragment, useEffect, useState } from "react";
-import { CreatePdContext, ICreatePdProvide } from "./CreatePdContext";
 import { useFieldArray, useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { InputForm } from "@/components/input";
 import { IconChevronLeft, IconDelete } from "@/components/icon";
 import { Button } from "@/components/button";
-
 import useTestContext from "@/hook/useTestContext";
 import Modal from "@/components/modal";
-import LoadingSpinner from "../../../../components/loading/index";
+import LoadingSpinner from "@/components/loading";
+import { CreatePdContext, ICreatePdProvide } from "../context";
 
 function Specs() {
   const {
@@ -79,33 +78,13 @@ function Specs() {
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
+
   const { fields, remove, append } = useFieldArray({
     control,
     name: "data",
   });
 
   const [openModal, setOpenModal] = useState<boolean>(false);
-
-  useEffect(() => {
-    window.scrollTo({ top: 0 });
-  }, []);
-
-  useEffect(() => {
-    if (fields) {
-      trigger();
-    }
-  }, [fields, trigger]);
-
-  useEffect(() => {
-    const data = watch().data;
-    if (data) {
-      setTotal(
-        data.reduce((a: number, b: { size: number; quantity: number }) => {
-          return a + Number(b.quantity);
-        }, 0)
-      );
-    }
-  }, [watch]);
 
   const handleBLurInput = (index: number) => {
     const { size, quantity } = watch().data[index];
@@ -166,12 +145,6 @@ function Specs() {
     }
   };
 
-  useEffect(() => {
-    if (!isLoading) {
-      setOpenModal(false);
-    }
-  }, [isLoading]);
-
   const onSubmit = async (data: FormValues) => {
     if (modifyTable) {
       handleModifyTable(false);
@@ -182,6 +155,33 @@ function Specs() {
       handleModifyTable(true);
     }
   };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
+  useEffect(() => {
+    if (fields) {
+      trigger();
+    }
+  }, [fields, trigger]);
+
+  useEffect(() => {
+    const data = watch().data;
+    if (data) {
+      setTotal(
+        data.reduce((a: number, b: { size: number; quantity: number }) => {
+          return a + Number(b.quantity);
+        }, 0)
+      );
+    }
+  }, [watch]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setOpenModal(false);
+    }
+  }, [isLoading]);
 
   return (
     <Fragment>

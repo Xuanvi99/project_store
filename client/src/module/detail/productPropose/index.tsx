@@ -43,21 +43,26 @@ export default function ProductPropose() {
       </div>
       <SlideSwiper
         optionSwiper={{
-          quantitySlide: resProduct?.data.length || 10,
+          quantitySlide: resProduct?.listProduct.length || 10,
           slidesPerView: 5,
           spaceBetween: 10,
           slidesPerGroup: 1,
           lazyPreloadPrevNext: 1,
           grabCursor: true,
-          loop: resProduct?.data && resProduct?.data.length > 5 ? true : false,
+          loop:
+            resProduct?.listProduct && resProduct?.listProduct.length > 5
+              ? true
+              : false,
           speed: 100,
         }}
         slideHover={
-          resProduct?.data && resProduct?.data.length > 5 ? true : false
+          resProduct?.listProduct && resProduct?.listProduct.length > 5
+            ? true
+            : false
         }
         className={{ container: "mt-5" }}
       >
-        {resProduct?.data.map((product, index) => {
+        {resProduct?.listProduct.map((product, index) => {
           return (
             <SwiperSlide key={index}>
               {isFetching ? (

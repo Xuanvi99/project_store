@@ -1,7 +1,7 @@
-import { useGetListProductFilterQuery } from "@/stores/service/product.service";
+import { useGetListProductFilterDashboardQuery } from "@/stores/service/product.service";
 import {
+  IParamsFilterProductDashboard,
   IProductRes,
-  paramsFilterProduct,
   TParams,
 } from "@/types/product.type";
 import { QueryStatus } from "@reduxjs/toolkit/query";
@@ -12,57 +12,109 @@ export interface IListPdProvide {
   data: {
     listProduct: IProductRes[];
     totalPage: number;
-    amount_filter: number;
+    amountProductFound: number;
   };
 
   statusQuery: QueryStatus;
 
-  filter: paramsFilterProduct;
+  isLoadingQuery: boolean;
 
-  handleSetFilter: (value: TParams<paramsFilterProduct>) => void;
+  filter: IParamsFilterProductDashboard;
+
+  listSelectProductId: string[];
+
+  setListSelectProductId: React.Dispatch<React.SetStateAction<string[]>>;
+
+  handleSetFilter: (value: TParams<IParamsFilterProductDashboard>) => void;
+
+  handleCheckAllProduct: (checked: boolean) => void;
 }
 
 const ListPdContext = createContext<IListPdProvide | null>(null);
 
 function ListProductProvider({ children }: { children: React.ReactNode }) {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [filter, setFilter] = useState<paramsFilterProduct>({
+  const [filter, setFilter] = useState<IParamsFilterProductDashboard>({
     activePage: Number(searchParams.get("page")) || 1,
-    limit: 10,
+    limit: Number(searchParams.get("limit")) || 10,
     search: (searchParams.get("search") as string) || "",
     sortBy: ["news", "sales", "price", "relevancy", ""].includes(
-      searchParams.get("sortBy") as paramsFilterProduct["sortBy"]
+      searchParams.get("sortBy") as IParamsFilterProductDashboard["sortBy"]
     )
-      ? (searchParams.get("sortBy") as paramsFilterProduct["sortBy"])
+      ? (searchParams.get("sortBy") as IParamsFilterProductDashboard["sortBy"])
       : "relevancy",
-    order: (searchParams.get("order") as paramsFilterProduct["order"]) || "",
+    order:
+      (searchParams.get("order") as IParamsFilterProductDashboard["order"]) ||
+      "",
+    status:
+      (searchParams.get("status") as IParamsFilterProductDashboard["status"]) ||
+      "",
+    deleted: false,
   });
+
+  const [listSelectProductId, setListSelectProductId] = useState<string[]>([]);
 
   const [data, setData] = useState<IListPdProvide["data"]>({
     listProduct: [],
     totalPage: 0,
-    amount_filter: 0,
+    amountProductFound: 0,
   });
 
-  const { data: resProduct, status: statusQuery } =
-    useGetListProductFilterQuery(filter);
+  const {
+    data: resProduct,
+    status: statusQuery,
+    isLoading: isLoadingQuery,
+  } = useGetListProductFilterDashboardQuery(filter);
 
-  const handleSetFilter = (value: TParams<paramsFilterProduct>) => {
+  const handleSetFilter = (value: TParams<IParamsFilterProductDashboard>) => {
     setFilter((filter) => {
       return { ...filter, ...value };
     });
   };
 
+  const handleCheckAllProduct = (checked: boolean) => {
+    const listIdProduct: string[] = [];
+    if (checked) {
+      for (const product of data.listProduct) {
+        listIdProduct.push(product._id);
+      }
+    } else {
+      listIdProduct.slice(0, data.listProduct.length);
+    }
+    setListSelectProductId([...listIdProduct]);
+  };
+
   useEffect(() => {
     if (resProduct && statusQuery === "fulfilled") {
       setData(resProduct);
+      searchParams.set("search", filter.search);
+      searchParams.set("limit", "" + filter.limit);
+      searchParams.set("activePage", "" + filter.activePage);
+      setSearchParams(searchParams);
     }
-  }, [resProduct, statusQuery]);
+  }, [
+    filter.activePage,
+    filter.limit,
+    filter.search,
+    resProduct,
+    searchParams,
+    setSearchParams,
+    statusQuery,
+  ]);
 
   return (
     <ListPdContext.Provider
-      value={{ data, statusQuery, filter, handleSetFilter }}
+      value={{
+        data,
+        statusQuery,
+        filter,
+        isLoadingQuery,
+        listSelectProductId,
+        setListSelectProductId,
+        handleSetFilter,
+        handleCheckAllProduct,
+      }}
     >
       {children}
     </ListPdContext.Provider>

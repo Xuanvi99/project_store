@@ -14,7 +14,6 @@ const ProductSchema = new Schema(
       minLength: [3, "name must be at least 3 character"],
     },
     slug: { type: String, slug: "name", unique: true },
-    summary: { type: String, required: true, default: "" },
     desc: { type: String, required: true, default: "" },
     brand: { type: String, required: true },
     thumbnail: { type: Schema.Types.ObjectId, ref: "images" },
@@ -24,7 +23,7 @@ const ProductSchema = new Schema(
     sold: { type: Number, default: 0 },
     status: {
       type: String,
-      enum: ["active", "inactive"],
+      enum: ["active", "inactive", "deleted"],
       default: "inactive",
     },
     imageIds: [{ type: Schema.Types.ObjectId, ref: "images", require: true }],
@@ -39,6 +38,8 @@ const ProductSchema = new Schema(
       ref: "inventories",
       require: true,
     },
+    deleted: { type: Boolean, default: false },
+    deletedBy: { type: Schema.Types.ObjectId, ref: "users" },
   },
   { timestamps: true }
 );

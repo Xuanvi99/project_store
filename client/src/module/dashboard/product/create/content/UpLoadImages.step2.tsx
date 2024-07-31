@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { Button } from "../../../../components/button";
-import useTestContext from "../../../../hook/useTestContext";
-import { CreatePdContext, ICreatePdProvide } from "./CreatePdContext";
+import { Button } from "../../../../../components/button";
+import useTestContext from "../../../../../hook/useTestContext";
+import { CreatePdContext, ICreatePdProvide } from "../context";
 import ImageUploading, { ImageListType } from "react-images-uploading";
-import IconUploadImage from "../../../../components/icon/IconUploadImage";
-import { cn } from "../../../../utils";
-import { IconRemoveBtn } from "../../../../components/icon";
-import IconChevronRight from "./../../../../components/icon/IconChevronRight";
-import IconChevronLeft from "../../../../components/icon/IconChevronLeft";
+import IconUploadImage from "../../../../../components/icon/IconUploadImage";
+import { cn } from "../../../../../utils";
+import { IconRemoveBtn } from "../../../../../components/icon";
+import IconChevronRight from "../../../../../components/icon/IconChevronRight";
+import IconChevronLeft from "../../../../../components/icon/IconChevronLeft";
 
 function UpLoadImages() {
   const { handleActiveStep, handleSetData, uploadImage, handleSaveStep2 } =

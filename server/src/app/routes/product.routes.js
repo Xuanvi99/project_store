@@ -15,8 +15,6 @@ routes.route("/api/product/").post(
   productCtrl.addProduct
 );
 
-routes.route("/api/product/sale").get(productCtrl.getListProductSale);
-
 routes
   .route("/api/product/checkName")
   .post(
@@ -29,30 +27,51 @@ routes.route("/api/productItem").get(productCtrl.getProductItem);
 
 routes.route("/api/product/filter").get(productCtrl.getListProductFilter);
 
+routes
+  .route("/api/product/dashboard/filter")
+  .get(productCtrl.getListProductFilterDashboard);
+
+routes
+  .route("/api/product/dashboard/deleted")
+  .get(productCtrl.getListProductDeleted);
+
 routes.route("/api/product/test").post(productCtrl.updateAbc);
+routes.route("/api/product/statistics").get(productCtrl.getStatisticsProduct);
 
 routes.route("/api/product/:productId").get(productCtrl.getOneProduct);
 
-routes
-  .route("/api/product/:productId")
-  .put(
-    uploadFileMdw.fields([
-      { name: "thumbnail", maxCount: 1 },
-      { name: "images", maxCount: 10 },
-    ]),
-    verifyMdw.verifyToken,
-    verifyMdw.verifyRole,
-    productCtrl.updateProduct
-  )
-  .delete(
-    verifyMdw.verifyToken,
-    verifyMdw.verifyRole,
-    productCtrl.deleteProduct
-  )
-  .patch(
-    verifyMdw.verifyToken,
-    verifyMdw.verifyRole,
-    productCtrl.restoreProduct
-  );
+routes.route("/api/product/:productId").put(
+  uploadFileMdw.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "images", maxCount: 10 },
+  ]),
+  verifyMdw.verifyToken,
+  verifyMdw.verifyRole,
+  productCtrl.updateProduct
+);
+
+routes.route("/api/product/deleteOne/:productId").delete(
+  // verifyMdw.verifyToken,
+  // verifyMdw.verifyRole,
+  productCtrl.deleteOneProduct
+);
+
+routes.route("/api/product/deleteMultiple").delete(
+  // verifyMdw.verifyToken,
+  // verifyMdw.verifyRole,
+  productCtrl.deleteMultipleProduct
+);
+
+routes.route("/api/product/restoreOne/:productId").patch(
+  // verifyMdw.verifyToken,
+  // verifyMdw.verifyRole,
+  productCtrl.restoreOneProduct
+);
+
+routes.route("/api/product/restoreMultiple").patch(
+  // verifyMdw.verifyToken,
+  // verifyMdw.verifyRole,
+  productCtrl.restoreMultipleProduct
+);
 
 module.exports = routes;

@@ -25,14 +25,6 @@ function ProductSummary() {
             </tr>
             <tr className="">
               <th className="w-[300px] leading-8 h-8 text-left p-2">
-                Quà tặng
-              </th>
-              <td className="w-[calc(100vw-300px)] p-3  text-sm bg-[#FAFAFA]">
-                <p>Full box + tax + bill</p>
-              </td>
-            </tr>
-            <tr className="">
-              <th className="w-[300px] leading-8 h-8 text-left p-2">
                 Thương hiệu
               </th>
               <td className="w-[calc(100vw-300px)] bg-white p-3 text-sm">

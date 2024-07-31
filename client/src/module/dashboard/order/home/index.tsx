@@ -1,7 +1,7 @@
 import StatisticsOrder from "./StatisticsOrder.home";
 import ListOrder from "../listOrder";
 import { Fragment } from "react";
-import HeaderOrder from "../header";
+import HeaderOrder from "../header.order";
 
 function HomeOrder() {
   return (
