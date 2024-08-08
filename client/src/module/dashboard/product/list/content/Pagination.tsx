@@ -1,7 +1,7 @@
 import { IconChevronLeft, IconChevronRight } from "@/components/icon";
 import useTestContext from "@/hook/useTestContext";
 import ReactPaginate from "react-paginate";
-import { IListPdProvide, ListPdContext } from "../context";
+import { IListProductProvide, ListProductContext } from "../context";
 import { Input } from "@/components/input";
 import { useDeleteMultipleProductMutation } from "@/stores/service/product.service";
 import { useAppSelector, useToggle } from "@/hook";
@@ -9,16 +9,18 @@ import { RootState } from "@/stores";
 import { toast } from "react-toastify";
 import ModalDeleteProduct from "./ModalDeleteProduct";
 import { Fragment } from "react";
+import { cn } from "@/utils";
 
 function PaginationListProduct() {
   const {
     data,
+    showProduct,
     handleSetFilter,
     handleCheckAllProduct,
     listSelectProductId,
     setListSelectProductId,
-  } = useTestContext<IListPdProvide>(
-    ListPdContext as React.Context<IListPdProvide>
+  } = useTestContext<IListProductProvide>(
+    ListProductContext as React.Context<IListProductProvide>
   );
 
   const user = useAppSelector((state: RootState) => state.authSlice.user);
@@ -57,31 +59,38 @@ function PaginationListProduct() {
         handleOpenModal={handleOpenModal}
         handleDeleteProduct={handleDeleteMultipleProduct}
       ></ModalDeleteProduct>
-      <div className="flex items-center justify-between w-full p-4 bg-slate-100 border-t-1 border-t-grayCa">
-        <div className="flex items-center justify-start basis-1/2 gap-x-5">
-          <Input
-            type="checkbox"
-            name="checkAll"
-            className={{
-              input: "w-5 h-5 cursor-pointer",
-              wrap: "w-5 static",
-            }}
-            onChange={(event) => {
-              handleCheckAllProduct(event.target.checked);
-            }}
-            checked={
-              listSelectProductId.length === data.listProduct.length
-                ? true
-                : false
-            }
-          />
-          <span
-            onClick={handleOpenModal}
-            className="text-sm cursor-pointer text-danger font-semibold hover:text-orange hover:underline "
-          >
-            Xoá sản phẩm ({listSelectProductId.length})
-          </span>
-        </div>
+      <div
+        className={cn(
+          "w-full flex items-center justify-between p-4 bg-slate-100 border-t-1 border-t-grayCa",
+          showProduct === "grid" && "justify-end bg-white border-none"
+        )}
+      >
+        {showProduct === "list" && (
+          <div className="flex items-center justify-start basis-1/2 gap-x-5">
+            <Input
+              type="checkbox"
+              name="checkAll"
+              className={{
+                input: "w-5 h-5 cursor-pointer",
+                wrap: "w-5 static",
+              }}
+              onChange={(event) => {
+                handleCheckAllProduct(event.target.checked);
+              }}
+              checked={
+                listSelectProductId.length === data.listProduct.length
+                  ? true
+                  : false
+              }
+            />
+            <span
+              onClick={handleOpenModal}
+              className="text-sm font-semibold cursor-pointer text-danger hover:text-orange hover:underline "
+            >
+              Xoá sản phẩm ({listSelectProductId.length})
+            </span>
+          </div>
+        )}
         <div className="flex justify-end basis-1/2">
           {data.totalPage > 1 && (
             <ReactPaginate
@@ -90,6 +99,7 @@ function PaginationListProduct() {
               onPageChange={(selectedItem) => {
                 handleSetFilter({ activePage: selectedItem.selected + 1 });
                 setListSelectProductId([]);
+                window.scrollTo({ behavior: "smooth", top: 289 });
               }}
               pageRangeDisplayed={5}
               pageCount={data.totalPage}

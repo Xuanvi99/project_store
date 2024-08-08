@@ -5,7 +5,10 @@ export const imageApi = createApi({
   reducerPath: "image",
   baseQuery: baseQueryWithAuth,
   endpoints: (build) => ({
-    removeWithUrl: build.mutation<{ message: string }, { imageUrl: string }>({
+    removeWithImageUrl: build.mutation<
+      { message: string },
+      { imageUrl: string }
+    >({
       query: (body) => ({
         url: "image/removeWithUrl",
         method: "DELETE",
@@ -15,4 +18,4 @@ export const imageApi = createApi({
   }),
 });
 
-export const { useRemoveWithUrlMutation } = imageApi;
+export const { useRemoveWithImageUrlMutation } = imageApi;

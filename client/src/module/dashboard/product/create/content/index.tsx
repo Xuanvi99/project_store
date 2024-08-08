@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { CreatePdContext, ICreatePdProvide } from "../context";
+import { CreateProductContext, ICreateProductProvide } from "../context";
 import General from "./General.step1";
 import useTestContext from "@/hook/useTestContext";
 import { ModalNotification } from "@/components/modal";
 import UpLoadImages from "./UpLoadImages.step2";
-import Specs from "./Specs.step3";
+import SizeAndQuantity from "./SizeAndQuantity.step3";
 
 function Content() {
-  const { activeStep, isSuccess, isError } = useTestContext<ICreatePdProvide>(
-    CreatePdContext as React.Context<ICreatePdProvide>
-  );
+  const { activeStep, isSuccess, isError } =
+    useTestContext<ICreateProductProvide>(
+      CreateProductContext as React.Context<ICreateProductProvide>
+    );
 
   const selectStep = (activeStep: string) => {
     switch (activeStep) {
@@ -20,7 +21,7 @@ function Content() {
         return <UpLoadImages></UpLoadImages>;
 
       case "3":
-        return <Specs></Specs>;
+        return <SizeAndQuantity></SizeAndQuantity>;
 
       default:
         break;

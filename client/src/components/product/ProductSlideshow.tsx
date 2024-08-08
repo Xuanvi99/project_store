@@ -75,11 +75,7 @@ export default function ProductSlideshow({ name = "" }: IProps) {
               resProduct && resProduct?.listProduct.length > 5 ? true : false,
             speed: 100,
           }}
-          slideHover={
-            resProduct?.listProduct && resProduct?.listProduct.length > 5
-              ? true
-              : false
-          }
+          slideActions="hover"
           className={{ container: "mt-5" }}
         >
           {resProduct?.listProduct.map((product, index) => {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../../../../components/button";
 import useTestContext from "../../../../../hook/useTestContext";
-import { CreatePdContext, ICreatePdProvide } from "../context";
+import { CreateProductContext, ICreateProductProvide } from "../context";
 import ImageUploading, { ImageListType } from "react-images-uploading";
 import IconUploadImage from "../../../../../components/icon/IconUploadImage";
 import { cn } from "../../../../../utils";
@@ -11,8 +11,8 @@ import IconChevronLeft from "../../../../../components/icon/IconChevronLeft";
 
 function UpLoadImages() {
   const { handleActiveStep, handleSetData, uploadImage, handleSaveStep2 } =
-    useTestContext<ICreatePdProvide>(
-      CreatePdContext as React.Context<ICreatePdProvide>
+    useTestContext<ICreateProductProvide>(
+      CreateProductContext as React.Context<ICreateProductProvide>
     );
 
   const [thumbnail, setThumbnail] = useState<ImageListType>(

@@ -1,7 +1,7 @@
 import Skeleton from "../../skeleton/index";
 function CartSkeleton() {
   return (
-    <div className="relative rounded-sm card-item shadow-shadow77 shadow-grayCa bg-grayF5">
+    <div className="relative rounded-sm card-item shadow-shadow1 shadow-grayCa bg-grayF5">
       <div className="flex flex-col">
         <div className="w-full overflow-hidden h-[200px]">
           <Skeleton></Skeleton>

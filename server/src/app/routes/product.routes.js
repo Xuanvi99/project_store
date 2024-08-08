@@ -4,8 +4,9 @@ const { uploadFileMdw } = require("../middleware");
 const { verifyMdw } = require("../middleware");
 const routes = express.Router();
 
-routes.route("/api/product/").get(productCtrl.getListProduct);
-routes.route("/api/product/").post(
+routes.route("/api/product/list").get(productCtrl.getListProduct);
+
+routes.route("/api/product/create").post(
   uploadFileMdw.fields([
     { name: "thumbnail", maxCount: 1 },
     { name: "images", maxCount: 10 },
@@ -27,28 +28,43 @@ routes.route("/api/productItem").get(productCtrl.getProductItem);
 
 routes.route("/api/product/filter").get(productCtrl.getListProductFilter);
 
-routes
-  .route("/api/product/dashboard/filter")
-  .get(productCtrl.getListProductFilterDashboard);
-
-routes
-  .route("/api/product/dashboard/deleted")
-  .get(productCtrl.getListProductDeleted);
-
-routes.route("/api/product/test").post(productCtrl.updateAbc);
 routes.route("/api/product/statistics").get(productCtrl.getStatisticsProduct);
 
-routes.route("/api/product/:productId").get(productCtrl.getOneProduct);
-
-routes.route("/api/product/:productId").put(
+routes.route("/api/product/update/:productId").put(
   uploadFileMdw.fields([
     { name: "thumbnail", maxCount: 1 },
     { name: "images", maxCount: 10 },
   ]),
-  verifyMdw.verifyToken,
-  verifyMdw.verifyRole,
+  // verifyMdw.verifyToken,
+  // verifyMdw.verifyRole,
   productCtrl.updateProduct
 );
+
+routes.route("/api/product/update/info/:productId").put(
+  // verifyMdw.verifyToken,
+  // verifyMdw.verifyRole,
+  productCtrl.updateInfoProduct
+);
+
+routes.route("/api/product/update/sizeAndQuantity/:productId").put(
+  // verifyMdw.verifyToken,
+  // verifyMdw.verifyRole,
+  productCtrl.updateSizeAndQuantityProduct
+);
+
+routes.route("/api/product/update/thumbnailAndImages/:productId").put(
+  uploadFileMdw.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "images", maxCount: 10 },
+  ]),
+  // verifyMdw.verifyToken,
+  // verifyMdw.verifyRole,
+  productCtrl.updateThumbnailAndImagesProduct
+);
+
+routes
+  .route("/api/product/detail/:productId")
+  .get(productCtrl.getDetailProduct);
 
 routes.route("/api/product/deleteOne/:productId").delete(
   // verifyMdw.verifyToken,
@@ -73,5 +89,13 @@ routes.route("/api/product/restoreMultiple").patch(
   // verifyMdw.verifyRole,
   productCtrl.restoreMultipleProduct
 );
+
+routes
+  .route("/api/product/dashboard/filter")
+  .get(productCtrl.getListProductFilterDashboard);
+
+routes
+  .route("/api/product/dashboard/deleted")
+  .get(productCtrl.getListProductDeleted);
 
 module.exports = routes;

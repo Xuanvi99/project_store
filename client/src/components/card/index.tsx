@@ -19,7 +19,7 @@ function Card({ product }: ICardItemProps) {
       onClick={() =>
         navigate(`/product_detail/${product?.slug}_${product?._id}`)
       }
-      className="relative rounded-sm card-item shadow-shadow77 cursor-pointer bg-grayF5 "
+      className="relative rounded-sm card-item shadow-shadow1 cursor-pointer bg-grayF5 "
     >
       {product.is_sale && (
         <CardSales

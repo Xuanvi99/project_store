@@ -11,15 +11,15 @@ import { Link } from "react-router-dom";
 import { IconChevronRight } from "@/components/icon";
 
 export default function ProductPropose() {
-  const { data } = useTestContext<IProductDetailProvide>(
+  const { product } = useTestContext<IProductDetailProvide>(
     PDetailContext as React.Context<IProductDetailProvide>
   );
 
   const { data: resProduct, isFetching } = useGetListProductQuery({
-    search: data?.brand || "",
+    search: product?.brand || "",
     activePage: 1,
     limit: 10,
-    productId: data?._id,
+    productId: product?._id,
   });
 
   return (
@@ -32,7 +32,7 @@ export default function ProductPropose() {
       >
         <span className="text-2xl">Khám phá thêm</span>
         <Link
-          to={`/category/${data?.brand}?page=1`}
+          to={`/category/${product?.brand}?page=1`}
           className={cn(
             "flex items-center text-base duration-500 gap-x-1 hover:text-black"
           )}
@@ -55,11 +55,7 @@ export default function ProductPropose() {
               : false,
           speed: 100,
         }}
-        slideHover={
-          resProduct?.listProduct && resProduct?.listProduct.length > 5
-            ? true
-            : false
-        }
+        slideActions={"hover"}
         className={{ container: "mt-5" }}
       >
         {resProduct?.listProduct.map((product, index) => {

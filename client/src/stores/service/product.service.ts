@@ -5,7 +5,7 @@ import {
   IProductRes,
   TParamsFilterProduct,
   TParamsListProduct,
-  productItem,
+  TProductItem,
   TResStatisticsProduct,
   IResProductDeleted,
 } from "@/types/product.type";
@@ -21,8 +21,8 @@ interface IResponsiveFilter extends IResponsive<IProductRes> {
 }
 
 interface IResProductDetail {
-  data: IProductRes;
-  listProductItem: productItem[];
+  product: IProductRes;
+  listProductItem: TProductItem[];
 }
 
 type request<T> = T;
@@ -37,7 +37,7 @@ export const productApi = createApi({
       request<TParamsListProduct>
     >({
       query: (params) => ({
-        url: "product",
+        url: "product/list",
         method: "GET",
         params: { ...params },
       }),
@@ -54,7 +54,7 @@ export const productApi = createApi({
     }),
     getProductLoadMoreData: build.query<
       IResponsiveFilter,
-      request<TParamsFilterProduct>
+      TParamsFilterProduct
     >({
       query: (params) => ({
         url: "product/filter",
@@ -65,11 +65,11 @@ export const productApi = createApi({
         const { search, sortBy, order, min_price, max_price } = queryArgs;
         return { search, sortBy, order, min_price, max_price };
       },
-      // Always merge incoming data to the cache entry
+
       merge: (currentCache, newItems) => {
         currentCache.listProduct.push(...newItems.listProduct);
       },
-      //Refetch when the page arg changes
+
       forceRefetch({ currentArg, previousArg }) {
         return currentArg?.activePage !== previousArg?.activePage;
       },
@@ -84,10 +84,7 @@ export const productApi = createApi({
             ]
           : [{ type: "Product", id: "LOAD_MORE" }],
     }),
-    getListProductFilter: build.query<
-      IResponsiveFilter,
-      request<TParamsFilterProduct>
-    >({
+    getListProductFilter: build.query<IResponsiveFilter, TParamsFilterProduct>({
       query: (params) => ({
         url: "product/filter",
         method: "GET",
@@ -106,7 +103,7 @@ export const productApi = createApi({
     }),
     getListProductFilterDashboard: build.query<
       IResponsiveFilter,
-      request<IParamsFilterProductDashboard>
+      IParamsFilterProductDashboard
     >({
       query: (params) => ({
         url: "product/dashboard/filter",
@@ -126,7 +123,7 @@ export const productApi = createApi({
     }),
     getListProductDeleted: build.query<
       IResponsive<IResProductDeleted>,
-      request<TParamsListProduct>
+      TParamsListProduct
     >({
       query: (params) => ({
         url: "product/dashboard/deleted",
@@ -144,13 +141,13 @@ export const productApi = createApi({
             ]
           : [{ type: "Product", id: "LIST" }],
     }),
-    getOneProduct: build.query<IResProductDetail, string>({
-      query: (id) => ({ url: "product/" + id }),
+    getDetailProduct: build.query<IResProductDetail, string>({
+      query: (id) => ({ url: "product/detail/" + id }),
       providesTags: (result, error, id) => [{ type: "Product", id }],
     }),
     addProduct: build.mutation<{ message: string }, FormData>({
       query: (body) => ({
-        url: "product",
+        url: "product/create",
         method: "POST",
         body,
       }),
@@ -163,7 +160,7 @@ export const productApi = createApi({
       }),
     }),
     getProductItem: build.query<
-      { data: productItem },
+      { data: TProductItem },
       { productId: string; size: string }
     >({
       query: (params) => ({
@@ -227,6 +224,18 @@ export const productApi = createApi({
       }),
       invalidatesTags: [{ type: "Product" }],
     }),
+    //update product
+    updateProduct: build.mutation<
+      { message: string },
+      { productId: string; FromData: FormData }
+    >({
+      query: ({ productId, ...body }) => ({
+        url: `/api/product/update/${productId}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: [{ type: "Product" }],
+    }),
   }),
 });
 
@@ -234,7 +243,7 @@ export const {
   useAddProductMutation,
   useCheckNameMutation,
   useGetListProductQuery,
-  useGetOneProductQuery,
+  useGetDetailProductQuery,
   useGetProductLoadMoreDataQuery,
   useGetProductItemQuery,
   useGetListProductFilterQuery,
@@ -245,4 +254,5 @@ export const {
   useRestoreOneProductMutation,
   useRestoreMultipleProductMutation,
   useGetStatisticsProductQuery,
+  useUpdateProductMutation,
 } = productApi;

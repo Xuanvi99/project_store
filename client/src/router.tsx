@@ -126,6 +126,10 @@ const router = createBrowserRouter([
             path: "/dashboard/product/restore",
             element: <Dashboard.Product.Restore></Dashboard.Product.Restore>,
           },
+          {
+            path: "/dashboard/product/detail/:slug",
+            element: <Dashboard.Product.Detail></Dashboard.Product.Detail>,
+          },
         ],
       },
       {

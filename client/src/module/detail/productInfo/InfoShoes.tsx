@@ -10,13 +10,14 @@ import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IUser } from "@/types/user.type";
+import { handleFormatStatusProduct } from "@/utils/product.utils";
 
 function InfoShoes() {
   const user: IUser | null = useAppSelector(
     (state: RootState) => state.authSlice.user
   );
 
-  const { data, listProductItem } = useTestContext<IProductDetailProvide>(
+  const { product, listProductItem } = useTestContext<IProductDetailProvide>(
     PDetailContext as React.Context<IProductDetailProvide>
   );
 
@@ -36,6 +37,7 @@ function InfoShoes() {
     quantity: 1,
   });
   const [quantityOrder, setQuantityOrder] = useState<number>(1);
+
   const [selectSizeQuantityShoes, setSelectSizeQuantityShoes] = useState<{
     size: string;
     quantity: number;
@@ -54,7 +56,7 @@ function InfoShoes() {
   const handleIncrement = () => {
     let quantityShoes = selectSizeQuantityShoes.size
       ? selectSizeQuantityShoes.quantity
-      : data?.inventoryId.total;
+      : product?.inventoryId.total;
     quantityShoes = quantityShoes ? quantityShoes : 0;
     if (quantityOrder + 1 > quantityShoes) return;
     setQuantityOrder((quantityOrder) => quantityOrder + 1);
@@ -89,7 +91,7 @@ function InfoShoes() {
     const quantityChange = Number(e.target.value);
     const quantityShoes = selectSizeQuantityShoes.size
       ? selectSizeQuantityShoes.quantity || 0
-      : data?.inventoryId.total || 0;
+      : product?.inventoryId.total || 0;
     if (e.target.value === "") {
       setQuantityOrder(1);
     }
@@ -120,8 +122,8 @@ function InfoShoes() {
   };
 
   const handleAddProductToCart = async () => {
-    if (user && data) {
-      await addToCart({ id: user._id, productId: data._id, ...productOrder })
+    if (user && product) {
+      await addToCart({ id: user._id, productId: product._id, ...productOrder })
         .unwrap()
         .then(() => {
           setNotify({
@@ -142,10 +144,10 @@ function InfoShoes() {
   };
 
   const handleAddToCartBuyNow = async () => {
-    if (user && data) {
+    if (user && product) {
       await addToCart({
         id: user._id,
-        productId: data._id,
+        productId: product._id,
         ...productOrder,
       })
         .unwrap()
@@ -174,17 +176,17 @@ function InfoShoes() {
   };
 
   useEffect(() => {
-    if (data) {
-      if (data.commentIds.length === 0) {
+    if (product) {
+      if (product.commentIds.length === 0) {
         setStar("50");
       } else {
-        const countStar = data.commentIds.reduce((a, b) => a + b.star, 0);
+        const countStar = product.commentIds.reduce((a, b) => a + b.star, 0);
         const mediumStar =
-          Math.round((countStar * 10) / data.commentIds.length) / 10;
+          Math.round((countStar * 10) / product.commentIds.length) / 10;
         setStar("" + mediumStar);
       }
     }
-  }, [data]);
+  }, [product]);
 
   useEffect(() => {
     setSelectSizeQuantityShoes({
@@ -196,6 +198,10 @@ function InfoShoes() {
     setOpenModal(false);
     setNotify({ type: "default", message: "" });
   }, [slug]);
+
+  if (!product) {
+    return;
+  }
 
   return (
     <div className="basis-5/12 max-w-[500px]">
@@ -216,7 +222,7 @@ function InfoShoes() {
           "border-b-2 border-grayCa"
         )}
       >
-        {data?.name}
+        {product?.name}
       </h2>
       <div className="flex flex-col mt-5 gap-y-5">
         <ul className="flex gap-x-5">
@@ -231,55 +237,49 @@ function InfoShoes() {
           <li className="border-l-[1px] border-grayCa"></li>
           <li className="flex items-center gap-x-2 text-gray">
             <p className="text-xl border-b-2 text-grayDark border-grayCa">
-              {data?.commentIds.length}
+              {product?.commentIds.length}
             </p>
             Đánh Giá
           </li>
           <li className="border-l-[1px] border-grayCa"></li>
           <li className="flex items-center gap-x-2 text-gray">
             <p className="text-xl border-b-2 text-grayDark border-grayCa">
-              {data?.sold}
+              {product?.sold}
             </p>
             Đã Bán
           </li>
         </ul>
-        <div className="flex flex-col justify-start text-sm text-grayDark gap-y-2">
-          <span>
-            Tình trạng:
-            <span
-              className={cn(
-                "ml-2 text-danger",
-                data?.status === "active" && "text-green"
-              )}
-            >
-              {data?.inventoryId.stocked
-                ? "Hết hàng"
-                : data?.status === "active"
-                ? "Đang bán"
-                : " Ngừng bán"}
-            </span>
+        <div className="flex items-center justify-start text-sm text-grayDark gap-x-2">
+          <span className="font-bold">Tình trạng:</span>
+          <span
+            className={cn(
+              "ml-2 text-danger",
+              product?.status === "active" && "text-green"
+            )}
+          >
+            {handleFormatStatusProduct(product.status)}
           </span>
         </div>
       </div>
-      {data && data.is_sale && (
+      {product && product.is_sale && (
         <div className="w-full bg-redLinear rounded mt-5 p-[10px] grid grid-cols-2">
           <div className="grid grid-cols-1 grid-rows-3 text-white gap-y-2">
             <span>
               Giá sale:
               <strong className="ml-1 text-xl font-bold text-yellow">
-                {formatPrice(data?.priceSale)}₫
+                {formatPrice(product?.priceSale)}₫
               </strong>
             </span>
             <span className="flex items-center">
               Giá gốc:
               <strong className="ml-1 line-through ">
-                {formatPrice(data?.price)}₫
+                {formatPrice(product?.price)}₫
               </strong>
             </span>
             <span>
               Tiết kiệm:
               <strong className="ml-1 text-xl font-bold text-yellow">
-                {formatPrice(data?.price - data?.priceSale)}₫
+                {formatPrice(product?.price - product?.priceSale)}₫
               </strong>
             </span>
           </div>
@@ -288,7 +288,7 @@ function InfoShoes() {
           </div>
         </div>
       )}
-      {data && !data.is_sale && (
+      {product && !product.is_sale && (
         <div className="flex items-end mt-5 gap-x-3">
           <span className="text-lg font-bold">Giá:</span>
           <span className="text-2xl font-bold text-red-600">
@@ -321,7 +321,7 @@ function InfoShoes() {
           </span>
         </div>
       </div>
-      {data?.status === "active" && !data.inventoryId.stocked ? (
+      {product?.status === "active" && !product.inventoryId.stocked ? (
         <div className="flex flex-col mt-10 gap-y-10">
           <div className="grid grid-cols-[50px_calc(100%-50px)]">
             <span className="inline-block font-bold ">Size:</span>
@@ -390,7 +390,7 @@ function InfoShoes() {
             <span className="text-gray">
               (
               {selectSizeQuantityShoes.size === ""
-                ? data?.inventoryId.total
+                ? product?.inventoryId.total
                 : selectSizeQuantityShoes.quantity}
               &nbsp;sản phẩm có sẵn)
             </span>

@@ -337,7 +337,7 @@ class Product {
     }
   };
 
-  getOneProduct = async (req, res) => {
+  getDetailProduct = async (req, res) => {
     try {
       const productId = req.params.productId;
       if (!productId)
@@ -348,6 +348,7 @@ class Product {
           { path: "thumbnail", select: "url" },
           { path: "imageIds", select: "url" },
           { path: "commentIds" },
+          { path: "categoryId" },
           { path: "inventoryId", select: "_id sold total stocked" },
         ])
         .lean()
@@ -363,7 +364,7 @@ class Product {
         })
         .lean();
 
-      res.status(200).json({ data: product, listProductItem });
+      res.status(200).json({ product, listProductItem });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }
@@ -534,6 +535,144 @@ class Product {
       if (!result)
         return res.status(400).json({ errMessage: "Cập nhật thất bại" });
       res.status(200).json({ message: "Cập nhật thành công", result });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  updateInfoProduct = async (req, res) => {
+    const productId = req.params.productId;
+    const { brand } = req.body;
+    if (!productId)
+      return res.status(403).json({ message: "Invalid productId" });
+    try {
+      const product = await productModel.findById(productId).lean();
+      if (!product) {
+        return res.status(404).json({ errMessage: "Không tìm thấy sản phẩm" });
+      }
+
+      if (brand !== product.brand) {
+        const categoryOld = await categoryModel
+          .findOne({ name: product.brand })
+          .exec();
+        const categoryNew = await categoryModel.findOne({ name: brand }).exec();
+        if (categoryOld && categoryNew) {
+          
+          product.categoryId = categoryNew._id;
+          await product.save();
+          categoryNew.productIds.push(product._id);
+          await categoryNew.save();
+
+          const productIds = categoryOld.productIds.filter(
+            (id) => id !== product._id
+          );
+          categoryOld.productIds = productIds;
+          await categoryOld.save();
+        }
+      }
+
+      const result = await productModel
+        .findByIdAndUpdate(productId, { ...req.body }, { new: true })
+        .exec();
+      if (!result)
+        return res
+          .status(400)
+          .json({ errMessage: "Cập nhật thông tin thất bại" });
+      res
+        .status(200)
+        .json({ message: "Cập nhật thông tin thành công", result });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  updateThumbnailAndImagesProduct = async (req, res) => {
+    const productId = req.params.productId;
+    const { files } = req;
+    if (!productId)
+      return res.status(403).json({ message: "Invalid productId" });
+    try {
+      const product = await productModel.findById(productId).lean();
+      if (!product) {
+        return res.status(404).json({ errMessage: "Không tìm thấy sản phẩm" });
+      }
+      let productUpdate = {};
+      const { imageIds, thumbnail } = product;
+      if (files.images && imageIds.length > 0) {
+        for (let i = 0; i < imageIds.length; i++) {
+          await imageModel.removeFile(imageIds[i]);
+        }
+        const imagesUpLoad = await imageModel.uploadMultipleFile(
+          files.images,
+          "product"
+        );
+        productUpdate = { ...productUpdate, imageIds: imagesUpLoad };
+      }
+      if (files.thumbnail && thumbnail) {
+        await imageModel.removeFile(thumbnail);
+        const thumbnailUpLoad = await imageModel.uploadSingleFile(
+          files.thumbnail,
+          "product"
+        );
+        productUpdate = { ...productUpdate, thumbnail: thumbnailUpLoad };
+      }
+      const result = await productModel
+        .findByIdAndUpdate(productId, { ...productUpdate }, { new: true })
+        .exec();
+      if (!result)
+        return res
+          .status(400)
+          .json({ errMessage: "Cập nhật hình ảnh thất bại" });
+      res.status(200).json({ message: "Cập nhật hình ảnh thành công", result });
+    } catch (error) {
+      res.status(500).json({ errMessage: "server error" });
+    }
+  };
+
+  updateSizeAndQuantityProduct = async (req, res) => {
+    const productId = req.params.productId;
+    const { specs } = req.body;
+    if (!productId)
+      return res.status(403).json({ message: "Invalid productId" });
+    try {
+      const product = await productModel.findById(productId).lean();
+      if (!product) {
+        return res.status(404).json({ errMessage: "Không tìm thấy sản phẩm" });
+      }
+
+      let total = 0;
+      for (let i = 0; i < specs.length; i++) {
+        const result = await productItemModel
+          .findOne({ size: specs.size })
+          .exec();
+        if (result) {
+          result.updateOne({
+            $addToSet: { quantity: specs[i].quantity },
+          });
+        } else {
+          productItemModel.insertOne({
+            productId: product._id,
+            ...specs[i],
+          });
+        }
+        total += specs[i].quantity;
+      }
+
+      await inventoryModel.updateOne(
+        { _id: product._id },
+        { $set: { total: total, stocked: total > 0 ? true : false } }
+      );
+
+      const result = await productModel
+        .findByIdAndUpdate(productId, { ...productUpdate }, { new: true })
+        .exec();
+      if (!result)
+        return res
+          .status(400)
+          .json({ errMessage: "Cập nhật size và số lượng thất bại" });
+      res
+        .status(200)
+        .json({ message: "Cập nhật size và số lượng thành công", result });
     } catch (error) {
       res.status(500).json({ errMessage: "server error" });
     }

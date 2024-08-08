@@ -8,7 +8,7 @@ import { QueryStatus } from "@reduxjs/toolkit/query";
 import { createContext, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-export interface IRestorePdProvide {
+export interface IRestoreProductProvide {
   data: {
     listProduct: IResProductDeleted[];
     totalPage: number;
@@ -30,9 +30,11 @@ export interface IRestorePdProvide {
   handleSetParams: (value: TParams<TParamsListProduct>) => void;
 }
 
-const RestorePdContext = createContext<IRestorePdProvide | null>(null);
+const RestoreProductContext = createContext<IRestoreProductProvide | null>(
+  null
+);
 
-const RestorePdProvide = ({ children }: { children: React.ReactNode }) => {
+const RestoreProductProvide = ({ children }: { children: React.ReactNode }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [params, setParams] = useState<TParamsListProduct>({
@@ -43,7 +45,7 @@ const RestorePdProvide = ({ children }: { children: React.ReactNode }) => {
 
   const [listSelectProductId, setListSelectProductId] = useState<string[]>([]);
 
-  const [data, setData] = useState<IRestorePdProvide["data"]>({
+  const [data, setData] = useState<IRestoreProductProvide["data"]>({
     listProduct: [],
     totalPage: 0,
     amountProductFound: 0,
@@ -91,7 +93,7 @@ const RestorePdProvide = ({ children }: { children: React.ReactNode }) => {
     statusQuery,
   ]);
   return (
-    <RestorePdContext.Provider
+    <RestoreProductContext.Provider
       value={{
         data,
         statusQuery,
@@ -104,8 +106,8 @@ const RestorePdProvide = ({ children }: { children: React.ReactNode }) => {
       }}
     >
       {children}
-    </RestorePdContext.Provider>
+    </RestoreProductContext.Provider>
   );
 };
 
-export { RestorePdProvide, RestorePdContext };
+export { RestoreProductProvide, RestoreProductContext };

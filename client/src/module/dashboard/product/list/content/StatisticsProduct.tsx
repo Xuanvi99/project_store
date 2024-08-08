@@ -18,7 +18,7 @@ function StatisticsProduct() {
         return (
           <div
             key={index}
-            className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2"
+            className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow1 gap-y-2"
           >
             <span>{statistics.value}</span>
             <span className="flex items-center gap-x-1">

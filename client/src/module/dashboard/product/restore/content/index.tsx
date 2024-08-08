@@ -5,13 +5,13 @@ import { cn } from "@/utils";
 import { debounce } from "lodash";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { IRestorePdProvide, RestorePdContext } from "../context";
+import { IRestoreProductProvide, RestoreProductContext } from "../context";
 import ProductItemSkeleton from "./ProductItemSkeleton.Restore";
 import ProductItem from "./ProductItem.Restore";
 import PaginationRestore from "./Pagination.Restore";
 import IconRightArrow from "@/components/icon/IconRightArrow";
 import { Dropdown } from "@/components/dropdown";
-import { optionLimit } from "@/constant/category.constant";
+import { optionLimitList } from "@/constant/category.constant";
 import LoadingSpinner from "@/components/loading";
 
 function ListRestoreProduct() {
@@ -23,8 +23,8 @@ function ListRestoreProduct() {
     isLoadingQuery,
     setListSelectProductId,
     handleSetParams,
-  } = useTestContext<IRestorePdProvide>(
-    RestorePdContext as React.Context<IRestorePdProvide>
+  } = useTestContext<IRestoreProductProvide>(
+    RestoreProductContext as React.Context<IRestoreProductProvide>
   );
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -77,7 +77,7 @@ function ListRestoreProduct() {
           <IconSearch size={25}></IconSearch>
         </div>
       </Input>
-      <div className="flex items-center text-sm font-semibold text-end gap-x-2 mt-5">
+      <div className="flex items-center mt-5 text-sm font-semibold text-end gap-x-2">
         <span className="flex items-center gap-x-1">
           <IconRightArrow size={10}></IconRightArrow>
           <span>Hiện thị:</span>
@@ -91,7 +91,7 @@ function ListRestoreProduct() {
             }}
             title={"" + params.limit}
             value={"" + params.limit}
-            options={optionLimit}
+            options={optionLimitList}
             handleSelect={(option) => {
               searchParams.set("limit", option.value);
               setSearchParams(searchParams);
@@ -115,7 +115,7 @@ function ListRestoreProduct() {
         className={cn(
           "w-full mt-5 list_Restore_Product ",
           data.listProduct.length > 0
-            ? "shadow-shadow77 border-1 border-grayCa"
+            ? "shadow-shadow1 border-1 border-grayCa"
             : ""
         )}
       >

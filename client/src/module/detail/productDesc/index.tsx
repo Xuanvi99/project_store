@@ -6,17 +6,16 @@ import useTestContext from "@/hook/useTestContext";
 import { IProductDetailProvide, PDetailContext } from "../context";
 
 function ProductDesc() {
-  const { data } = useTestContext<IProductDetailProvide>(
+  const { product } = useTestContext<IProductDetailProvide>(
     PDetailContext as React.Context<IProductDetailProvide>
   );
   const [heightDesc, setHeightDesc] = useState<string>("200px");
   const [openDesc, setOpenDesc] = useState(false);
-  console.log("openDesc: ", openDesc);
 
   useEffect(() => {
     setOpenDesc(false);
     setHeightDesc("200px");
-  }, [data]);
+  }, [product]);
 
   return (
     <section className="w-full mt-5 bg-white rounded-md py-5 px-[10px]">
@@ -25,10 +24,12 @@ function ProductDesc() {
         style={{ height: heightDesc }}
         className="relative w-full mt-5 overflow-hidden"
       >
-        <div className="w-full px-5 flex flex-col justify-center items-center">
+        <div className="flex flex-col items-center justify-center w-full px-5">
           <div
             dangerouslySetInnerHTML={{
-              __html: marked.parse(data && data?.desc ? data?.desc : ""),
+              __html: marked.parse(
+                product && product?.desc ? product?.desc : ""
+              ),
             }}
           ></div>
         </div>

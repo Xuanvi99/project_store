@@ -136,11 +136,11 @@
         border-bottom: 15px solid #f5f5f7;
     }
 
-    .arrow-top {
-        animation: 1s arrowTop linear infinite;
+    .arrow-top_down {
+        animation: 1s arrowTopDown linear infinite;
     }
 
-    @keyframes arrowTop {
+    @keyframes arrowTopDown {
         0% {
             opacity: 0;
             top: -20px;
@@ -151,17 +151,47 @@
         }
     }
 
-    .arrow-bottom {
-        animation: 1s arrowBottom linear 1s infinite;
+    .arrow-bottom_down {
+        animation: 1s arrowBottomDown linear 1s infinite;
     }
 
-    @keyframes arrowBottom {
+    @keyframes arrowBottomDown {
         0% {
             opacity: 0;
             top: -20px;
         }
         100% {
             top: 10px;
+            opacity: 1;
+        }
+    }
+
+    .arrow-top_up {
+        animation: 1s arrowTopUp linear infinite;
+    }
+
+    @keyframes arrowTopUp {
+        0% {
+            opacity: 0;
+            top: 15px;
+        }
+        100% {
+            top: -5px;
+            opacity: 1;
+        }
+    }
+
+    .arrow-bottom_up {
+        animation: 1s arrowBottomUp linear 1s infinite;
+    }
+
+    @keyframes arrowBottomUp {
+        0% {
+            opacity: 0;
+            top: 25px;
+        }
+        100% {
+            top: -5px;
             opacity: 1;
         }
     }
@@ -194,11 +224,6 @@
             inset 0 0 0 5px #ffffff;
         background-color: #ff2929;
         border: none;
-    }
-
-    .iconDelete:hover .delete-lid {
-        top: -10px;
-        transform: rotate(45deg);
     }
 
     .borderCheckOut {
@@ -254,17 +279,6 @@
         .tr_product {
             td {
                 text-align: center;
-            }
-        }
-    }
-
-    .Dashboard_product_List {
-        .productItem {
-            span {
-                padding: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
             }
         }
     }

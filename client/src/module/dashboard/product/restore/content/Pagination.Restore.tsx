@@ -1,5 +1,5 @@
 import useTestContext from "@/hook/useTestContext";
-import { IRestorePdProvide, RestorePdContext } from "../context";
+import { IRestoreProductProvide, RestoreProductContext } from "../context";
 import { useToggle } from "@/hook";
 import { toast } from "react-toastify";
 import { Fragment } from "react";
@@ -16,8 +16,8 @@ function PaginationRestore() {
     handleCheckAllProduct,
     listSelectProductId,
     setListSelectProductId,
-  } = useTestContext<IRestorePdProvide>(
-    RestorePdContext as React.Context<IRestorePdProvide>
+  } = useTestContext<IRestoreProductProvide>(
+    RestoreProductContext as React.Context<IRestoreProductProvide>
   );
 
   const { toggle: openModal, handleToggle: handleOpenModal } = useToggle();

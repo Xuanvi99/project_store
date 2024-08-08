@@ -1,5 +1,5 @@
-import FilterProductDB from "./content/FilterProductDB";
-import ShowListProduct from "./content";
+import ProductFilter from "./content/ProductFilter";
+import ProductContent from "./content";
 import StatisticsProduct from "./content/StatisticsProduct";
 import { ListProductProvider } from "./context";
 import HeaderProductDB from "../header.product";
@@ -8,12 +8,12 @@ function ListProduct() {
   return (
     <div className="Dashboard_product_List">
       <HeaderProductDB></HeaderProductDB>
-      <div className="w-full px-6 pb-10 mt-5">
+      <div className="w-full px-6 pb-10 mt-[80px]">
         <StatisticsProduct></StatisticsProduct>
-        <div className="p-5 bg-white mt-5 rounded-md">
+        <div className="p-5 mt-5 bg-white rounded-md">
           <ListProductProvider>
-            <FilterProductDB></FilterProductDB>
-            <ShowListProduct></ShowListProduct>
+            <ProductFilter></ProductFilter>
+            <ProductContent></ProductContent>
           </ListProductProvider>
         </div>
       </div>

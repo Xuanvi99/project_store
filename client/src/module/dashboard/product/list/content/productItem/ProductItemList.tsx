@@ -2,24 +2,25 @@ import { IconDelete } from "@/components/icon";
 import { Input } from "@/components/input";
 import { IProductRes } from "@/types/product.type";
 import { cn, formatPrice } from "@/utils";
-import IconEye from "../../../../../components/icon/IconEye";
+import IconEye from "../../../../../../components/icon/IconEye";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import ModalDeleteProduct from "./ModalDeleteProduct";
+import ModalDeleteProduct from "../ModalDeleteProduct";
 import { useDeleteOneProductMutation } from "@/stores/service/product.service";
 import { useAppSelector, useToggle } from "@/hook";
 import { RootState } from "@/stores";
 import { toast } from "react-toastify";
 import { Fragment } from "react";
+import { useNavigate } from "react-router-dom";
 
 type TProps = {
-  data: IProductRes;
+  product: IProductRes;
   index: number;
   isChecked: boolean;
   handleCheckOneProduct: (checked: boolean, id: string) => void;
 };
 
-function ProductItem({
-  data,
+function ProductItemList({
+  product,
   index,
   isChecked,
   handleCheckOneProduct,
@@ -35,7 +36,9 @@ function ProductItem({
     priceSale,
     inventoryId,
     _id,
-  } = data;
+  } = product;
+
+  const navigate = useNavigate();
 
   const user = useAppSelector((state: RootState) => state.authSlice.user);
 
@@ -90,7 +93,8 @@ function ProductItem({
       ></ModalDeleteProduct>
       <div
         className={cn(
-          "productItem grid w-full grid-cols-[50px_350px_100px_100px_100px_100px_100px_auto] text-sm grid-rows-1 ",
+          "productItem_list grid w-full grid-cols-[50px_350px_100px_100px_100px_100px_100px_auto] text-sm grid-rows-1",
+          "[&>span]:flex [&>span]:items-center [&>span]:justify-center [&>span]:p-3",
           index % 2 !== 0 ? "bg-grayFa" : ""
         )}
       >
@@ -109,7 +113,7 @@ function ProductItem({
             checked={isChecked}
           />
         </span>
-        <div className="flex items-center justify-start w-full text-xs font-semibold text-grayDark gap-x-1">
+        <span className="flex items-center justify-start text-xs font-semibold w-fit text-grayDark gap-x-1">
           <LazyLoadImage
             alt="Thumbnails"
             placeholderSrc={thumbnail.url}
@@ -118,7 +122,7 @@ function ProductItem({
             className="min-w-[50px] h-[50px]"
           />
           <p className="p-2 line-clamp-2">{name}</p>
-        </div>
+        </span>
         <span className="font-semibold">{categoryId.name}</span>
         <span className="text-danger">
           {formatPrice(is_sale ? priceSale : price)}₫
@@ -131,6 +135,9 @@ function ProductItem({
             isOpenEye={true}
             size={20}
             className="cursor-pointer hover:text-orange"
+            onClick={() => {
+              navigate(`/dashboard/product/detail/${_id}`);
+            }}
           ></IconEye>
           <div className="w-[1px] h-1/2 bg-gray"></div>
           <IconDelete size={20} onClick={handleOpenModal}></IconDelete>
@@ -140,4 +147,4 @@ function ProductItem({
   );
 }
 
-export default ProductItem;
+export default ProductItemList;

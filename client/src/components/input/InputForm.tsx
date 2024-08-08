@@ -11,7 +11,7 @@ type IInputFormProps = Omit<IInputProps, "ref">;
 const InputForm = <T extends FieldValues>(
   props: IInputFormProps & UseControllerProps<T>
 ) => {
-  const { type, name, control, children, onChange, ...rest } = props;
+  const { type, name, control, children, onChange, onBlur, ...rest } = props;
 
   const { field } = useController<T>({
     control,
@@ -23,6 +23,13 @@ const InputForm = <T extends FieldValues>(
       type={type}
       {...field}
       {...rest}
+      onBlur={() => {
+        // field.onBlur();
+        // if (onBlur) {
+        //   onBlur();
+        // }
+        console.log("cấ");
+      }}
       onChange={(event) => {
         field.onChange(event);
         if (onChange) {

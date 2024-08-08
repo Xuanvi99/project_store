@@ -13,11 +13,11 @@ function IconDelete({
     <div
       onClick={onClick}
       className={cn(
-        `relative iconDelete cursor-pointer w-[${size}px]`,
+        `relative group/iconDelete cursor-pointer w-[${size}px]`,
         className
       )}
     >
-      <div className="absolute top-0 left-0 duration-300 delete-lid">
+      <div className="absolute top-0 left-0 duration-300 group-hover/iconDelete:top-[-10px] group-hover/iconDelete:rotate-45">
         <IconDeleteLid size={size}></IconDeleteLid>
       </div>
       <div>
@@ -30,7 +30,7 @@ function IconDelete({
 const IconDeleteLid = ({ size }: { size: number }) => {
   return (
     <svg
-      fill="#000000"
+      fill="currentColor"
       width={size}
       version="1.1"
       id="Layer_1"
@@ -64,7 +64,7 @@ const IconDeleteLid = ({ size }: { size: number }) => {
 const IconDeleteBin = ({ size }: { size: number }) => {
   return (
     <svg
-      fill="#000000"
+      fill="currentColor"
       height={size}
       width={size}
       version="1.1"

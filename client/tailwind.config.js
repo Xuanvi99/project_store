@@ -46,7 +46,8 @@ export default {
       },
       boxShadow: {
         shadowButton: "0 5px 5px rgba(0,0,0,0.5)",
-        shadow77: " 0px 2px 8px rgba(0, 0, 0, 0.15)",
+        shadow1: " 0px 2px 8px rgba(0, 0, 0, 0.15)",
+        shadow2: " 0px 2px 8px rgba(0, 0, 0, 0.5)",
       },
       animation: {
         textScale: "textScale 0.5s linear  infinite",

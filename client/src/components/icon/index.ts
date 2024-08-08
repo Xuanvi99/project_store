@@ -32,6 +32,8 @@ import IconNotification from "./IconNotification";
 import IconPurchase from "./IconPurchase";
 import IconInfo from "./IconInfo";
 import IconShoppingFee from "./IconShoppingFee";
+import IconShowList from "./IconShowList";
+import IconShowGrid from "./IconShowGrid";
 
 export {
   IconSearch,
@@ -69,4 +71,6 @@ export {
   IconPurchase,
   IconShoppingFee,
   IconInfo,
+  IconShowList,
+  IconShowGrid,
 };

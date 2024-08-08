@@ -1,3 +1,4 @@
+import { ICategory } from "./category.type";
 import { IComment } from "./comment.type";
 import { IImage } from "./commonType";
 import { IUser } from "./user.type";
@@ -8,11 +9,10 @@ export type TParams<T> = {
 
 export interface IProductReq {
   name: string;
-  summary: string;
   desc: string;
   brand: string;
   price: number;
-  status: string;
+  status: "active" | "inactive" | "deleted" | string;
   thumbnail: File | null;
   images: File[] | null;
   specs: string;
@@ -34,10 +34,10 @@ export interface IProductRes {
   price: number;
   priceSale: number;
   sold: number;
-  status: string;
+  status: "active" | "inactive" | "deleted";
   imageIds: IImage[];
   commentIds: IComment[];
-  categoryId: { _id: string; name: string };
+  categoryId: ICategory;
   inventoryId: IInventory;
   is_sale: boolean;
   deleted: boolean;
@@ -79,7 +79,7 @@ export type TParamsListSale = {
   is_sale: boolean;
 };
 
-export type productItem = {
+export type TProductItem = {
   _id: string;
   productId: string;
   size: string;
@@ -92,3 +92,14 @@ export type TResStatisticsProduct = {
   inactive: number;
   deleted: number;
 };
+
+export interface IUpdateInfoProduct
+  extends Omit<IProductReq, "thumbnail" | "images" | "specs"> {
+  is_sale: boolean;
+  priceSale: number;
+}
+
+export interface IUpdateThumbnailAndImagesProduct {
+  thumbnail: File | null;
+  images: File[] | null;
+}

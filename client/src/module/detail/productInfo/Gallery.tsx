@@ -11,7 +11,7 @@ import { IProductDetailProvide, PDetailContext } from "../context";
 import LoadingSpinner from "../../../components/loading/index";
 
 const Gallery = () => {
-  const { data } = useTestContext<IProductDetailProvide>(
+  const { product } = useTestContext<IProductDetailProvide>(
     PDetailContext as React.Context<IProductDetailProvide>
   );
 
@@ -46,7 +46,7 @@ const Gallery = () => {
     }
   };
 
-  if (!data) {
+  if (!product) {
     return (
       <div className="w-[400px] h-[400px] flex justify-center items-center">
         <LoadingSpinner className="w-10 h-10 border-4 border-orangeFe border-r-transparent"></LoadingSpinner>
@@ -59,7 +59,7 @@ const Gallery = () => {
       <div className="w-full min-h-[400px] relative">
         <SlideSwiper
           slideActive={slideSmallIndex}
-          slideHover={true}
+          slideActions={"hover"}
           optionSwiper={{
             grabCursor: true,
             slidesPerView: 1,
@@ -74,7 +74,7 @@ const Gallery = () => {
             container: "slide-product_normal ",
           }}
         >
-          {data?.imageIds.map((image, index) => {
+          {product?.imageIds.map((image, index) => {
             return (
               <SwiperSlide key={index}>
                 <img
@@ -91,10 +91,10 @@ const Gallery = () => {
             );
           })}
         </SlideSwiper>
-        {data.is_sale && (
+        {product.is_sale && (
           <CardSales
             discount={Math.ceil(
-              ((data.price - data.priceSale) * 100) / data.price
+              ((product.price - product.priceSale) * 100) / product.price
             )}
             className="-left-1 top-1"
           ></CardSales>
@@ -119,7 +119,7 @@ const Gallery = () => {
           <div className="flex flex-col justify-between w-full h-full">
             <div className="h-[50px] flex justify-between items-center text-white px-5">
               <span className="text-2xl">
-                {slideBigIndex + 1}/{data?.imageIds.length}
+                {slideBigIndex + 1}/{product?.imageIds.length}
               </span>
               <span
                 onClick={handleShowModal}
@@ -135,18 +135,18 @@ const Gallery = () => {
                   slidesPerView: 1,
                   slidesPerGroup: 1,
                   quantitySlide: 5,
-                  loop: data.imageIds.length > 5 ? true : false,
+                  loop: product.imageIds.length > 5 ? true : false,
                   onSlideNextTransitionEnd: () => handleChangeSlide("zoom"),
                   onSlidePrevTransitionEnd: () => handleChangeSlide("zoom"),
                 }}
-                slideHover={false}
+                slideActions={"display"}
                 className={{
                   container: "h-full flex slide-product_zoom",
                   btnLeft: "opacity-100",
                   btnRight: "opacity-100",
                 }}
               >
-                {data?.imageIds.map((image, index) => {
+                {product?.imageIds.map((image, index) => {
                   return (
                     <SwiperSlide key={index} onClick={handleShowModal}>
                       <div className="flex justify-center h-full">
@@ -160,7 +160,7 @@ const Gallery = () => {
             <div className="w-full h-[50px] text-white relative">
               <span className="absolute inset-0 z-40 bg-black opacity-70"></span>
               <p className="absolute inset-0 z-50 flex items-center justify-center">
-                {data.name}
+                {product.name}
               </p>
             </div>
           </div>
@@ -176,11 +176,11 @@ const Gallery = () => {
             lazyPreloadPrevNext: 5,
             quantitySlide: 5,
           }}
-          slideHover={true}
+          slideActions={"hover"}
           slideActive={slideSmallIndex}
           className={{ btnLeft: "py-4", btnRight: "py-4" }}
         >
-          {data?.imageIds.map((image, index) => {
+          {product?.imageIds.map((image, index) => {
             return (
               <SwiperSlide key={index}>
                 <img

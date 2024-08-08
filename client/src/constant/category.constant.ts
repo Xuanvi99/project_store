@@ -13,9 +13,14 @@ export const OptionPrice = [
   { id: "2", label: "Giá: cao đến thấp", value: "desc" },
 ];
 
-export const optionLimit = [
+export const optionLimitList = [
   { id: "1", label: "5", value: "5" },
   { id: "2", label: "10", value: "10" },
+];
+
+export const optionLimitGrid = [
+  { id: "1", label: "4", value: "4" },
+  { id: "2", label: "8", value: "8" },
 ];
 
 export const OptionSearch: {

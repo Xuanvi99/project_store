@@ -8,9 +8,9 @@ import { Button } from "@/components/button";
 import useTestContext from "@/hook/useTestContext";
 import Modal from "@/components/modal";
 import LoadingSpinner from "@/components/loading";
-import { CreatePdContext, ICreatePdProvide } from "../context";
+import { CreateProductContext, ICreateProductProvide } from "../context";
 
-function Specs() {
+function SizeAndQuantity() {
   const {
     specs,
     modifyTable,
@@ -20,8 +20,8 @@ function Specs() {
     handleSetData,
     handleSaveStep3,
     handleSubmitProduct,
-  } = useTestContext<ICreatePdProvide>(
-    CreatePdContext as React.Context<ICreatePdProvide>
+  } = useTestContext<ICreateProductProvide>(
+    CreateProductContext as React.Context<ICreateProductProvide>
   );
 
   const [watchData, setWatchData] = useState<
@@ -371,4 +371,4 @@ function Specs() {
   );
 }
 
-export default Specs;
+export default SizeAndQuantity;

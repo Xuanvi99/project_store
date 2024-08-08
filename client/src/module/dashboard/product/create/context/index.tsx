@@ -6,7 +6,7 @@ import { SerializedError } from "@reduxjs/toolkit";
 import { IProductReq } from "@/types/product.type";
 import { useAddProductMutation } from "@/stores/service/product.service";
 
-export interface ICreatePdProvide {
+export interface ICreateProductProvide {
   data: IProductReq;
 
   activeStep: string;
@@ -46,15 +46,14 @@ export interface ICreatePdProvide {
   error: FetchBaseQueryError | SerializedError | undefined;
 }
 
-const CreatePdContext = createContext<ICreatePdProvide | null>(null);
+const CreateProductContext = createContext<ICreateProductProvide | null>(null);
 
-function CreatePdProvide({ children }: { children: React.ReactNode }) {
+function CreateProductProvide({ children }: { children: React.ReactNode }) {
   const [addProduct, { isLoading, isSuccess, isError, error }] =
     useAddProductMutation();
 
   const [data, setData] = useState<IProductReq>({
     name: "",
-    summary: "",
     desc: "",
     brand: "",
     price: 0,
@@ -71,8 +70,6 @@ function CreatePdProvide({ children }: { children: React.ReactNode }) {
     thumbnail: [],
     listImages: [],
   });
-
-  console.log("data", data);
 
   const [activeStep, setActiveStep] = useState<string>("1");
 
@@ -108,7 +105,6 @@ function CreatePdProvide({ children }: { children: React.ReactNode }) {
   const handleReset = () => {
     setData({
       name: "",
-      summary: "",
       desc: "",
       brand: "",
       price: 0,
@@ -147,7 +143,7 @@ function CreatePdProvide({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <CreatePdContext.Provider
+    <CreateProductContext.Provider
       value={{
         data,
         activeStep,
@@ -168,8 +164,8 @@ function CreatePdProvide({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
-    </CreatePdContext.Provider>
+    </CreateProductContext.Provider>
   );
 }
 
-export { CreatePdProvide, CreatePdContext };
+export { CreateProductProvide, CreateProductContext };

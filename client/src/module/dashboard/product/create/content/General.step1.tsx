@@ -2,10 +2,10 @@ import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { Editor } from "@tinymce/tinymce-react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { CreatePdContext, ICreatePdProvide } from "../context";
+import { CreateProductContext, ICreateProductProvide } from "../context";
 import { useEffect, useState } from "react";
 import useTestContext from "@/hook/useTestContext";
-import { useRemoveWithUrlMutation } from "@/stores/service/image.service";
+import { useRemoveWithImageUrlMutation } from "@/stores/service/image.service";
 import { useCheckNameMutation } from "@/stores/service/product.service";
 import { useGetAllCategoryQuery } from "@/stores/service/category.service";
 import Field from "@/components/fields";
@@ -41,18 +41,18 @@ const validationSchema = Yup.object({
     .min(0, "Giá sản phẩm không hợp lệ"),
   status: Yup.string()
     .required("Vui lòng điền vào mục này.")
-    .oneOf(["active", "deActive"]),
+    .oneOf(["active", "inactive"]),
 });
 
 type FormValues = Yup.InferType<typeof validationSchema>;
 
 function General() {
   const { data, handleActiveStep, handleSetData } =
-    useTestContext<ICreatePdProvide>(
-      CreatePdContext as React.Context<ICreatePdProvide>
+    useTestContext<ICreateProductProvide>(
+      CreateProductContext as React.Context<ICreateProductProvide>
     );
 
-  const [removeWithUrl] = useRemoveWithUrlMutation();
+  const [removeWithImageUrl] = useRemoveWithImageUrlMutation();
   const [checkName] = useCheckNameMutation();
 
   const [brandOptions, setBrandOptions] = useState<
@@ -64,21 +64,6 @@ function General() {
   >([]);
 
   const { data: category, status } = useGetAllCategoryQuery();
-
-  useEffect(() => {
-    if (category && status === "fulfilled") {
-      const data = category.data;
-      const options = [];
-      for (let i = 0; i < data?.length; i++) {
-        options.push({
-          label: data[i].name,
-          value: data[i].name,
-          id: `${i + 1}`,
-        });
-      }
-      setBrandOptions([...options]);
-    }
-  }, [category, status]);
 
   const {
     handleSubmit,
@@ -99,10 +84,6 @@ function General() {
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
-
-  useEffect(() => {
-    window.scrollTo({ top: 0 });
-  }, []);
 
   const validateForm = () => {
     if (
@@ -197,6 +178,25 @@ function General() {
     handleSetData(data);
     handleActiveStep("2");
   };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
+  useEffect(() => {
+    if (category && status === "fulfilled") {
+      const data = category.data;
+      const options = [];
+      for (let i = 0; i < data?.length; i++) {
+        options.push({
+          label: data[i].name,
+          value: data[i].name,
+          id: `${i + 1}`,
+        });
+      }
+      setBrandOptions([...options]);
+    }
+  }, [category, status]);
 
   return (
     <div className="mt-7">
@@ -309,7 +309,7 @@ function General() {
                     mutation.removedNodes.forEach(function (removed_node) {
                       if (removed_node.nodeName == "IMG") {
                         const node = removed_node as HTMLElement;
-                        removeWithUrl({
+                        removeWithImageUrl({
                           imageUrl: node.getAttribute("src") as string,
                         });
                       }

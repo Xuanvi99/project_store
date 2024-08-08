@@ -7,24 +7,24 @@ import { useEffect, useState } from "react";
 const listStar = ["Tất cả", "5 sao", "4 sao", "3 sao", "2 sao", "1 sao"];
 
 function ProductReviews() {
-  const { data } = useTestContext<IProductDetailProvide>(
+  const { product } = useTestContext<IProductDetailProvide>(
     PDetailContext as React.Context<IProductDetailProvide>
   );
 
   const [star, setStar] = useState<string>("0");
 
   useEffect(() => {
-    if (data) {
-      if (data.commentIds.length === 0) {
+    if (product) {
+      if (product.commentIds.length === 0) {
         setStar("50");
       } else {
-        const countStar = data.commentIds.reduce((a, b) => a + b.star, 0);
+        const countStar = product.commentIds.reduce((a, b) => a + b.star, 0);
         const mediumStar =
-          Math.round((countStar * 10) / data.commentIds.length) / 10;
+          Math.round((countStar * 10) / product.commentIds.length) / 10;
         setStar("" + mediumStar);
       }
     }
-  }, [data]);
+  }, [product]);
 
   return (
     <section className="w-full mt-5 bg-white rounded-md py-5 px-[10px]">

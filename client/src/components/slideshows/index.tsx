@@ -37,19 +37,21 @@ interface ISwiperProps extends IOptionSwiperProps {
   };
   children: React.ReactNode;
   slideActive?: number;
-  slideHover?: boolean;
+  slideActions: "display" | "hover" | "noActions";
 }
 
 function SlideSwiper({
   children,
   className,
   slideActive,
-  slideHover,
+  slideActions,
   optionSwiper,
 }: ISwiperProps) {
   const sliderRef = useRef<SwiperRef>(null);
   const wrapSliderRef = useRef<HTMLDivElement>(null);
-  const [showBtn, setShowBtn] = useState<boolean>(false);
+  const [showBtn, setShowBtn] = useState<boolean>(
+    slideActions === "display" ? true : false
+  );
   const [screenWidth, setScreenWidth] = useState<number>(window.innerWidth);
 
   const { quantitySlide, slidesPerView, autoPlay, ...option } = optionSwiper;
@@ -81,7 +83,7 @@ function SlideSwiper({
     };
     window.addEventListener("resize", handleSizeScreen);
 
-    if (!slider || !slideHover || screenWidth < 1024) return;
+    if (!slider || slideActions !== "hover" || screenWidth < 1024) return;
 
     const handleOverSlider = () => {
       setShowBtn(true);
@@ -99,7 +101,7 @@ function SlideSwiper({
       slider.removeEventListener("mouseover", handleOverSlider);
       slider.removeEventListener("mouseout", handleOutSlider);
     };
-  }, [screenWidth, slideHover]);
+  }, [screenWidth, slideActions]);
 
   return (
     <div
@@ -123,9 +125,10 @@ function SlideSwiper({
           className={cn(
             "absolute left-0 top-1/2 -translate-y-1/2 z-30 duration-700 shadow-sm shadow-slate-600 px-2 py-7 rounded-sm",
             "bg-white hover:bg-orangeLinear hover:text-white",
-            showBtn
+            slideActions === "hover" && showBtn
               ? "-translate-x-[100%] opacity-100"
               : "opacity-0 max-lg:opacity-100",
+            slideActions === "display" && "opacity-1 max-lg:opacity-100",
             className?.btnLeft
           )}
         >
@@ -137,11 +140,12 @@ function SlideSwiper({
           type="button"
           onClick={handleNext}
           className={cn(
-            "absolute right-0 top-1/2 -translate-y-1/2 z-50 duration-700 shadow-sm shadow-slate-600 px-2 py-7 rounded-sm",
+            "absolute right-0 top-1/2 -translate-y-1/2 z-30 duration-700 shadow-sm shadow-slate-600 px-2 py-7 rounded-sm",
             "bg-white hover:bg-orangeLinear hover:text-white",
-            showBtn
+            slideActions === "hover" && showBtn
               ? "translate-x-[100%] opacity-100"
               : "opacity-0 max-lg:opacity-100",
+            slideActions === "display" && "opacity-1 max-lg:opacity-100",
             className?.btnRight
           )}
         >

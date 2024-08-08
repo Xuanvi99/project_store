@@ -8,7 +8,7 @@ import { QueryStatus } from "@reduxjs/toolkit/query";
 import { createContext, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-export interface IListPdProvide {
+export interface IListProductProvide {
   data: {
     listProduct: IProductRes[];
     totalPage: number;
@@ -19,9 +19,17 @@ export interface IListPdProvide {
 
   isLoadingQuery: boolean;
 
+  showProduct: "list" | "grid";
+
   filter: IParamsFilterProductDashboard;
 
   listSelectProductId: string[];
+
+  scrollTop: number;
+
+  setScrollTop: React.Dispatch<React.SetStateAction<number>>;
+
+  setShowProduct: React.Dispatch<React.SetStateAction<"list" | "grid">>;
 
   setListSelectProductId: React.Dispatch<React.SetStateAction<string[]>>;
 
@@ -30,7 +38,7 @@ export interface IListPdProvide {
   handleCheckAllProduct: (checked: boolean) => void;
 }
 
-const ListPdContext = createContext<IListPdProvide | null>(null);
+const ListProductContext = createContext<IListProductProvide | null>(null);
 
 function ListProductProvider({ children }: { children: React.ReactNode }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -55,7 +63,13 @@ function ListProductProvider({ children }: { children: React.ReactNode }) {
 
   const [listSelectProductId, setListSelectProductId] = useState<string[]>([]);
 
-  const [data, setData] = useState<IListPdProvide["data"]>({
+  const [showProduct, setShowProduct] = useState<"list" | "grid">(
+    (searchParams.get("show") as "list" | "grid") || "list"
+  );
+
+  const [scrollTop, setScrollTop] = useState<number>(0);
+
+  const [data, setData] = useState<IListProductProvide["data"]>({
     listProduct: [],
     totalPage: 0,
     amountProductFound: 0,
@@ -104,21 +118,25 @@ function ListProductProvider({ children }: { children: React.ReactNode }) {
   ]);
 
   return (
-    <ListPdContext.Provider
+    <ListProductContext.Provider
       value={{
         data,
         statusQuery,
         filter,
         isLoadingQuery,
         listSelectProductId,
+        showProduct,
+        scrollTop,
+        setShowProduct,
         setListSelectProductId,
+        setScrollTop,
         handleSetFilter,
         handleCheckAllProduct,
       }}
     >
       {children}
-    </ListPdContext.Provider>
+    </ListProductContext.Provider>
   );
 }
 
-export { ListProductProvider, ListPdContext };
+export { ListProductProvider, ListProductContext };

@@ -6,7 +6,7 @@ function StatisticsOrder() {
 
   return (
     <div className="grid grid-cols-4 grid-rows-2 gap-x-5 gap-y-5">
-      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
+      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow1 gap-y-2">
         <span>TỔNG ĐƠN HÀNG</span>
         <span className="flex items-center gap-x-1">
           {isFetching ? (
@@ -17,7 +17,7 @@ function StatisticsOrder() {
           <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
         </span>
       </div>
-      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
+      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow1 gap-y-2">
         <span>ĐƠN CHỜ DUYỆT</span>
         <span className="flex items-center gap-x-1">
           {isFetching ? (
@@ -28,7 +28,7 @@ function StatisticsOrder() {
           <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
         </span>
       </div>
-      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
+      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow1 gap-y-2">
         <span>ĐƠN CHỜ VẬN CHUYỂN</span>
         <span className="flex items-center gap-x-1">
           {isFetching ? (
@@ -39,7 +39,7 @@ function StatisticsOrder() {
           <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
         </span>
       </div>
-      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
+      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow1 gap-y-2">
         <span>ĐƠN ĐANG GIAO</span>
         <span className="flex items-center gap-x-1">
           {isFetching ? (
@@ -50,7 +50,7 @@ function StatisticsOrder() {
           <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
         </span>
       </div>
-      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
+      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow1 gap-y-2">
         <span>ĐƠN HOÀN THÀNH</span>
         <span className="flex items-center gap-x-1">
           {isFetching ? (
@@ -61,7 +61,7 @@ function StatisticsOrder() {
           <span className="text-sm font-normal text-grayCa">Đơn hàng</span>
         </span>
       </div>
-      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow77 gap-y-2">
+      <div className="grid grid-cols-1 p-3 font-semibold bg-white rounded-md shadow-shadow1 gap-y-2">
         <span>ĐƠN HỦY</span>
         <span className="flex items-center gap-x-1">
           {isFetching ? (

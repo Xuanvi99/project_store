@@ -52,6 +52,7 @@ function ProductItem({
       <div
         className={cn(
           "productItem grid w-full grid-cols-[50px_350px_100px_150px_150px_100px_auto] text-sm grid-rows-1 ",
+          "[&>span]:flex [&>span]:items-center [&>span]:justify-center [&>span]:p-3",
           index % 2 !== 0 ? "bg-grayFa" : ""
         )}
       >
@@ -70,7 +71,7 @@ function ProductItem({
             checked={isChecked}
           />
         </span>
-        <div className="flex items-center justify-start w-full text-xs font-semibold text-grayDark gap-x-1">
+        <span className="flex items-center justify-start text-xs font-semibold w-fit text-grayDark gap-x-1">
           <LazyLoadImage
             alt="Thumbnails"
             placeholderSrc={thumbnail.url}
@@ -79,14 +80,14 @@ function ProductItem({
             className="min-w-[50px] h-[50px]"
           />
           <p className="p-2 line-clamp-2">{name}</p>
-        </div>
+        </span>
         <span className="font-semibold">{categoryId.name}</span>
         <span>{new Date(deletedAt).toLocaleString()}</span>
         <span>{deletedBy.userName}</span>
         <span>{deletedBy.role}</span>
         <span
           onClick={handleOpenModal}
-          className="font-semibold text-blue cursor-pointer hover:text-orange hover:underline"
+          className="font-semibold cursor-pointer text-blue hover:text-orange hover:underline"
         >
           Khôi phục
         </span>

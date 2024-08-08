@@ -1,12 +1,12 @@
-import { useGetOneProductQuery } from "@/stores/service/product.service";
-import { IProductRes, productItem } from "@/types/product.type";
+import { useGetDetailProductQuery } from "@/stores/service/product.service";
+import { IProductRes, TProductItem } from "@/types/product.type";
 import { QueryStatus } from "@reduxjs/toolkit/query";
-import { createContext } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 export type IProductDetailProvide = {
-  data: IProductRes | undefined;
-  listProductItem: productItem[] | undefined;
+  product: IProductRes | undefined;
+  listProductItem: TProductItem[] | [];
   status: QueryStatus;
   isLoading: boolean;
 };
@@ -16,17 +16,30 @@ const PDetailContext = createContext<IProductDetailProvide | null>(null);
 function ProductDetailProvide({ children }: { children: React.ReactNode }) {
   const { slug } = useParams();
 
+  const [product, setProduct] = useState<IProductRes | undefined>(undefined);
+
+  const [listProductItem, setListProductItem] = useState<TProductItem[] | []>(
+    []
+  );
+
   const {
-    data: res,
+    data: resQuery,
     status,
     isLoading,
-  } = useGetOneProductQuery(slug?.split("_")[1] as string);
+  } = useGetDetailProductQuery(slug?.split("_")[1] as string);
+
+  useEffect(() => {
+    if (resQuery && status === "fulfilled") {
+      setProduct(resQuery.product);
+      setListProductItem(resQuery.listProductItem);
+    }
+  }, [resQuery, status]);
 
   return (
     <PDetailContext.Provider
       value={{
-        data: res?.data,
-        listProductItem: res?.listProductItem,
+        product,
+        listProductItem,
         status,
         isLoading,
       }}

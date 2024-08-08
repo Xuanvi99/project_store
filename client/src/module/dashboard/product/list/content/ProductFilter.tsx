@@ -1,12 +1,13 @@
 import useTestContext from "@/hook/useTestContext";
 import { debounce } from "lodash";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { IListPdProvide, ListPdContext } from "../context";
+import { IListProductProvide, ListProductContext } from "../context";
 import { Input } from "@/components/input";
 import { IconSearch } from "@/components/icon";
 import {
-  optionLimit,
+  optionLimitGrid,
+  optionLimitList,
   OptionPrice,
   OptionSearch,
 } from "@/constant/category.constant";
@@ -17,12 +18,23 @@ import { IParamsFilterProductDashboard } from "@/types/product.type";
 import IconRightArrow from "@/components/icon/IconRightArrow";
 import { useGetListProductDeletedQuery } from "@/stores/service/product.service";
 import LoadingSpinner from "@/components/loading";
+import IconShowList from "../../../../../components/icon/IconShowList";
+import IconShowGrid from "../../../../../components/icon/IconShowGrid";
 
-function FilterProductDB() {
-  const { filter, handleSetFilter, data, isLoadingQuery } =
-    useTestContext<IListPdProvide>(
-      ListPdContext as React.Context<IListPdProvide>
-    );
+function ProductFilter() {
+  const {
+    filter,
+    showProduct,
+    data,
+    isLoadingQuery,
+    setShowProduct,
+    handleSetFilter,
+    setScrollTop,
+  } = useTestContext<IListProductProvide>(
+    ListProductContext as React.Context<IListProductProvide>
+  );
+
+  const filterRef = useRef<HTMLDivElement | null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -64,8 +76,14 @@ function FilterProductDB() {
     });
   };
 
+  useEffect(() => {
+    if (filterRef.current) {
+      setScrollTop(filterRef.current.offsetTop);
+    }
+  }, [setScrollTop]);
+
   return (
-    <div className="flex flex-col gap-y-5">
+    <div ref={filterRef} className="flex flex-col bg-white rounded-md gap-y-5">
       <Input
         type="text"
         name="search"
@@ -182,6 +200,37 @@ function FilterProductDB() {
           </Label>
         </span>
       </div>
+      <div className="flex items-center justify-center cursor-pointer gap-x-3">
+        <span
+          onClick={() => {
+            setShowProduct("list");
+            searchParams.set("show", "list");
+            setSearchParams(searchParams);
+            handleSetFilter({ limit: 10 });
+          }}
+          className={cn(
+            `hover:text-orange`,
+            showProduct === "list" && "text-orange"
+          )}
+        >
+          <IconShowList size={25}></IconShowList>
+        </span>
+        <span className="w-[2px] h-[25px] bg-gray"></span>
+        <span
+          onClick={() => {
+            setShowProduct("grid");
+            searchParams.set("show", "grid");
+            setSearchParams(searchParams);
+            handleSetFilter({ limit: 8 });
+          }}
+          className={cn(
+            `hover:text-orange`,
+            showProduct === "grid" && "text-orange"
+          )}
+        >
+          <IconShowGrid size={25}></IconShowGrid>
+        </span>
+      </div>
       <div className="flex justify-between text-sm">
         <div className="flex items-center text-sm font-semibold text-end gap-x-2">
           <span className="flex items-center gap-x-1">
@@ -197,7 +246,9 @@ function FilterProductDB() {
               }}
               title={"" + filter.limit}
               value={"" + filter.limit}
-              options={optionLimit}
+              options={
+                showProduct === "list" ? optionLimitList : optionLimitGrid
+              }
               handleSelect={(option) => {
                 searchParams.set("limit", option.value);
                 setSearchParams(searchParams);
@@ -246,4 +297,4 @@ function FilterProductDB() {
   );
 }
 
-export default FilterProductDB;
+export default ProductFilter;
