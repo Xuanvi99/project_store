@@ -51,7 +51,7 @@ function DropdownForm<T extends FieldValues>({
     show: showOptions,
     handleShow,
     nodeRef,
-  } = useClickOutSide<HTMLUListElement>("input");
+  } = useClickOutSide<HTMLDivElement>("input");
 
   const [label, setLabel] = useState<string>(title);
   const [textSearch, setTextSearch] = useState<string>("");

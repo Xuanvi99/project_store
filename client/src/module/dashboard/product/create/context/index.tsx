@@ -71,7 +71,7 @@ function CreateProductProvide({ children }: { children: React.ReactNode }) {
     listImages: [],
   });
 
-  const [activeStep, setActiveStep] = useState<string>("1");
+  const [activeStep, setActiveStep] = useState<string>("2");
 
   const [specs, setSpecs] = useState<{ size: number; quantity: number }[]>([
     { size: 0, quantity: 0 },

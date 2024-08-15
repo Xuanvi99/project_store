@@ -23,12 +23,11 @@ const InputForm = <T extends FieldValues>(
       type={type}
       {...field}
       {...rest}
-      onBlur={() => {
-        // field.onBlur();
-        // if (onBlur) {
-        //   onBlur();
-        // }
-        console.log("cấ");
+      onBlur={(event) => {
+        field.onBlur();
+        if (onBlur) {
+          onBlur(event);
+        }
       }}
       onChange={(event) => {
         field.onChange(event);

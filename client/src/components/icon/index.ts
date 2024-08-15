@@ -34,8 +34,10 @@ import IconInfo from "./IconInfo";
 import IconShoppingFee from "./IconShoppingFee";
 import IconShowList from "./IconShowList";
 import IconShowGrid from "./IconShowGrid";
+import IconRestore from "./IconRestore";
 
 export {
+  IconRestore,
   IconSearch,
   IconBag,
   IconChevronLeft,

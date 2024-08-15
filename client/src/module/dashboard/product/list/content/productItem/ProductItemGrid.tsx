@@ -9,7 +9,7 @@ import { useAppSelector, useToggle } from "@/hook";
 import { RootState } from "@/stores";
 import { toast } from "react-toastify";
 import { Fragment } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/button";
 
 type TProps = {
@@ -30,6 +30,8 @@ function ProductItemGrid({ product }: TProps) {
   } = product;
 
   const navigate = useNavigate();
+
+  const { pathname, search } = useLocation();
 
   const user = useAppSelector((state: RootState) => state.authSlice.user);
 
@@ -137,7 +139,11 @@ function ProductItemGrid({ product }: TProps) {
             type="button"
             className="px-3 py-1"
             onClick={() => {
-              navigate(`/dashboard/product/detail/${_id}`);
+              navigate(`/dashboard/product/detail/${_id}`, {
+                state: {
+                  redirectUrl: pathname + search,
+                },
+              });
             }}
           >
             <IconEye isOpenEye={true} size={14}></IconEye>

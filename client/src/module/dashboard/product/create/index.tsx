@@ -1,7 +1,7 @@
 import Content from "./content";
 import { CreateProductProvide } from "./context";
 import Progress from "./content/Progress.create";
-import HeaderProductDB from "../header.product";
+import HeaderProductDB from "../header.product.db";
 
 function CreateProduct() {
   return (

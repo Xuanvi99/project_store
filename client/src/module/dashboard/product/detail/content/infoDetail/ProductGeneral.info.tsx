@@ -6,7 +6,7 @@ import { IconStar } from "@/components/icon";
 import { handleFormatStatusProduct } from "@/utils/product.utils";
 
 function ProductGeneral() {
-  const { product, listProductItem } = useTestContext<IDetailProductProvide>(
+  const { product } = useTestContext<IDetailProductProvide>(
     DetailProductContext as React.Context<IDetailProductProvide>
   );
 
@@ -30,7 +30,7 @@ function ProductGeneral() {
   }
 
   return (
-    <div className="max-w-[600px] basis-3/5 flex flex-col gap-y-5">
+    <div className="flex flex-col w-full gap-y-5">
       <h1
         className={cn(
           "font-bold text-left pb-2 text-xl border-b-2 border-grayCa"
@@ -106,38 +106,7 @@ function ProductGeneral() {
           {product.categoryId.name}
         </span>
       </div>
-      <div className="flex flex-col gap-y-3">
-        <span className="text-sm font-semibold">Chi tiết Size - Số lượng:</span>
-        <table
-          className={cn(
-            "font-semibold table-auto mx-auto w-[400px]",
-            "[&>thead]:bg-gray98 [&>thead]:text-white"
-          )}
-        >
-          <thead>
-            <tr>
-              <th className="py-2 text-center">Size</th>
-              <th>Số lượng</th>
-            </tr>
-          </thead>
-          <tbody>
-            {listProductItem &&
-              listProductItem.length > 0 &&
-              listProductItem.map((item, index) => {
-                return (
-                  <tr
-                    key={index}
-                    className={index % 2 !== 0 ? "bg-slate-100" : ""}
-                  >
-                    <td className="py-2 text-center">{item.size}</td>
-                    <td className="py-2 text-center">{item.quantity}</td>
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex items-center font-semibold gap-x-2">
+      <div className="flex items-center text-sm font-semibold gap-x-2">
         <span>Số lượng trong kho:</span>
         <span className="text-orange">{product.inventoryId.total}</span>
       </div>

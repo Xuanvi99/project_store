@@ -282,4 +282,18 @@
             }
         }
     }
+
+    .upLoadImagesDetail {
+        .show {
+            height: 500px;
+
+            transition: height 0.5s ease-in;
+        }
+
+        .close {
+            height: 0;
+
+            transition: height 0.5s ease-in;
+        }
+    }
 }

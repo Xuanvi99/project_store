@@ -76,14 +76,18 @@ function ProductFilter() {
     });
   };
 
+  console.log(filterRef);
+
   useEffect(() => {
     if (filterRef.current) {
-      setScrollTop(filterRef.current.offsetTop);
+      setScrollTop(
+        filterRef.current.offsetTop + filterRef.current.clientHeight - 80
+      );
     }
   }, [setScrollTop]);
 
   return (
-    <div ref={filterRef} className="flex flex-col bg-white rounded-md gap-y-5">
+    <div ref={filterRef} className="flex flex-col rounded-md gap-y-5">
       <Input
         type="text"
         name="search"

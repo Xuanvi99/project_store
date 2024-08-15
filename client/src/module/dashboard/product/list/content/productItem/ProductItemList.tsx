@@ -10,7 +10,7 @@ import { useAppSelector, useToggle } from "@/hook";
 import { RootState } from "@/stores";
 import { toast } from "react-toastify";
 import { Fragment } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type TProps = {
   product: IProductRes;
@@ -39,6 +39,8 @@ function ProductItemList({
   } = product;
 
   const navigate = useNavigate();
+
+  const { pathname, search } = useLocation();
 
   const user = useAppSelector((state: RootState) => state.authSlice.user);
 
@@ -94,7 +96,7 @@ function ProductItemList({
       <div
         className={cn(
           "productItem_list grid w-full grid-cols-[50px_350px_100px_100px_100px_100px_100px_auto] text-sm grid-rows-1",
-          "[&>span]:flex [&>span]:items-center [&>span]:justify-center [&>span]:p-3",
+          "[&>span]:flex [&>span]:items-center [&>span]:justify-center [&>span.ProductName]:justify-start [&>span]:p-3",
           index % 2 !== 0 ? "bg-grayFa" : ""
         )}
       >
@@ -113,15 +115,17 @@ function ProductItemList({
             checked={isChecked}
           />
         </span>
-        <span className="flex items-center justify-start text-xs font-semibold w-fit text-grayDark gap-x-1">
-          <LazyLoadImage
-            alt="Thumbnails"
-            placeholderSrc={thumbnail.url}
-            srcSet={thumbnail.url}
-            effect="blur"
-            className="min-w-[50px] h-[50px]"
-          />
-          <p className="p-2 line-clamp-2">{name}</p>
+        <span className="flex items-center justify-start text-xs font-semibold leading-relaxed ProductName text-grayDark gap-x-1">
+          <div className="max-w-[50px] h-[50px] overflow-hidden">
+            <LazyLoadImage
+              alt="Thumbnails"
+              placeholderSrc={thumbnail.url}
+              srcSet={thumbnail.url}
+              effect="blur"
+              className="object-cover"
+            />
+          </div>
+          <p className="px-2 line-clamp-2">{name}</p>
         </span>
         <span className="font-semibold">{categoryId.name}</span>
         <span className="text-danger">
@@ -136,7 +140,11 @@ function ProductItemList({
             size={20}
             className="cursor-pointer hover:text-orange"
             onClick={() => {
-              navigate(`/dashboard/product/detail/${_id}`);
+              navigate(`/dashboard/product/detail/${_id}`, {
+                state: {
+                  redirectUrl: pathname + search,
+                },
+              });
             }}
           ></IconEye>
           <div className="w-[1px] h-1/2 bg-gray"></div>

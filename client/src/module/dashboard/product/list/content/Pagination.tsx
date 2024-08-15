@@ -14,11 +14,13 @@ import { cn } from "@/utils";
 function PaginationListProduct() {
   const {
     data,
+    filter,
     showProduct,
     handleSetFilter,
     handleCheckAllProduct,
     listSelectProductId,
     setListSelectProductId,
+    scrollTop,
   } = useTestContext<IListProductProvide>(
     ListProductContext as React.Context<IListProductProvide>
   );
@@ -92,30 +94,29 @@ function PaginationListProduct() {
           </div>
         )}
         <div className="flex justify-end basis-1/2">
-          {data.totalPage > 1 && (
-            <ReactPaginate
-              breakLabel="..."
-              nextLabel={<IconChevronRight size={15}></IconChevronRight>}
-              onPageChange={(selectedItem) => {
-                handleSetFilter({ activePage: selectedItem.selected + 1 });
-                setListSelectProductId([]);
-                window.scrollTo({ behavior: "smooth", top: 289 });
-              }}
-              pageRangeDisplayed={5}
-              pageCount={data.totalPage}
-              previousLabel={<IconChevronLeft size={15}></IconChevronLeft>}
-              renderOnZeroPageCount={null}
-              className="flex items-center text-sm gap-x-1"
-              pageClassName="py-[6px] px-3"
-              previousClassName={`${
-                data.totalPage === 1 && "hidden"
-              } hover:text-orange`}
-              nextClassName={`${
-                data.totalPage === 1 && "hidden"
-              }  hover:text-orange`}
-              activeClassName="bg-orangeFe flex justify-center items-center rounded-full text-white text-sm font-semibold"
-            />
-          )}
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel={<IconChevronRight size={15}></IconChevronRight>}
+            initialPage={filter.activePage - 1}
+            onPageChange={(selectedItem) => {
+              handleSetFilter({ activePage: selectedItem.selected + 1 });
+              setListSelectProductId([]);
+              window.scrollTo({ behavior: "smooth", top: scrollTop });
+            }}
+            pageRangeDisplayed={5}
+            pageCount={data.totalPage}
+            previousLabel={<IconChevronLeft size={15}></IconChevronLeft>}
+            renderOnZeroPageCount={null}
+            className="flex items-center text-sm gap-x-1"
+            pageClassName="py-[6px] px-3"
+            previousClassName={`${
+              filter.activePage === 1 && "hidden"
+            } hover:text-orange`}
+            nextClassName={`${
+              data.totalPage === filter.activePage && "hidden"
+            }  hover:text-orange`}
+            activeClassName="bg-orangeFe flex justify-center items-center rounded-full text-white text-sm font-semibold"
+          />
         </div>
       </div>
     </Fragment>

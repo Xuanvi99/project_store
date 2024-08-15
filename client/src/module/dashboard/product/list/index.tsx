@@ -2,9 +2,13 @@ import ProductFilter from "./content/ProductFilter";
 import ProductContent from "./content";
 import StatisticsProduct from "./content/StatisticsProduct";
 import { ListProductProvider } from "./context";
-import HeaderProductDB from "../header.product";
+import HeaderProductDB from "../header.product.db";
+import { useEffect } from "react";
 
 function ListProduct() {
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
   return (
     <div className="Dashboard_product_List">
       <HeaderProductDB></HeaderProductDB>

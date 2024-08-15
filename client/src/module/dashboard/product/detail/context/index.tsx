@@ -8,6 +8,10 @@ import { useParams } from "react-router-dom";
 export interface IDetailProductProvide {
   product: IProductRes | null;
 
+  showTab: "info" | "update";
+
+  setShowTab: React.Dispatch<React.SetStateAction<"info" | "update">>;
+
   listProductItem: TProductItem[] | [];
 
   statusQuery: QueryStatus;
@@ -26,6 +30,8 @@ const DetailProductProvide = ({ children }: { children: React.ReactNode }) => {
     []
   );
 
+  const [showTab, setShowTab] = useState<"info" | "update">("info");
+
   const {
     data: resQuery,
     status: statusQuery,
@@ -34,6 +40,8 @@ const DetailProductProvide = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (resQuery && statusQuery === "fulfilled") {
+      console.log("resQuery: ", resQuery);
+
       const product = resQuery.product;
       setProduct(product);
       setListProductItem(resQuery.listProductItem);
@@ -50,7 +58,14 @@ const DetailProductProvide = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <DetailProductContext.Provider
-      value={{ product, listProductItem, statusQuery, isLoading }}
+      value={{
+        product,
+        listProductItem,
+        statusQuery,
+        isLoading,
+        showTab,
+        setShowTab,
+      }}
     >
       {children}
     </DetailProductContext.Provider>

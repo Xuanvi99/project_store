@@ -557,7 +557,6 @@ class Product {
           .exec();
         const categoryNew = await categoryModel.findOne({ name: brand }).exec();
         if (categoryOld && categoryNew) {
-          
           product.categoryId = categoryNew._id;
           await product.save();
           categoryNew.productIds.push(product._id);
@@ -588,33 +587,48 @@ class Product {
 
   updateThumbnailAndImagesProduct = async (req, res) => {
     const productId = req.params.productId;
-    const { files } = req;
+    const { files, body } = req;
+    console.log("files: ", files);
+    let productUpdate = {};
     if (!productId)
       return res.status(403).json({ message: "Invalid productId" });
     try {
-      const product = await productModel.findById(productId).lean();
+      const product = await productModel.findById(productId).exec();
       if (!product) {
         return res.status(404).json({ errMessage: "Không tìm thấy sản phẩm" });
       }
-      let productUpdate = {};
-      const { imageIds, thumbnail } = product;
-      if (files.images && imageIds.length > 0) {
-        for (let i = 0; i < imageIds.length; i++) {
-          await imageModel.removeFile(imageIds[i]);
+      if (body.listIdImageDeleted) {
+        const listIdImageDeleted = JSON.parse(body.listIdImageDeleted);
+        const imagesNew = product.imageIds.filter(
+          (id) => !listIdImageDeleted.includes(id.toString())
+        );
+
+        await product.updateOne({ imageIds: imagesNew });
+
+        for (const id of listIdImageDeleted) {
+          await imageModel.removeFile(id);
         }
+      }
+
+      if (files.thumbnail && files.thumbnail.length > 0) {
+        if (product.thumbnail) await imageModel.removeFile(product.thumbnail);
+        const thumbnailUpLoad = await imageModel.uploadSingleFile(
+          files.thumbnail[0],
+          "product"
+        );
+
+        productUpdate = { ...productUpdate, thumbnail: thumbnailUpLoad };
+      }
+
+      if (files.images && files.images.length > 0) {
         const imagesUpLoad = await imageModel.uploadMultipleFile(
           files.images,
           "product"
         );
-        productUpdate = { ...productUpdate, imageIds: imagesUpLoad };
-      }
-      if (files.thumbnail && thumbnail) {
-        await imageModel.removeFile(thumbnail);
-        const thumbnailUpLoad = await imageModel.uploadSingleFile(
-          files.thumbnail,
-          "product"
-        );
-        productUpdate = { ...productUpdate, thumbnail: thumbnailUpLoad };
+        productUpdate = {
+          ...productUpdate,
+          imageIds: [...product.imageIds, ...imagesUpLoad],
+        };
       }
       const result = await productModel
         .findByIdAndUpdate(productId, { ...productUpdate }, { new: true })
@@ -623,8 +637,9 @@ class Product {
         return res
           .status(400)
           .json({ errMessage: "Cập nhật hình ảnh thất bại" });
-      res.status(200).json({ message: "Cập nhật hình ảnh thành công", result });
+      res.status(200).json({ message: "Cập nhật hình ảnh thành công" });
     } catch (error) {
+      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -639,8 +654,25 @@ class Product {
       if (!product) {
         return res.status(404).json({ errMessage: "Không tìm thấy sản phẩm" });
       }
-
       let total = 0;
+
+      const listProductItem = await productItemModel
+        .find({
+          productId: product._id,
+        })
+        .lean();
+
+      for (const productItem of listProductItem) {
+        for (let i = 0; i < specs.length; i++) {
+          if (Number(productItem.size) === Number(specs[i])) {
+            break;
+          }
+          if (specs.length === i + 1) {
+            await productItemModel.findByIdAndDelete(productItem._id);
+          }
+        }
+      }
+
       for (let i = 0; i < specs.length; i++) {
         const result = await productItemModel
           .findOne({ size: specs.size })
@@ -650,10 +682,11 @@ class Product {
             $addToSet: { quantity: specs[i].quantity },
           });
         } else {
-          productItemModel.insertOne({
+          const newProductItem = await productItemModel({
             productId: product._id,
             ...specs[i],
           });
+          await newProductItem.save();
         }
         total += specs[i].quantity;
       }
@@ -663,17 +696,9 @@ class Product {
         { $set: { total: total, stocked: total > 0 ? true : false } }
       );
 
-      const result = await productModel
-        .findByIdAndUpdate(productId, { ...productUpdate }, { new: true })
-        .exec();
-      if (!result)
-        return res
-          .status(400)
-          .json({ errMessage: "Cập nhật size và số lượng thất bại" });
-      res
-        .status(200)
-        .json({ message: "Cập nhật size và số lượng thành công", result });
+      res.status(200).json({ message: "Cập nhật size và số lượng thành công" });
     } catch (error) {
+      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };

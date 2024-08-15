@@ -6,17 +6,21 @@ import { Label } from "@/components/label";
 import useTestContext from "@/hook/useTestContext";
 import { useGetAllCategoryQuery } from "@/stores/service/category.service";
 import { useRemoveWithImageUrlMutation } from "@/stores/service/image.service";
-import { useCheckNameMutation } from "@/stores/service/product.service";
+import {
+  useCheckNameMutation,
+  useUpdateInfoProductMutation,
+} from "@/stores/service/product.service";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { DetailProductContext, IDetailProductProvide } from "../../context";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "@/components/button";
-import { IconChevronRight } from "@/components/icon";
 import InputRadio from "@/components/input/InputRadio";
 import { Editor } from "@tinymce/tinymce-react";
-import { IUpdateInfoProduct } from "@/types/product.type";
+import { cn } from "@/utils";
+import { toast } from "react-toastify";
+import { formatPrice } from "../../../../../../utils/index";
 
 interface BlobInfo {
   id: () => string;
@@ -36,17 +40,23 @@ const validationSchema = Yup.object({
     .min(8, "Tên sản phẩm ít nhất 8 ký tự"),
   brand: Yup.string().required("Vui lòng điền vào mục này."),
   desc: Yup.string().required("Vui lòng điền vào mục này."),
+  status: Yup.string()
+    .required("Vui lòng điền vào mục này.")
+    .oneOf(["active", "inactive"]),
+  is_sale: Yup.bool()
+    .required("")
+    .oneOf([true, false], "Field must be checked"),
   price: Yup.number()
     .required("Vui lòng điền thông tin")
     .typeError("Giá sản phẩm không hợp lệ")
     .min(0, "Giá sản phẩm không hợp lệ"),
-  status: Yup.string()
-    .required("Vui lòng điền vào mục này.")
-    .oneOf(["active", "inactive"]),
   priceSale: Yup.number()
-    .typeError("Giá sản phẩm không hợp lệ")
-    .min(0, "Giá sản phẩm không hợp lệ"),
-  is_sale: Yup.boolean().required("Vui lòng điền vào mục này."),
+    .required("Vui lòng điền thông tin")
+    .typeError("Giá sale sản phẩm không hợp lệ")
+    .min(0, "Giá sản phẩm không hợp lệ")
+    .test("invalid", "Giá sale phải nhỏ hơn giá gốc", (value, context) => {
+      return !context.parent.is_sale && value < context.parent.price;
+    }),
 });
 
 type TBrandOptions = {
@@ -62,16 +72,6 @@ function GeneralDetail() {
     DetailProductContext as React.Context<IDetailProductProvide>
   );
 
-  const [dataUpdate, setDataUpdate] = useState<IUpdateInfoProduct>({
-    name: "",
-    brand: "",
-    status: "",
-    is_sale: false,
-    price: 0,
-    priceSale: 0,
-    desc: "",
-  });
-
   const [removeWithImageUrl] = useRemoveWithImageUrlMutation();
 
   const [checkName] = useCheckNameMutation();
@@ -80,27 +80,32 @@ function GeneralDetail() {
 
   const { data: category, status } = useGetAllCategoryQuery();
 
+  const [updateInfoProduct] = useUpdateInfoProductMutation();
+
   const {
     handleSubmit,
     control,
     setValue,
     setError,
+    reset,
     clearErrors,
     watch,
     formState: { errors, dirtyFields },
   } = useForm({
     defaultValues: {
-      name: dataUpdate.name,
-      brand: dataUpdate.brand,
-      desc: dataUpdate.desc,
-      status: dataUpdate.status,
-      is_sale: dataUpdate.is_sale,
-      price: dataUpdate.price,
-      priceSale: dataUpdate.priceSale,
+      name: "",
+      brand: "",
+      desc: "",
+      status: "",
+      is_sale: false,
+      price: 0,
+      priceSale: 0,
     },
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
+  console.log(watch());
+  console.log(errors);
 
   const validateForm = () => {
     if (
@@ -169,18 +174,26 @@ function GeneralDetail() {
 
   const handleBLurInput = (field: keyof FormValues) => {
     const fieldForm = watch(`${field}`);
-    if (!fieldForm) {
-      setValue(`${field}`, dataUpdate[`${field}`]);
+    if (!fieldForm && product) {
+      setValue(`${field}`, product[`${field}`]);
       clearErrors(`${field}`);
     }
-    console.log("field", field);
+    if (
+      field === "priceSale" &&
+      Number(watch("priceSale")) >= Number(watch("price"))
+    ) {
+      setError("priceSale", {
+        message: "Giá sale phải nhỏ hơn giá gốc",
+        type: "invalid",
+      });
+    }
   };
 
   const handleChangeName = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const name = event.currentTarget.value;
-    if (name.length > 8 && name !== watch("name")) {
+    if (product && name.length > 8 && name !== product.name) {
       await checkName({ name: event.currentTarget.value })
         .unwrap()
         .then(() => {
@@ -194,7 +207,15 @@ function GeneralDetail() {
   };
 
   const onSubmit = async (data: FormValues) => {
-    console.log("data: ", data);
+    if (product) {
+      await updateInfoProduct({ productId: product?._id, body: data })
+        .then(() => {
+          toast("Cập nhật thông tin thành công", { type: "success" });
+        })
+        .catch(() => {
+          toast("Cập nhật thông tin thất bại", { type: "error" });
+        });
+    }
   };
 
   useEffect(() => {
@@ -214,39 +235,39 @@ function GeneralDetail() {
 
   useEffect(() => {
     if (product) {
-      setDataUpdate({
-        name: product.name,
-        brand: product.brand,
-        status: product.status,
-        is_sale: product.is_sale,
-        price: product.price,
-        priceSale: product.priceSale,
-        desc: product.desc,
-      });
-      setValue("name", product.name);
-      setValue("brand", product.brand);
-      setValue("status", product.status);
-      setValue("is_sale", product.is_sale);
-      setValue("price", product.price);
-      setValue("priceSale", product.priceSale);
-      setValue("desc", product.desc);
+      reset(
+        {
+          name: product.name,
+          brand: product.brand,
+          status: product.status,
+          is_sale: product.is_sale,
+          price: product.price,
+          priceSale: product.priceSale,
+          desc: product.desc,
+        },
+        { keepDirtyValues: true }
+      );
     }
-  }, [product, setValue]);
+  }, [product, reset]);
+
+  if (!product) return;
 
   return (
-    <div className="flex flex-col w-full gap-y-3">
-      <h1 className="font-semibold">a.Sửa thông tin chung</h1>
+    <div className="flex flex-col w-full rounded-md shadow-md shadow-gray">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col text-sm gap-y-5"
+        className={cn(
+          "flex-col text-sm gap-y-5 flex shadow-shadow1 p-5 transition-all bg-white"
+        )}
       >
+        <h1 className="text-lg font-semibold text-orange">1.Thông tin chung</h1>
         <div className="flex w-full gap-x-7">
           <Field variant="flex-col" className="basis-1/2 gap-y-2">
             <Label
               htmlFor="phoneOrEmail"
               className="font-semibold text-secondary"
             >
-              Tên sản phẩm<strong className="text-danger">*</strong>
+              Tên sản phẩm:
             </Label>
             <InputForm
               control={control}
@@ -254,21 +275,22 @@ function GeneralDetail() {
               name="name"
               id="name"
               placeholder="ví dụ: Shoes adidas"
-              value={watch("name")}
+              onFocus={() => handleFocusInput("name")}
               onBlur={() => handleBLurInput("name")}
               onChange={(event) => handleChangeName(event)}
+              className={{ input: `${dirtyFields.name && "border-orange"}` }}
               error={errors["name"] ? true : false}
             />
             <ErrorInput text={errors["name"]?.message} />
           </Field>
           <Field variant="flex-col" className="basis-1/2 gap-y-2">
             <Label htmlFor="category" className="font-semibold text-secondary">
-              Thương hiệu<strong className="text-danger">*</strong>
+              Thương hiệu:
             </Label>
             <DropdownForm
               control={control}
               name="brand"
-              title={watch("brand") || "Lựa chọn"}
+              title={product.brand || "Lựa chọn"}
               options={brandOptions}
               error={errors.brand && !watch("brand")}
               search={{
@@ -278,10 +300,19 @@ function GeneralDetail() {
               className={{
                 option:
                   "max-h-[160px] overflow-y-scroll rounded-none text-base font-bold",
-                select: "shadow-none border-1 border-grayCa rounded-md",
+                select: cn(
+                  "shadow-none border-1 border-grayCa rounded-md",
+                  dirtyFields.brand && "border-orange"
+                ),
               }}
               onClick={(option) => {
-                setValue("brand", option.value);
+                if (option.value === product.brand) {
+                  reset({ brand: option.value });
+                } else {
+                  setValue("brand", option.value, {
+                    shouldDirty: true,
+                  });
+                }
               }}
             />
             <ErrorInput text={errors["brand"]?.message} />
@@ -289,7 +320,7 @@ function GeneralDetail() {
         </div>
         <Field variant="flex-row" className="basis-1/2 gap-y-3">
           <Label htmlFor="" className="font-semibold text-secondary">
-            Sale:<strong className="text-danger">*</strong>
+            Sale:
           </Label>
           <div className="flex items-center gap-x-5">
             <span className="flex items-center gap-x-2">
@@ -308,7 +339,10 @@ function GeneralDetail() {
                 name="is_sale"
                 id="is_sale_false"
                 checked={watch("is_sale") === false}
-                onChange={() => setValue("is_sale", false)}
+                onChange={() => {
+                  setValue("is_sale", false)
+                  setValue("priceSale", 0)
+                } }
               ></InputRadio>
               <label htmlFor="is_sale_false">Không</label>
             </span>
@@ -316,18 +350,24 @@ function GeneralDetail() {
         </Field>
         <div className="flex w-full gap-x-7">
           <Field variant="flex-col" className="basis-1/2 gap-y-2">
-            <Label htmlFor="price" className="font-semibold text-secondary">
-              Giá gốc (vnđ)<strong className="text-danger">*</strong>
+            <Label
+              htmlFor="price"
+              className="flex font-semibold text-secondary gap-x-2"
+            >
+              <span>Giá gốc (vnđ):</span>
+              <span className="text-danger">
+                {formatPrice(watch("price"))}₫
+              </span>
             </Label>
             <InputForm
               control={control}
               type="number"
               name="price"
               id="price"
-              value={watch("price")}
               onFocus={() => handleFocusInput("price")}
               onBlur={() => handleBLurInput("price")}
               onChange={() => {
+                setValue("price", Number(watch("price")));
                 clearErrors("price");
               }}
               error={errors["price"] ? true : false}
@@ -335,18 +375,24 @@ function GeneralDetail() {
             <ErrorInput text={errors["price"]?.message} />
           </Field>
           <Field variant="flex-col" className="basis-1/2 gap-y-2">
-            <Label htmlFor="price" className="font-semibold text-secondary">
-              Giá sale (vnđ)<strong className="text-danger">*</strong>
+            <Label
+              htmlFor="priceSale"
+              className="flex font-semibold text-secondary gap-x-2"
+            >
+              <span>Giá sale (vnđ):</span>
+              <span className="text-danger">
+                {formatPrice(watch("priceSale"))}₫
+              </span>
             </Label>
             <InputForm
               control={control}
               type="number"
               name="priceSale"
               id="priceSale"
-              value={watch("priceSale")}
               onFocus={() => handleFocusInput("priceSale")}
               onBlur={() => handleBLurInput("priceSale")}
               onChange={() => {
+                setValue("priceSale", Number(watch("priceSale")));
                 clearErrors("priceSale");
               }}
               disabled={!watch("is_sale")}
@@ -357,7 +403,7 @@ function GeneralDetail() {
         </div>
         <Field variant="flex-col" className="basis-1/2 gap-y-3">
           <Label htmlFor="" className="font-semibold text-secondary">
-            Trạng thái<strong className="text-danger">*</strong>
+            Trạng thái:
           </Label>
           <div className="flex items-center gap-x-5">
             <span className="flex items-center gap-x-2">
@@ -368,7 +414,7 @@ function GeneralDetail() {
                 value="active"
                 checked={watch("status") === "active"}
               ></InputRadio>
-              <label htmlFor="active">Bán</label>
+              <Label htmlFor="active">Bán</Label>
             </span>
             <span className="flex items-center gap-x-2">
               <InputRadio
@@ -378,11 +424,12 @@ function GeneralDetail() {
                 value="inactive"
                 checked={watch("status") === "inactive"}
               ></InputRadio>
-              <label htmlFor="inactive">Ngừng bán</label>
+              <Label htmlFor="inactive">Ngừng bán</Label>
             </span>
           </div>
         </Field>
         <Field variant="flex-col" className="basis-1/2 gap-y-2">
+          <InputForm control={control} type="text" name="desc" />
           <Label
             htmlFor="phoneOrEmail"
             className="font-semibold text-secondary"
@@ -392,14 +439,20 @@ function GeneralDetail() {
           <Editor
             apiKey="upnnupf3dq8wz66922756jw4v2w241nvoxv3hvhnmqhng63w"
             onEditorChange={(_, editor) => {
-              setValue("desc", editor.getContent());
+              const desc = editor.getContent();
+              // console.log(product.desc);
+              // console.log(desc);
+              // console.log("" + product.desc === "" + desc);
+              setValue("desc", desc, {
+                shouldDirty: product.desc === desc ? false : true,
+              });
               if (editor.getContent() === "") {
                 setError("desc", { message: "Vui lòng điền vào mục này." });
               } else {
                 clearErrors("desc");
               }
             }}
-            initialValue={dataUpdate.desc || ""}
+            initialValue={product.desc || ""}
             init={{
               height: 600,
               width: "100%",
@@ -454,17 +507,18 @@ function GeneralDetail() {
           />
           <ErrorInput text={errors["desc"]?.message} />
         </Field>
-        <Button
-          variant="default"
-          type="submit"
-          disabled={
-            Object.keys(errors).length === 0 && validateForm() ? false : true
-          }
-          className="max-w-[120px] ml-auto text-sm flex"
-        >
-          Tiếp theo
-          <IconChevronRight size={20}></IconChevronRight>
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            variant="default"
+            type="submit"
+            disabled={
+              Object.keys(errors).length === 0 && validateForm() ? false : true
+            }
+            className="max-w-[120px] text-sm "
+          >
+            Cập nhật
+          </Button>
+        </div>
       </form>
     </div>
   );

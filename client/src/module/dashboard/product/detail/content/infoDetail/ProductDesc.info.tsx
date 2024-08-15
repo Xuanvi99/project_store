@@ -24,8 +24,9 @@ function ProductDesc() {
         style={{ height: heightDesc }}
         className="relative w-full mt-5 overflow-hidden"
       >
-        <div className="flex flex-col items-center justify-center w-full px-5">
+        <div className="flex flex-col items-center justify-center w-full px-5 ">
           <div
+            className="flex flex-col gap-y-3 [&>p]:mx-auto"
             dangerouslySetInnerHTML={{
               __html: marked.parse(
                 product && product?.desc ? product?.desc : ""
@@ -39,8 +40,9 @@ function ProductDesc() {
             setOpenDesc(!openDesc);
           }}
           className={cn(
-            "flex items-center justify-center absolute left-0 bottom-0 bg-grayFa z-30 w-full h-16 ",
-            "before:absolute before:h-14 before:w-full before:bg-whiteLinear before:bottom-full before:left-0 "
+            "flex items-center justify-center absolute left-0 bottom-0 bg-white z-30 w-full h-16 ",
+            "before:absolute before:w-full before:bg-whiteLinear before:bottom-full before:left-0 ",
+            openDesc ? "before:h-10" : "before:h-[100px]"
           )}
         >
           <button className="text-lg relative text-gray w-[100px] h-full flex items-end justify-center">

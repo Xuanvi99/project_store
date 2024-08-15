@@ -70,6 +70,7 @@ function SizeAndQuantity() {
     setValue,
     trigger,
     clearErrors,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -95,6 +96,9 @@ function SizeAndQuantity() {
       setValue(`data.${index}.quantity`, 0);
       clearErrors(`data.${index}.quantity`);
     }
+    if (size || quantity) {
+      reset({ data: specs });
+    }
   };
 
   const handleFocusInput = (index: number, type: "size" | "quantity") => {
@@ -119,22 +123,25 @@ function SizeAndQuantity() {
 
   const handleChangeInput = (
     event: React.ChangeEvent<HTMLInputElement>,
-    type: "size" | "quantity"
+    type: "size" | "quantity",
+    index: number
   ) => {
     const data = watch().data;
-    const value = event.currentTarget.value;
+    const value = Number(event.currentTarget.value);
     if (type === "quantity" && data) {
-      if (Number(value) > 0) {
+      if (value > 0) {
         setTotal(
           data.reduce((a: number, b: { size: number; quantity: number }) => {
             return a + Number(b.quantity);
           }, 0)
         );
       }
+      setValue(`data.${index}.quantity`, Number(value));
     }
     if (type === "size") {
-      setWatchData(watch().data);
+      setValue(`data.${index}.size`, value);
     }
+    setWatchData(watch().data);
     handleSaveStep3(watch().data);
     trigger();
   };
@@ -235,7 +242,9 @@ function SizeAndQuantity() {
                           disabled={modifyTable}
                           onBlur={() => handleBLurInput(index)}
                           onFocus={() => handleFocusInput(index, "size")}
-                          onChange={(event) => handleChangeInput(event, "size")}
+                          onChange={(event) =>
+                            handleChangeInput(event, "size", index)
+                          }
                           className={{
                             input: `w-[50px] text-base text-center font-medium border-transparent border-b-2 border-b-gray rounded-none ${
                               errors &&
@@ -259,7 +268,7 @@ function SizeAndQuantity() {
                           onBlur={() => handleBLurInput(index)}
                           onFocus={() => handleFocusInput(index, "quantity")}
                           onChange={(event) =>
-                            handleChangeInput(event, "quantity")
+                            handleChangeInput(event, "quantity", index)
                           }
                           className={{
                             input: `w-[150px] text-base text-center border-transparent border-b-2 border-b-gray rounded-none transition-all ${

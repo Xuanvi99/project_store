@@ -48,6 +48,23 @@ export default {
         shadowButton: "0 5px 5px rgba(0,0,0,0.5)",
         shadow1: " 0px 2px 8px rgba(0, 0, 0, 0.15)",
         shadow2: " 0px 2px 8px rgba(0, 0, 0, 0.5)",
+        shadow3: [
+          "25px 25px 14px -22px rgba(0,0,0,0.34)",
+          "0px 4px 6px -4px rgba(0,0,0,0.1)",
+        ],
+        shadow_4: [
+          " rgb(195, 195, 195,1) 3px 3px 6px 0px ",
+          " rgba(255,255,255,0.5) -3px -3px 6px 1px ",
+        ],
+        shadow_inset_2: [
+          " rgb(195, 195, 195,1) 3px 3px 6px 0px inset",
+          " rgba(255,255,255,0.5) -3px -3px 6px 1px inset",
+        ],
+
+        shadow_inset_1: [
+          " rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset",
+          "rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset",
+        ],
       },
       animation: {
         textScale: "textScale 0.5s linear  infinite",

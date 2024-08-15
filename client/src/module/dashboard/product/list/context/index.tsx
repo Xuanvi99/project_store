@@ -44,7 +44,7 @@ function ListProductProvider({ children }: { children: React.ReactNode }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [filter, setFilter] = useState<IParamsFilterProductDashboard>({
-    activePage: Number(searchParams.get("page")) || 1,
+    activePage: Number(searchParams.get("activePage")) || 1,
     limit: Number(searchParams.get("limit")) || 10,
     search: (searchParams.get("search") as string) || "",
     sortBy: ["news", "sales", "price", "relevancy", ""].includes(

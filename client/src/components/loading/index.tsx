@@ -17,7 +17,7 @@ export function LoadingCallApi({
   className?: {
     wrap: string;
   };
-  size: number;
+  size?: number;
 }) {
   return (
     <div className={cn("flex justify-center w-full", className?.wrap)}>

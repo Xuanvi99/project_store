@@ -51,7 +51,7 @@ const ProductImages = () => {
   }
 
   return (
-    <div className="max-w-[400px] basis-2/5 ">
+    <div className="w-full">
       <Modal
         isOpenModal={showModal}
         onClick={handleShowModal}
@@ -106,7 +106,7 @@ const ProductImages = () => {
           </div>
         </div>
       </Modal>
-      <div className="w-full h-[400px] relative">
+      <div className="w-full h-[500px] relative">
         <SlideSwiper
           slideActive={slideSmallIndex}
           slideActions={"display"}
@@ -121,18 +121,19 @@ const ProductImages = () => {
             onSlidePrevTransitionEnd: () => handleChangeSlide("normal"),
           }}
           className={{
-            container: "slide-product_normal w-full h-full",
+            container:
+              "slide-product_normal w-full h-full shadow-shadow2 rounded-md",
           }}
         >
           {product?.imageIds.map((image, index) => {
             return (
-              <SwiperSlide key={index}>
+              <SwiperSlide key={index} className="h-[500px]">
                 <LazyLoadImage
                   alt="Thumbnails"
                   placeholderSrc={image.url}
                   srcSet={image.url}
                   effect="blur"
-                  className="object-cover rounded-md"
+                  className="w-[400px] h-[500px] rounded-md"
                   onClick={() => {
                     handleShowModal();
                   }}
@@ -174,18 +175,25 @@ const ProductImages = () => {
           }}
           slideActions={"hover"}
           slideActive={slideSmallIndex}
-          className={{ btnLeft: "py-4", btnRight: "py-4" }}
+          className={{
+            btnLeft: "py-4",
+            btnRight: "py-4",
+            container: "h-20 overflow-hidden",
+          }}
         >
           {product?.imageIds.map((image, index) => {
             return (
-              <SwiperSlide key={index} className="flex items-center">
+              <SwiperSlide
+                key={index}
+                className="flex items-center gap-x-2 max-h-20 [&>span]:h-20"
+              >
                 <LazyLoadImage
                   alt="slideItem"
                   placeholderSrc={image.url}
                   srcSet={image.url}
                   effect="blur"
                   className={cn(
-                    "bg-white opacity-50 max-h-[150px] duration-300 hover:opacity-100 hover:scale-110 hover:border-none",
+                    "bg-white opacity-50 h-full w-[calc(400px/5)] duration-300 hover:opacity-100 hover:scale-110 hover:border-none",
                     index === slideSmallIndex
                       ? "opacity-100 border-4 border-orange"
                       : ""

@@ -58,8 +58,17 @@ function ListRestoreProduct() {
     }
   };
 
+  if (data && data.listProduct.length === 0 && params.search === "") {
+    return (
+      <div className="flex flex-col items-center justify-center h-[350px] font-semibold gap-y-3">
+        <img alt="" srcSet="/orderNull.png" />
+        <p>Không tìm thấy sản phẩm</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="restore_product w-full rounded-md min-h-[400px]">
+    <div className="restore_product w-full rounded-md min-h-[400px] p-5 bg-white">
       <Input
         type="text"
         name="search"

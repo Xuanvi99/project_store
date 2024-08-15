@@ -8,6 +8,7 @@ import {
   TProductItem,
   TResStatisticsProduct,
   IResProductDeleted,
+  IUpdateInfoProduct,
 } from "@/types/product.type";
 
 interface IResponsive<T> {
@@ -230,9 +231,42 @@ export const productApi = createApi({
       { productId: string; FromData: FormData }
     >({
       query: ({ productId, ...body }) => ({
-        url: `/api/product/update/${productId}`,
+        url: `/product/update/${productId}`,
         method: "PUT",
         body,
+      }),
+      invalidatesTags: [{ type: "Product" }],
+    }),
+    updateInfoProduct: build.mutation<
+      { message: string },
+      { productId: string; body: IUpdateInfoProduct }
+    >({
+      query: ({ productId, body }) => ({
+        url: `/product/update/info/${productId}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: [{ type: "Product" }],
+    }),
+    updateThumbnailAndImagesProduct: build.mutation<
+      { message: string },
+      { productId: string; body: FormData }
+    >({
+      query: ({ productId, body }) => ({
+        url: `/product/update/thumbnailAndImages/${productId}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: [{ type: "Product" }],
+    }),
+    updateSizeAndQuantityProduct: build.mutation<
+      { message: string },
+      { productId: string; specs: { size: number; quantity: number }[] }
+    >({
+      query: ({ productId, specs }) => ({
+        url: `/product/update/sizeAndQuantity/${productId}`,
+        method: "PUT",
+        body: { specs },
       }),
       invalidatesTags: [{ type: "Product" }],
     }),
@@ -255,4 +289,7 @@ export const {
   useRestoreMultipleProductMutation,
   useGetStatisticsProductQuery,
   useUpdateProductMutation,
+  useUpdateInfoProductMutation,
+  useUpdateThumbnailAndImagesProductMutation,
+  useUpdateSizeAndQuantityProductMutation,
 } = productApi;
