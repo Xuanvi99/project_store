@@ -10,7 +10,6 @@ const listStatistics = [
 
 function StatisticsProduct() {
   const { data, isFetching } = useGetStatisticsProductQuery();
-
   return (
     <div className="grid grid-cols-4 gap-x-5 gap-y-5">
       {listStatistics.map((statistics, index) => {

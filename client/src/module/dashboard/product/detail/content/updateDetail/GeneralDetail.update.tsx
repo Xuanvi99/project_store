@@ -10,7 +10,7 @@ import {
   useCheckNameMutation,
   useUpdateInfoProductMutation,
 } from "@/stores/service/product.service";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import * as Yup from "yup";
 import { DetailProductContext, IDetailProductProvide } from "../../context";
 import { useForm } from "react-hook-form";
@@ -18,9 +18,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "@/components/button";
 import InputRadio from "@/components/input/InputRadio";
 import { Editor } from "@tinymce/tinymce-react";
-import { cn } from "@/utils";
+import { cn, formatPrice } from "@/utils";
 import { toast } from "react-toastify";
-import { formatPrice } from "../../../../../../utils/index";
+
+import { debounce } from "lodash";
+import ModalVerify from "../../../../../../components/modal/ModalVerify";
+import { useToggle } from "@/hook";
 
 interface BlobInfo {
   id: () => string;
@@ -68,19 +71,23 @@ type TBrandOptions = {
 type FormValues = Yup.InferType<typeof validationSchema>;
 
 function GeneralDetail() {
-  const { product } = useTestContext<IDetailProductProvide>(
+  const { product, setShowTab } = useTestContext<IDetailProductProvide>(
     DetailProductContext as React.Context<IDetailProductProvide>
   );
+
+  const [brandOptions, setBrandOptions] = useState<TBrandOptions>([]);
+  const [dataUpdate, setDataUpdate] = useState<FormValues | null>(null);
+
+  const { toggle: isOpenModal, handleToggle: handleOpenModal } = useToggle();
 
   const [removeWithImageUrl] = useRemoveWithImageUrlMutation();
 
   const [checkName] = useCheckNameMutation();
 
-  const [brandOptions, setBrandOptions] = useState<TBrandOptions>([]);
-
   const { data: category, status } = useGetAllCategoryQuery();
 
-  const [updateInfoProduct] = useUpdateInfoProductMutation();
+  const [updateInfoProduct, { isLoading: isLoadingUpdate }] =
+    useUpdateInfoProductMutation();
 
   const {
     handleSubmit,
@@ -90,7 +97,7 @@ function GeneralDetail() {
     reset,
     clearErrors,
     watch,
-    formState: { errors, dirtyFields },
+    formState: { errors },
   } = useForm({
     defaultValues: {
       name: "",
@@ -104,8 +111,6 @@ function GeneralDetail() {
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
-  console.log(watch());
-  console.log(errors);
 
   const validateForm = () => {
     if (
@@ -189,31 +194,62 @@ function GeneralDetail() {
     }
   };
 
+  const debounceInput = useMemo(() => {
+    return debounce(async (name: string) => {
+      if (product && name.length > 8 && name !== product.name) {
+        await checkName({ name })
+          .unwrap()
+          .then(() => {
+            clearErrors("name");
+          })
+          .catch((error) => {
+            const data = error.data as { errorMessage: string };
+            setError("name", { message: data.errorMessage });
+          });
+      }
+    }, 500);
+  }, [checkName, clearErrors, product, setError]);
+
   const handleChangeName = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const name = event.currentTarget.value;
-    if (product && name.length > 8 && name !== product.name) {
-      await checkName({ name: event.currentTarget.value })
-        .unwrap()
-        .then(() => {
-          clearErrors("name");
-        })
-        .catch((error) => {
-          const data = error.data as { errorMessage: string };
-          setError("name", { message: data.errorMessage });
-        });
-    }
+    debounceInput(name);
   };
 
   const onSubmit = async (data: FormValues) => {
+    setDataUpdate(data);
+    handleOpenModal();
+  };
+
+  const handleResetValue = useCallback(() => {
     if (product) {
-      await updateInfoProduct({ productId: product?._id, body: data })
+      reset({
+        name: product.name,
+        brand: product.brand,
+        status: product.status,
+        is_sale: product.is_sale,
+        price: product.price,
+        priceSale: product.priceSale,
+        desc: product.desc,
+      });
+    }
+  }, [product, reset]);
+
+  const handleCallApiUpdate = async () => {
+    if (product && dataUpdate) {
+      await updateInfoProduct({ productId: product._id, body: dataUpdate })
         .then(() => {
           toast("Cập nhật thông tin thành công", { type: "success" });
+          setShowTab("info");
+          window.scrollTo({ behavior: "smooth", top: 0 });
         })
         .catch(() => {
           toast("Cập nhật thông tin thất bại", { type: "error" });
+        })
+        .finally(() => {
+          handleOpenModal();
+          setDataUpdate(null);
         });
     }
   };
@@ -234,26 +270,24 @@ function GeneralDetail() {
   }, [category, status]);
 
   useEffect(() => {
-    if (product) {
-      reset(
-        {
-          name: product.name,
-          brand: product.brand,
-          status: product.status,
-          is_sale: product.is_sale,
-          price: product.price,
-          priceSale: product.priceSale,
-          desc: product.desc,
-        },
-        { keepDirtyValues: true }
-      );
-    }
-  }, [product, reset]);
+    handleResetValue();
+  }, [handleResetValue]);
 
   if (!product) return;
 
   return (
     <div className="flex flex-col w-full rounded-md shadow-md shadow-gray">
+      <ModalVerify
+        isOpenModal={isOpenModal}
+        handleOpenModal={handleOpenModal}
+        handleConfirm={handleCallApiUpdate}
+        isLoading={isLoadingUpdate}
+      >
+        <p className="mt-3 text-sm">
+          Bạn có chắc chắn muốn cập nhật
+          <strong className="text-danger ml-1">thông tin</strong> sản phẩm ?
+        </p>
+      </ModalVerify>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className={cn(
@@ -278,13 +312,15 @@ function GeneralDetail() {
               onFocus={() => handleFocusInput("name")}
               onBlur={() => handleBLurInput("name")}
               onChange={(event) => handleChangeName(event)}
-              className={{ input: `${dirtyFields.name && "border-orange"}` }}
               error={errors["name"] ? true : false}
             />
             <ErrorInput text={errors["name"]?.message} />
           </Field>
           <Field variant="flex-col" className="basis-1/2 gap-y-2">
-            <Label htmlFor="category" className="font-semibold text-secondary">
+            <Label
+              htmlFor="category"
+              className={"font-semibold text-secondary "}
+            >
               Thương hiệu:
             </Label>
             <DropdownForm
@@ -300,19 +336,10 @@ function GeneralDetail() {
               className={{
                 option:
                   "max-h-[160px] overflow-y-scroll rounded-none text-base font-bold",
-                select: cn(
-                  "shadow-none border-1 border-grayCa rounded-md",
-                  dirtyFields.brand && "border-orange"
-                ),
+                select: cn("shadow-none border-1 border-grayCa rounded-md"),
               }}
               onClick={(option) => {
-                if (option.value === product.brand) {
-                  reset({ brand: option.value });
-                } else {
-                  setValue("brand", option.value, {
-                    shouldDirty: true,
-                  });
-                }
+                setValue("brand", option.value);
               }}
             />
             <ErrorInput text={errors["brand"]?.message} />
@@ -340,9 +367,9 @@ function GeneralDetail() {
                 id="is_sale_false"
                 checked={watch("is_sale") === false}
                 onChange={() => {
-                  setValue("is_sale", false)
-                  setValue("priceSale", 0)
-                } }
+                  setValue("is_sale", false);
+                  setValue("priceSale", 0);
+                }}
               ></InputRadio>
               <label htmlFor="is_sale_false">Không</label>
             </span>
@@ -429,23 +456,17 @@ function GeneralDetail() {
           </div>
         </Field>
         <Field variant="flex-col" className="basis-1/2 gap-y-2">
-          <InputForm control={control} type="text" name="desc" />
           <Label
             htmlFor="phoneOrEmail"
             className="font-semibold text-secondary"
           >
-            Mô tả sản phẩm<strong className="text-danger">*</strong>
+            Mô tả sản phẩm :
           </Label>
           <Editor
             apiKey="upnnupf3dq8wz66922756jw4v2w241nvoxv3hvhnmqhng63w"
             onEditorChange={(_, editor) => {
               const desc = editor.getContent();
-              // console.log(product.desc);
-              // console.log(desc);
-              // console.log("" + product.desc === "" + desc);
-              setValue("desc", desc, {
-                shouldDirty: product.desc === desc ? false : true,
-              });
+              setValue("desc", desc);
               if (editor.getContent() === "") {
                 setError("desc", { message: "Vui lòng điền vào mục này." });
               } else {
@@ -479,7 +500,7 @@ function GeneralDetail() {
                 "undo redo  | fontsizeinput  | bold italic underline strikethrough| backcolor forecolor | align bullist numlist |  link image table | charmap",
               font_size_formats: "8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt",
               content_style:
-                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px; }",
               images_file_types: "jpg,png,jpeg",
               images_upload_handler: image_upload_handler,
               init_instance_callback: (editor) => {
@@ -507,7 +528,25 @@ function GeneralDetail() {
           />
           <ErrorInput text={errors["desc"]?.message} />
         </Field>
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-x-3">
+          <Button
+            variant="default"
+            type="button"
+            onClick={() => {
+              reset({
+                name: product.name,
+                brand: product.brand,
+                status: product.status,
+                is_sale: product.is_sale,
+                price: product.price,
+                priceSale: product.priceSale,
+                desc: product.desc,
+              });
+              window.scrollTo({ behavior: "smooth", top: 0 });
+            }}
+          >
+            Khôi phục mặc định
+          </Button>
           <Button
             variant="default"
             type="submit"

@@ -3,11 +3,11 @@ import { IRestoreProductProvide, RestoreProductContext } from "../context";
 import { useToggle } from "@/hook";
 import { toast } from "react-toastify";
 import { Fragment } from "react";
-import ModalRestoreProduct from "./ModalRestoreProduct";
 import { Input } from "@/components/input";
 import ReactPaginate from "react-paginate";
 import { IconChevronLeft, IconChevronRight } from "@/components/icon";
 import { useRestoreMultipleProductMutation } from "@/stores/service/product.service";
+import ModalVerify from "@/components/modal/ModalVerify";
 
 function PaginationRestore() {
   const {
@@ -20,7 +20,7 @@ function PaginationRestore() {
     RestoreProductContext as React.Context<IRestoreProductProvide>
   );
 
-  const { toggle: openModal, handleToggle: handleOpenModal } = useToggle();
+  const { toggle: isOpenModal, handleToggle: handleOpenModal } = useToggle();
 
   const [restoreMultipleProduct] = useRestoreMultipleProductMutation();
 
@@ -49,11 +49,15 @@ function PaginationRestore() {
 
   return (
     <Fragment>
-      <ModalRestoreProduct
-        openModal={openModal}
+      <ModalVerify
+        isOpenModal={isOpenModal}
         handleOpenModal={handleOpenModal}
-        handleRestoreProduct={handleRestoreMultipleProduct}
-      ></ModalRestoreProduct>
+        handleConfirm={handleRestoreMultipleProduct}
+      >
+        <p className="mt-3 text-sm">
+          Bạn có chắc chắn muốn khôi phục toàn bộ sản phẩm ?
+        </p>
+      </ModalVerify>
       <div className="flex items-center justify-between w-full p-4 bg-slate-100 border-t-1 border-t-grayCa">
         <div className="flex items-center justify-start basis-1/2 gap-x-5">
           <Input
@@ -74,7 +78,7 @@ function PaginationRestore() {
           />
           <span
             onClick={handleOpenModal}
-            className="text-sm cursor-pointer text-danger font-semibold hover:text-orange hover:underline "
+            className="text-sm font-semibold cursor-pointer text-danger hover:text-orange hover:underline "
           >
             Khôi phục sản phẩm ({listSelectProductId.length})
           </span>

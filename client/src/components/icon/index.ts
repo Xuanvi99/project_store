@@ -35,8 +35,10 @@ import IconShoppingFee from "./IconShoppingFee";
 import IconShowList from "./IconShowList";
 import IconShowGrid from "./IconShowGrid";
 import IconRestore from "./IconRestore";
+import IconMessage from "./IconMessage";
 
 export {
+  IconMessage,
   IconRestore,
   IconSearch,
   IconBag,

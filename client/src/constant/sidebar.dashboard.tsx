@@ -1,6 +1,6 @@
 import { IconSidebarDashboard } from "../components/icon";
 
-const size = 20;
+const size = 25;
 const listNavBarItem = [
   {
     icon: <IconSidebarDashboard.Dashboard size={size} />,
@@ -37,9 +37,21 @@ const listNavBarItem = [
     ],
   },
   {
+    icon: <IconSidebarDashboard.Inventory size={size} />,
+    title: "Quản lý Kho Hàng",
+    path: "/dashboard/inventory",
+    children: [],
+  },
+  {
     icon: <IconSidebarDashboard.Comment size={size} />,
     title: "Bình Luận",
     path: "/dashboard/comment",
+    children: [],
+  },
+  {
+    icon: <IconSidebarDashboard.Message size={size} />,
+    title: "Tin Nhắn",
+    path: "/dashboard/message",
     children: [],
   },
 ];

@@ -11,17 +11,24 @@ import { cn } from "@/utils";
 import { useUpdateSizeAndQuantityProductMutation } from "@/stores/service/product.service";
 import { toast } from "react-toastify";
 import ProductSizeAndQuantity from "../infoDetail/ProductSizeAndQuantity.info";
+import { useToggle } from "@/hook";
+import ModalVerify from "@/components/modal/ModalVerify";
 
 type specs = { size: number; quantity: number };
 
 function SizeAndQuantityDetail() {
-  const { product, listProductItem } = useTestContext<IDetailProductProvide>(
-    DetailProductContext as React.Context<IDetailProductProvide>
-  );
+  const { product, listProductItem, setShowTab } =
+    useTestContext<IDetailProductProvide>(
+      DetailProductContext as React.Context<IDetailProductProvide>
+    );
 
   const [specs, setSpecs] = useState<specs[]>([{ size: 0, quantity: 0 }]);
 
   const [total, setTotal] = useState<number>(0);
+
+  const [dataUpdate, setDataUpdate] = useState<FormValues | null>(null);
+
+  const { toggle: isOpenModal, handleToggle: handleOpenModal } = useToggle();
 
   const formSchema = {
     size: Yup.number()
@@ -57,7 +64,7 @@ function SizeAndQuantityDetail() {
     setValue,
     trigger,
     reset,
-    formState: { errors },
+    formState: { errors, dirtyFields, isDirty },
   } = useForm({
     defaultValues: {
       specs: specs,
@@ -66,12 +73,15 @@ function SizeAndQuantityDetail() {
     mode: "onChange",
   });
 
+  console.log("dirtyFields", dirtyFields);
+  console.log("isDirty", isDirty);
+
   const { fields, remove, append } = useFieldArray({
     control,
     name: "specs",
   });
 
-  const [updateSizeAndQuantityProduct] =
+  const [updateSizeAndQuantityProduct, { isLoading: isLoadingUpdate }] =
     useUpdateSizeAndQuantityProductMutation();
 
   const handleBLurInput = (index: number) => {
@@ -109,7 +119,7 @@ function SizeAndQuantityDetail() {
     }
   };
 
-  const handleChangeInput = (
+  const handleChangeInput = async (
     event: React.ChangeEvent<HTMLInputElement>,
     type: "size" | "quantity",
     index: number
@@ -130,7 +140,7 @@ function SizeAndQuantityDetail() {
       setValue(`specs.${index}.size`, value);
     }
     setSpecs(watch().specs);
-    trigger();
+    await trigger();
   };
 
   const handleResetSpecs = useCallback(() => {
@@ -142,12 +152,12 @@ function SizeAndQuantityDetail() {
         };
       });
       setSpecs([...arrSpecs]);
-      reset({ specs: arrSpecs }, { keepDefaultValues: true });
       setTotal(
         arrSpecs.reduce((a: number, b: { size: number; quantity: number }) => {
           return a + Number(b.quantity);
         }, 0)
       );
+      reset({ specs: arrSpecs });
     }
   }, [listProductItem, reset]);
 
@@ -175,18 +185,29 @@ function SizeAndQuantityDetail() {
   };
 
   const onSubmit = async (data: FormValues) => {
-    if (product) {
+    setDataUpdate(data);
+    handleOpenModal();
+  };
+
+  const handleCallApiUpdate = async () => {
+    if (product && dataUpdate) {
       await updateSizeAndQuantityProduct({
         productId: product._id,
-        specs: data.specs,
+        specs: dataUpdate.specs,
       })
         .unwrap()
         .then(() => {
           toast("Cập nhật size - số lượng thành công", { type: "success" });
+          setShowTab("info");
+          window.scrollTo({ behavior: "smooth", top: 0 });
         })
         .catch(() =>
           toast("Cập nhật size - số lượng thất bại", { type: "error" })
-        );
+        )
+        .finally(() => {
+          handleOpenModal();
+          setDataUpdate(null);
+        });
     }
   };
 
@@ -207,6 +228,18 @@ function SizeAndQuantityDetail() {
 
   return (
     <div className="flex flex-col w-full rounded-md shadow-md shadow-gray">
+      <ModalVerify
+        isOpenModal={isOpenModal}
+        handleOpenModal={handleOpenModal}
+        handleConfirm={handleCallApiUpdate}
+        isLoading={isLoadingUpdate}
+      >
+        <p className="mt-3 text-sm">
+          Bạn có chắc chắn muốn cập nhật
+          <strong className="text-danger ml-1">size - số lượng</strong> sản phẩm
+          ?
+        </p>
+      </ModalVerify>
       <div className="w-full p-5 bg-white shadow-shadow1">
         <h1 className="text-lg font-semibold text-orange">3.Size - Số lượng</h1>
         <div className="flex">
@@ -286,7 +319,7 @@ function SizeAndQuantityDetail() {
                         </td>
                         <td>
                           <span
-                            className="flex items-center justify-center "
+                            className="flex items-center justify-center"
                             onClick={() => {
                               remove(index);
                               setSpecs(watch().specs);
@@ -308,6 +341,7 @@ function SizeAndQuantityDetail() {
               )}
               <div className={`flex items-center justify-between`}>
                 <Button
+                  type="button"
                   variant="outLine-flex"
                   className="inline px-2 text-xs"
                   onClick={() => {
@@ -321,6 +355,7 @@ function SizeAndQuantityDetail() {
                   + Thêm Size-Số lượng
                 </Button>
                 <Button
+                  type="button"
                   variant="outLine-flex"
                   className="inline px-2 text-xs"
                   onClick={handleResetSpecs}

@@ -9,12 +9,15 @@ import { IImage } from "@/types/commonType";
 import { toast } from "react-toastify";
 import { useUpdateThumbnailAndImagesProductMutation } from "@/stores/service/product.service";
 import IconDelete from "../../../../../../components/icon/IconDelete";
-import LoadingSpinner from "@/components/loading";
+import { useToggle } from "@/hook";
+import ModalVerify from "@/components/modal/ModalVerify";
 
 function UpLoadImagesDetail() {
   const { product, setShowTab } = useTestContext<IDetailProductProvide>(
     DetailProductContext as React.Context<IDetailProductProvide>
   );
+
+  const { toggle: isOpenModal, handleToggle: handleOpenModal } = useToggle();
 
   const [thumbnailPresent, setThumbnailPresent] = useState<IImage | null>(null);
 
@@ -30,7 +33,7 @@ function UpLoadImagesDetail() {
 
   const [listImageDeleted, setListImageDeleted] = useState<IImage[]>([]);
 
-  const [updateThumbnailAndImagesProduct, { isLoading }] =
+  const [updateThumbnailAndImagesProduct, { isLoading: isLoadingUpdate }] =
     useUpdateThumbnailAndImagesProductMutation();
 
   const handleDeleteImagePresent = (image: IImage) => {
@@ -113,12 +116,15 @@ function UpLoadImagesDetail() {
           .unwrap()
           .then(() => {
             setShowTab("info");
-            window.scrollTo({ top: 0 });
+            window.scrollTo({ behavior: "smooth", top: 0 });
             setListFileUpLoadImages([]);
             setThumbnailNew([]);
             toast("Cập nhật hình ảnh thành công", { type: "success" });
           })
-          .catch(() => toast("Cập nhật hình ảnh thất bại", { type: "error" }));
+          .catch(() => toast("Cập nhật hình ảnh thất bại", { type: "error" }))
+          .finally(() => {
+            handleOpenModal();
+          });
       }
     } else {
       toast("Số lượng ảnh sản phẩm lớn hơn 5", { type: "error" });
@@ -136,6 +142,17 @@ function UpLoadImagesDetail() {
 
   return (
     <div className="flex flex-col w-full rounded-md shadow-md upLoadImagesDetail shadow-gray">
+      <ModalVerify
+        isOpenModal={isOpenModal}
+        handleOpenModal={handleOpenModal}
+        handleConfirm={handleSubmit}
+        isLoading={isLoadingUpdate}
+      >
+        <p className="mt-3 text-sm">
+          Bạn có chắc chắn muốn cập nhật
+          <strong className="text-danger ml-1">hình ảnh</strong> sản phẩm ?
+        </p>
+      </ModalVerify>
       <div className="p-5 bg-white shadow-shadow1">
         <h1 className="text-lg font-semibold text-orange">2.Hình ảnh</h1>
         <div className="flex mt-5 text-sm gap-y-5">
@@ -368,22 +385,14 @@ function UpLoadImagesDetail() {
           </div>
         </div>
         <div className="flex justify-end">
-          {isLoading ? (
-            <LoadingSpinner
-              className={
-                "border-orange border-t-transparent border-4 w-10 h-10"
-              }
-            ></LoadingSpinner>
-          ) : (
-            <Button
-              variant="default"
-              type="submit"
-              className="max-w-[120px] text-sm "
-              onClick={handleSubmit}
-            >
-              Cập nhật
-            </Button>
-          )}
+          <Button
+            variant="default"
+            type="submit"
+            className="max-w-[120px] text-sm "
+            onClick={handleOpenModal}
+          >
+            Cập nhật
+          </Button>
         </div>
       </div>
     </div>

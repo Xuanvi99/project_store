@@ -1,29 +1,32 @@
-import { Button } from "@/components/button";
-import Modal from "@/components/modal";
+import { Button } from "../button";
+import LoadingSpinner from "../loading";
+import Modal from "./Modal";
 
 type TProps = {
-  openModal: boolean;
+  children: React.ReactNode;
+  isOpenModal: boolean;
   handleOpenModal: () => void;
-  handleRestoreProduct: () => void;
+  handleConfirm?: () => void;
+  isLoading?: boolean;
 };
 
-function ModalRestoreProduct({
-  openModal,
+function ModalVerify({
+  children,
+  isOpenModal,
   handleOpenModal,
-  handleRestoreProduct,
+  handleConfirm,
+  isLoading = false,
 }: TProps) {
   return (
     <Modal
       variant="fixed"
-      isOpenModal={openModal}
+      isOpenModal={isOpenModal}
       onClick={handleOpenModal}
       className={{ content: "bg-white w-[350px] h-[200px] rounded-md " }}
     >
       <div className="flex flex-col w-full h-full p-4">
         <h1 className="text-lg font-semibold text-center">Thông báo</h1>
-        <p className="mt-3 text-sm">
-          Bạn có chắc chắn muốn xóa sản phẩm vào thùng rác?
-        </p>
+        {children}
         <div className="flex justify-end mt-auto gap-x-3">
           <Button
             variant="outLine"
@@ -35,11 +38,11 @@ function ModalRestoreProduct({
           </Button>
           <Button
             variant="default"
-            type="button"
+            type="submit"
             className="text-xs"
-            onClick={handleRestoreProduct}
+            onClick={handleConfirm}
           >
-            Khôi phục
+            {isLoading ? <LoadingSpinner></LoadingSpinner> : "Xác nhận"}
           </Button>
         </div>
       </div>
@@ -47,4 +50,4 @@ function ModalRestoreProduct({
   );
 }
 
-export default ModalRestoreProduct;
+export default ModalVerify;

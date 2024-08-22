@@ -8,7 +8,7 @@ import { useAppSelector, useToggle } from "@/hook";
 import { RootState } from "@/stores";
 import { toast } from "react-toastify";
 import ModalDeleteProduct from "./ModalDeleteProduct";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { cn } from "@/utils";
 
 function PaginationListProduct() {
@@ -26,7 +26,9 @@ function PaginationListProduct() {
   );
 
   const user = useAppSelector((state: RootState) => state.authSlice.user);
+
   const { toggle: openModal, handleToggle: handleOpenModal } = useToggle();
+  const [isScrollPage, setScrollPage] = useState<boolean>(false);
 
   const [deleteMultipleProduct] = useDeleteMultipleProductMutation();
 
@@ -53,6 +55,8 @@ function PaginationListProduct() {
         });
     }
   };
+
+  if (!data.totalPage) return;
 
   return (
     <Fragment>
@@ -96,17 +100,23 @@ function PaginationListProduct() {
         <div className="flex justify-end basis-1/2">
           <ReactPaginate
             breakLabel="..."
-            nextLabel={<IconChevronRight size={15}></IconChevronRight>}
             initialPage={filter.activePage - 1}
-            onPageChange={(selectedItem) => {
-              handleSetFilter({ activePage: selectedItem.selected + 1 });
-              setListSelectProductId([]);
-              window.scrollTo({ behavior: "smooth", top: scrollTop });
-            }}
             pageRangeDisplayed={5}
             pageCount={data.totalPage}
+            nextLabel={<IconChevronRight size={15}></IconChevronRight>}
             previousLabel={<IconChevronLeft size={15}></IconChevronLeft>}
             renderOnZeroPageCount={null}
+            onPageChange={(selectedItem) => {
+              handleSetFilter({
+                activePage: selectedItem.selected + 1,
+              });
+              setListSelectProductId([]);
+              if (isScrollPage) {
+                window.scrollTo({ behavior: "smooth", top: scrollTop });
+              } else {
+                setScrollPage(true);
+              }
+            }}
             className="flex items-center text-sm gap-x-1"
             pageClassName="py-[6px] px-3"
             previousClassName={`${

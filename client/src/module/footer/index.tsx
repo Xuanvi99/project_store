@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { IconChevronLeft } from "@/components/icon";
 import { cn } from "@/utils";
+import Chat from "../chat";
 
 function Footer() {
   const [scroll, setScroll] = useState<boolean>(false);
@@ -82,16 +83,13 @@ function Footer() {
         </div>
       </div>
       <div className="mt-6 mb-[15px] text-center text-gray text-sm">
-        Copyright 2023 © Team XV Store
+        Copyright 2024 © Team XV Store
       </div>
       <div
         className={cn(
           "fixed z-50 right-0 flex flex-col items-center justify-center cursor-pointer bottom-3 gap-y-3"
         )}
       >
-        <div className="w-10 h-10">
-          <img src="" alt="" srcSet="/chat.png" className="w-full" />
-        </div>
         {scroll && (
           <div
             onClick={() => {
@@ -99,7 +97,8 @@ function Footer() {
             }}
             className={cn(
               "flex items-center justify-center w-10 h-10 border-2 rounded-lg text-orange  border-orange",
-              "hover:bg-orange hover:text-white "
+              "hover:bg-orange hover:text-white ",
+              "absolute right-2 bottom-14"
             )}
           >
             <span className="rotate-90">
@@ -107,6 +106,8 @@ function Footer() {
             </span>
           </div>
         )}
+
+        <Chat></Chat>
       </div>
     </footer>
   );

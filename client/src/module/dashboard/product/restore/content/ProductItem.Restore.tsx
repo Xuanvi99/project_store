@@ -5,8 +5,8 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useToggle } from "@/hook";
 import { Fragment } from "react";
 import { toast } from "react-toastify";
-import ModalRestoreProduct from "./ModalRestoreProduct";
 import { useRestoreOneProductMutation } from "@/stores/service/product.service";
+import ModalVerify from "@/components/modal/ModalVerify";
 
 type TProps = {
   data: IResProductDeleted;
@@ -23,7 +23,7 @@ function ProductItem({
 }: TProps) {
   const { thumbnail, name, categoryId, _id, deletedBy, deletedAt } = data;
 
-  const { toggle: openModal, handleToggle: handleOpenModal } = useToggle();
+  const { toggle: isOpenModal, handleToggle: handleOpenModal } = useToggle();
 
   const [restoreOneProduct] = useRestoreOneProductMutation();
 
@@ -44,11 +44,15 @@ function ProductItem({
 
   return (
     <Fragment>
-      <ModalRestoreProduct
-        openModal={openModal}
+      <ModalVerify
+        isOpenModal={isOpenModal}
         handleOpenModal={handleOpenModal}
-        handleRestoreProduct={handleRestoreOneProduct}
-      ></ModalRestoreProduct>
+        handleConfirm={handleRestoreOneProduct}
+      >
+        <p className="mt-3 text-sm">
+          Bạn có chắc chắn muốn xóa sản phẩm vào thùng rác?
+        </p>
+      </ModalVerify>
       <div
         className={cn(
           "productItem grid w-full grid-cols-[50px_350px_100px_150px_150px_100px_auto] text-sm grid-rows-1 ",

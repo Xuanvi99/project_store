@@ -7,9 +7,9 @@ function ProductItemGridSkeleton() {
         <Skeleton></Skeleton>
       </div>
       <div className="z-40 flex flex-col p-3 text-sm bg-white border-t-1 border-t-grayCa gap-y-2">
-        <p className="font-semibold line-clamp-2">
+        <div className="font-semibold line-clamp-2">
           <Skeleton></Skeleton>
-        </p>
+        </div>
         <div className="h-6">
           <Skeleton></Skeleton>
         </div>

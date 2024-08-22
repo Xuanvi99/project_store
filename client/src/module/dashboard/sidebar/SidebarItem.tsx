@@ -33,7 +33,7 @@ function SidebarItem({ value }: TProps) {
           }
         }}
       >
-        <div className="flex gap-x-2">
+        <div className="flex items-center gap-x-2">
           <span>{icon}</span>
           <span>{title}</span>
         </div>

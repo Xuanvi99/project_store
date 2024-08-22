@@ -68,15 +68,15 @@ function ProductFilter() {
   const handleCheckStatusProduct = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    searchParams.set("activePage", "1");
     searchParams.set("status", event.target.dataset.value || "");
     setSearchParams(searchParams);
     handleSetFilter({
+      activePage: 1,
       status: event.target.dataset
         .value as IParamsFilterProductDashboard["status"],
     });
   };
-
-  console.log(filterRef);
 
   useEffect(() => {
     if (filterRef.current) {

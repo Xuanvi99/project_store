@@ -244,18 +244,6 @@
         box-shadow: rgba(0, 0, 0, 0.2) 6px 0px 4px -4px;
     }
 
-    .table_Ss {
-        border-collapse: collapse;
-        width: 100%;
-
-        th,
-        td {
-            padding: 8px 0px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-    }
-
     .listOrder {
         &::-webkit-scrollbar {
             height: 10px;
@@ -294,6 +282,55 @@
             height: 0;
 
             transition: height 0.5s ease-in;
+        }
+    }
+
+    .borderTinymce {
+        border: 2px solid #fd7e14 !important;
+    }
+
+    .chat_open {
+        width: 500px;
+        height: 400px;
+        opacity: 1;
+        animation: 0.3s chat_open linear;
+    }
+    @keyframes chat_open {
+        0% {
+            width: 0px;
+            height: 0px;
+            opacity: 0;
+        }
+        50% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 1;
+            width: 500px;
+            height: 400px;
+        }
+    }
+
+    .chat_close {
+        width: 0px;
+        height: 0px;
+        opacity: 0;
+        animation: 0.3s chat_close linear;
+    }
+
+    @keyframes chat_close {
+        0% {
+            width: 500px;
+            height: 400px;
+            opacity: 1;
+        }
+        80% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 0;
+            width: 0px;
+            height: 0px;
         }
     }
 }

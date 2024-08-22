@@ -9,6 +9,7 @@ import useTestContext from "@/hook/useTestContext";
 import Modal from "@/components/modal";
 import LoadingSpinner from "@/components/loading";
 import { CreateProductContext, ICreateProductProvide } from "../context";
+import { cn } from "@/utils";
 
 function SizeAndQuantity() {
   const {
@@ -212,12 +213,18 @@ function SizeAndQuantity() {
         <div className="flex justify-center mt-10">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col p-5 gap-y-5 border-1 border-grayCa"
+            className="flex flex-col p-5 gap-y-5 border-2 border-grayCa rounded-md"
           >
             <h1 className="text-xl font-semibold text-center">
               Bảng Size - Số lượng
             </h1>
-            <table className="w-[500px] table_Ss text-center">
+            <table
+              className={cn(
+                "w-full text-center",
+                "[&>tbody>tr>td]:py-2 [&>tbody>tr>td]:text-center [&>tbody>tr>td]:border-b-1 [&>tbody>tr>td]:border-b-grayCa",
+                "[&>tbody>tr>th]:text-center [&>tbody>tr>th]:py-2"
+              )}
+            >
               <tbody>
                 <tr className="text-base font-semibold">
                   <th>Stt</th>
@@ -283,9 +290,9 @@ function SizeAndQuantity() {
                         />
                       </td>
                       {!modifyTable && (
-                        <td className="leading-[30px] flex justify-center">
+                        <td>
                           <span
-                            className="py-2 mb-[3.5px]"
+                            className="flex items-center justify-center"
                             onClick={() => {
                               remove(index);
                               setWatchData(watch().data);

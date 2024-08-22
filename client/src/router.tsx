@@ -149,10 +149,18 @@ const router = createBrowserRouter([
           },
         ],
       },
-      // {
-      //   path: "/dashboard/comment",
-      //   element: <Dashboard.Comment></Dashboard.Comment>,
-      // },
+      {
+        path: "/dashboard/inventory",
+        element: <Dashboard.Inventory></Dashboard.Inventory>,
+      },
+      {
+        path: "/dashboard/comment",
+        element: <Dashboard.Comment></Dashboard.Comment>,
+      },
+      {
+        path: "/dashboard/message",
+        element: <Dashboard.Message></Dashboard.Message>,
+      },
     ],
   },
   {

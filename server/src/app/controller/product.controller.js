@@ -6,7 +6,6 @@ const {
   categoryModel,
   productItemModel,
   inventoryModel,
-  flashSaleModel,
 } = require("../model");
 
 class Product {
