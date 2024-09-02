@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const constants = require("../../constants");
+const constants = require("../../utils/constants");
 const mongoose_delete = require("mongoose-delete");
 
 const OrderSchema = new Schema(
@@ -72,7 +72,7 @@ const OrderSchema = new Schema(
       },
     },
 
-    quantityOrder:{ type: Number, required: true },
+    quantityOrder: { type: Number, required: true },
 
     shippingFee: { type: Number, required: true },
     subTotal: { type: Number, required: true },

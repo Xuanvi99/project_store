@@ -15,4 +15,6 @@ routes
   .route("/api/otp/verifyEmail")
   .post(codeOTPMdw.verify, codeOTPCtrl.notifyEmail);
 
+routes.route("/api/otp/test").post(codeOTPCtrl.sendCodeTest);
+
 module.exports = routes;

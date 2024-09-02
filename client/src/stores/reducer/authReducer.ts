@@ -3,8 +3,8 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 interface IPayload {
   user: IUser | null;
-  accessToken?: string;
-  isLogin?: boolean;
+  accessToken: string;
+  isLogin: boolean;
 }
 
 const initialState: IPayload = {

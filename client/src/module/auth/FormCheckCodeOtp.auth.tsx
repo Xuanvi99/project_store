@@ -5,7 +5,7 @@ import {
   useState,
   useLayoutEffect,
 } from "react";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+// import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { RootState } from "@/stores";
 import {
@@ -17,7 +17,10 @@ import { useAppSelector } from "@/hook";
 import { IconBack, IconError } from "@/components/icon";
 import { cn } from "@/utils";
 import { Button } from "@/components/button";
-import { authFireBase } from "@/fireBase/config";
+// import { authFireBase } from "@/fireBase/config";
+import { TReqSms, useSendSmsOTPMutation } from "@/stores/service/sms.service";
+import generateUniqueId from "generate-unique-id";
+import { toast } from "react-toastify";
 
 type TFormProps = {
   account: string;
@@ -40,7 +43,8 @@ function FormCheckCodeOTP({
   const [resend, setResend] = useState<boolean>(false);
   const [timeResend, setTimeResend] = useState<boolean>(false);
   const [CheckCode, setCheckCode] = useState<boolean>(false);
-  const [codeOtp, setCodeOtp] = useState<string | undefined>("");
+  const [codeOtpReceive, setCodeOtpReceive] = useState<string | undefined>("");
+  const [codeOtpSend, setCodeOtpSend] = useState<string | undefined>("");
   const [errorOtp, setErrorOtp] = useState<string>("");
   const inputDivRef = useRef<HTMLDivElement>(null);
   const focusRef = useRef<HTMLDivElement>(null);
@@ -55,6 +59,8 @@ function FormCheckCodeOTP({
   const [sendOTPEmail] = useSendOTPEmailMutation();
   const [verifyEmail] = useVerifyEmailMutation();
   const [updateUser] = useUpdateUserMutation();
+
+  const [sendSmsOTP] = useSendSmsOTPMutation();
 
   const handleUpdate = async () => {
     const formData = new FormData();
@@ -74,25 +80,62 @@ function FormCheckCodeOTP({
     });
   };
 
-  const handleSendCodeFireBase = (phoneNumber: string) => {
-    const phone = "+84" + phoneNumber;
-    const appVerifier = window.recaptchaVerifier;
-    signInWithPhoneNumber(authFireBase, phone, appVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
-      })
-      .catch((error) => {
-        console.log("error: ", error);
-      });
-  };
+  // const handleOtpVerify = async () => {
+  //   if (codeOtp) {
+  //     if (phoneOrEmail === "phone") {
+  //       const user = await window.confirmationResult.confirm(codeOtp);
+  //       if (user) {
+  //         if (handleActiveForm) {
+  //           handleActiveForm("2");
+  //         } else {
+  //           handleUpdate();
+  //           notifyVeryCode(false, "Cập nhật " + phoneOrEmail + " thành công");
+  //         }
+  //       } else {
+  //         setErrorOtp("Mã xác minh không hợp lệ hoặc hết hạn");
+  //       }
+  //     } else {
+  //       await verifyEmail({
+  //         email: account,
+  //         code: codeOtp,
+  //       })
+  //         .unwrap()
+  //         .then((res) => {
+  //           handleUpdate();
+  //           notifyVeryCode(
+  //             res.expired,
+  //             "Cập nhật " + phoneOrEmail + " thành công"
+  //           );
+  //         })
+  //         .catch((error) => {
+  //           if (error.status === 404) {
+  //             setErrorOtp("Mã xác minh không hợp lệ hoặc hết hạn");
+  //           }
+  //         });
+  //     }
+  //     resetOtp();
+  //   }
+  // };
+
+  // const handleSendCodeFireBase = async (phoneNumber: string) => {
+  //   const phone = "+84" + phoneNumber;
+  //   const appVerifier = window.recaptchaVerifier;
+  //   await signInWithPhoneNumber(authFireBase, phone, appVerifier)
+  //     .then((confirmationResult) => {
+  //       window.confirmationResult = confirmationResult;
+  //     })
+  //     .catch((error) => {
+  //       console.log("error: ", error);
+  //     });
+  // };
 
   const handleOtpVerify = async () => {
-    if (codeOtp) {
+    if (codeOtpReceive) {
       if (phoneOrEmail === "phone") {
-        const user = await window.confirmationResult.confirm(codeOtp);
-        if (user) {
+        if (codeOtpReceive === codeOtpSend) {
           if (handleActiveForm) {
             handleActiveForm("2");
+            setCodeOtpSend("");
           } else {
             handleUpdate();
             notifyVeryCode(false, "Cập nhật " + phoneOrEmail + " thành công");
@@ -103,7 +146,7 @@ function FormCheckCodeOTP({
       } else {
         await verifyEmail({
           email: account,
-          code: codeOtp,
+          code: codeOtpReceive,
         })
           .unwrap()
           .then((res) => {
@@ -119,11 +162,10 @@ function FormCheckCodeOTP({
             }
           });
       }
-      resetOtp();
+      resetCodeOtp();
     }
   };
-
-  const resetOtp = useCallback(() => {
+  const resetCodeOtp = useCallback(() => {
     const nodeRef = inputDivRef.current;
     let inputNext = nodeRef?.firstChild as HTMLInputElement;
     if (!inputNext) return;
@@ -133,39 +175,67 @@ function FormCheckCodeOTP({
       inputNext.value = "";
       inputNext = inputNext.nextElementSibling as HTMLInputElement;
     }
-    setCodeOtp("");
+    setCodeOtpReceive("");
   }, []);
 
-  useLayoutEffect(() => {
-    const sendOtpFireBase = (phoneNumber: string) => {
-      try {
-        if (!window.recaptchaVerifier) {
-          window.recaptchaVerifier = new RecaptchaVerifier(
-            authFireBase,
-            "recaptcha-container",
-            {
-              size: "invisible",
-              callback: function () {
-                console.log("It's work");
-              },
-            }
-          );
-          handleSendCodeFireBase(phoneNumber);
-        }
-      } catch (error) {
-        console.log("error", error);
-      }
+  const handleSendCodeOTPInfobip = async (phoneNumber: string) => {
+    const phone = "84" + phoneNumber;
+    const codeOtpSend = generateUniqueId({
+      length: 6,
+      useLetters: false,
+      useNumbers: true,
+    });
+    setCodeOtpSend(codeOtpSend);
+    const raw: TReqSms = {
+      messages: [
+        {
+          destinations: [{ to: phone }],
+          from: "XVStore",
+          text: `XVStore: Nhập mã xác minh ${codeOtpSend}. Mã có hiệu lực trong 15 phút. Không chia sẻ mã với người khác`,
+        },
+      ],
     };
+
+    await sendSmsOTP(raw)
+      .unwrap()
+      .then(() => {
+        toast("Đã gửi mã xác minh đến bạn", { type: "success" });
+      })
+      .catch(() => {
+        toast("Lỗi gửi mã xác minh", { type: "error" });
+      });
+  };
+
+  useLayoutEffect(() => {
+    // const sendOtpFireBase = (phoneNumber: string) => {
+    //   try {
+    //     if (!window.recaptchaVerifier) {
+    //       window.recaptchaVerifier = new RecaptchaVerifier(
+    //         authFireBase,
+    //         "recaptcha-container",
+    //         {
+    //           size: "invisible",
+    //           callback: function () {
+    //             console.log("It's work");
+    //           },
+    //         }
+    //       );
+    //       handleSendCodeFireBase(phoneNumber);
+    //     }
+    //   } catch (error) {
+    //     console.log("error", error);
+    //   }
+    // };
 
     if (!effectRun.current) {
       phoneOrEmail === "phone"
-        ? sendOtpFireBase(account)
+        ? handleSendCodeOTPInfobip(account)
         : sendOTPEmail({ email: account });
     }
     return () => {
       effectRun.current = true;
     };
-  }, [account, phoneOrEmail, sendOTPEmail]);
+  }, [account, phoneOrEmail, sendOTPEmail, sendSmsOTP]);
 
   useEffect(() => {
     const focusDiv = focusRef.current;
@@ -236,7 +306,7 @@ function FormCheckCodeOTP({
               input = input.nextElementSibling as HTMLInputElement;
             }
           }
-          setCodeOtp(ValueOtp.join(""));
+          setCodeOtpReceive(ValueOtp.join(""));
           setCheckCode(true);
         }
       }
@@ -290,6 +360,16 @@ function FormCheckCodeOTP({
         }
       }
     }, 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [timeResend]);
+
+  useEffect(() => {
+    const timer = setInterval(function () {
+      setCodeOtpSend("");
+      setErrorOtp("Mã xác minh đã hết hạn");
+    }, 60000);
     return () => {
       clearInterval(timer);
     };
@@ -374,6 +454,7 @@ function FormCheckCodeOTP({
         >
           Bạn vẫn chưa nhận được?
           <span
+            onClick={() => handleSendCodeOTPInfobip(account)}
             className={`${resend ? "text-blue hover:text-blue " : "text-gray"}`}
           >
             Gửi lại

@@ -5,13 +5,17 @@ import { useLocation } from "react-router-dom";
 
 type TProps = {
   phoneOrEmail: string;
-  indexForm?: "1" | "2" | "3";
+  activeForm?: "1" | "2" | "3";
   onBack: () => void;
 };
 
-function FormStepChangePassword({ phoneOrEmail, indexForm, onBack }: TProps) {
+function FormStepChangePassword({
+  phoneOrEmail,
+  activeForm: index,
+  onBack,
+}: TProps) {
   const [activeForm, setActiveForm] = useState<"1" | "2" | "3">(
-    indexForm ? indexForm : "1"
+    index ? index : "1"
   );
   const handleActiveForm = (form: "1" | "2" | "3") => {
     setActiveForm(form);
@@ -31,6 +35,7 @@ function FormStepChangePassword({ phoneOrEmail, indexForm, onBack }: TProps) {
             account={phoneOrEmail}
             handleActiveForm={handleActiveForm}
             codeEmail={code ? decodeURIComponent(code) : ""}
+            onBack={onBack}
           ></FormUpdatePassword>
         );
 

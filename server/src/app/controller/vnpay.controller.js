@@ -74,7 +74,6 @@ class VnPay {
 
       res.status(201).json({ vnpUrl });
     } catch (error) {
-      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -83,7 +82,6 @@ class VnPay {
     const codeOrder = req.params.codeOrder;
 
     let vnp_Params = req.query;
-    console.log("vnp_Params: ", vnp_Params);
 
     let secureHash = vnp_Params["vnp_SecureHash"];
 
@@ -180,7 +178,6 @@ class VnPay {
   };
 
   vnpay_refund = async (req, res) => {
-    console.log("req: ", req.body);
     let date = new Date();
 
     let vnp_TmnCode = config.get("vnp_TmnCode");

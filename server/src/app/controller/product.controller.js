@@ -82,7 +82,6 @@ class Product {
       }
       res.status(200).json({ listProduct, totalPage, amountProductFound });
     } catch (error) {
-      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -109,27 +108,48 @@ class Product {
         }
       };
 
-      let listFindProduct = await productModel
-        .find({
-          $and: [
-            {
-              $or: [
-                { name: { $regex: search, $options: "i" } },
-                { brand: { $regex: search, $options: "i" } },
-                { slug: { $regex: search, $options: "i" } },
-              ],
-            },
-            {
-              deleted: { $eq: false },
-            },
-          ],
-        })
-        .populate([
-          { path: "thumbnail", select: "url" },
-          { path: "inventoryId", select: "_id sold total stocked" },
-          { path: "categoryId", select: "_id name" },
-        ])
-        .sort(customSort());
+      let listFindProduct = [];
+      if (search === "sale") {
+        listFindProduct = await productModel
+          .find({
+            $and: [
+              {
+                is_sale: true,
+              },
+              {
+                deleted: { $eq: false },
+              },
+            ],
+          })
+          .populate([
+            { path: "thumbnail", select: "url" },
+            { path: "inventoryId", select: "_id sold total stocked" },
+            { path: "categoryId", select: "_id name" },
+          ])
+          .sort(customSort());
+      } else {
+        listFindProduct = await productModel
+          .find({
+            $and: [
+              {
+                $or: [
+                  { name: { $regex: search, $options: "i" } },
+                  { brand: { $regex: search, $options: "i" } },
+                  { slug: { $regex: search, $options: "i" } },
+                ],
+              },
+              {
+                deleted: { $eq: false },
+              },
+            ],
+          })
+          .populate([
+            { path: "thumbnail", select: "url" },
+            { path: "inventoryId", select: "_id sold total stocked" },
+            { path: "categoryId", select: "_id name" },
+          ])
+          .sort(customSort());
+      }
 
       let listProductFilter = [...listFindProduct];
       if (min_price >= 0 && max_price > 0 && min_price <= max_price) {
@@ -263,7 +283,6 @@ class Product {
         amountProductFound: listProductFilter.length,
       });
     } catch (error) {
-      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -331,7 +350,6 @@ class Product {
         amountProductFound,
       });
     } catch (error) {
-      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -350,8 +368,8 @@ class Product {
           { path: "categoryId" },
           { path: "inventoryId", select: "_id sold total stocked" },
         ])
-        .lean()
-        .catch((error) => console.log(error));
+        .lean();
+
       if (!product) {
         return res
           .status(404)
@@ -402,11 +420,9 @@ class Product {
         });
         data[statistic] = ListProduct.length;
       }
-      console.log(data);
 
       res.status(200).json({ ...data });
     } catch (error) {
-      console.log("error: ", error);
       return res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -587,7 +603,7 @@ class Product {
   updateThumbnailAndImagesProduct = async (req, res) => {
     const productId = req.params.productId;
     const { files, body } = req;
-    console.log("files: ", files);
+
     let productUpdate = {};
     if (!productId)
       return res.status(403).json({ message: "Invalid productId" });
@@ -729,7 +745,6 @@ class Product {
           return res.status(400).json({ message: "Xóa sản phẩm thất bại" });
         });
     } catch (error) {
-      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -775,6 +790,7 @@ class Product {
           { _id: productId },
           {
             status: "inactive",
+            deleted: false,
           }
         )
         .exec()
@@ -803,6 +819,7 @@ class Product {
             { _id: productId },
             {
               status: "inactive",
+              deleted: false,
             }
           )
           .exec()

@@ -36,8 +36,10 @@ import IconShowList from "./IconShowList";
 import IconShowGrid from "./IconShowGrid";
 import IconRestore from "./IconRestore";
 import IconMessage from "./IconMessage";
+import IconSendMessage from "./IconSendMessage";
 
 export {
+  IconSendMessage,
   IconMessage,
   IconRestore,
   IconSearch,

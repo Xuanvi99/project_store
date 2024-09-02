@@ -10,6 +10,8 @@ const categoryCtrl = require("./categories.controller");
 const imageCtrl = require("./image.controller");
 const vnpayCtrl = require("./vnpay.controller");
 const orderCtrl = require("./orders.controller");
+const roomChatCtrl = require("./roomChat.controller");
+const messageCtrl = require("./messages.controller");
 
 module.exports = {
   userCtrl,
@@ -24,4 +26,6 @@ module.exports = {
   imageCtrl,
   vnpayCtrl,
   orderCtrl,
+  roomChatCtrl,
+  messageCtrl,
 };

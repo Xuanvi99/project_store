@@ -1,42 +1,48 @@
-import { IconDown, IconMessage } from "@/components/icon";
+import { Button } from "@/components/button";
+import { IconDown, IconMessage, IconSendMessage } from "@/components/icon";
+import { Input } from "@/components/input";
+import Message from "@/components/message";
 import Tooltip from "@/components/tooltip";
+import { SocketContext, TSocketProvider } from "@/context/SocketContext";
 import { useToggle } from "@/hook";
+import useTestContext from "@/hook/useTestContext";
 import { cn } from "@/utils";
-import { socket } from "@/utils/socket.io";
 import { useEffect, useState } from "react";
 
 function Chat() {
+  const socketIo_client = useTestContext<TSocketProvider>(
+    SocketContext as React.Context<TSocketProvider>
+  );
+
+  const [firstLoad, setFirstLoad] = useState<boolean>(false);
+
   const { toggle: isOpenChat, handleToggle: handleOpenChat } = useToggle();
 
-  const [isConnected, setIsConnected] = useState(socket.connected);
-  console.log("isConnected: ", isConnected);
+  const [message, setMessage] = useState<string>("");
+
+  const handleChangeMessage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
+  };
 
   useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
+    if (socketIo_client) {
+      socketIo_client.on("send_message", (data) => {
+        console.log(data);
+      });
     }
-
-    function onDisconnect() {
-      setIsConnected(false);
-    }
-
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-    };
-  }, []);
+  }, [socketIo_client]);
 
   return (
     <div className={cn("absolute right-2 -bottom-4")}>
       <div
-        onClick={handleOpenChat}
+        onClick={() => {
+          handleOpenChat();
+          setFirstLoad(true);
+        }}
         className={cn(
           "flex justify-center items-center transition-all gap-x-2 text-lg font-semibold text-orange bg-white",
           "rounded-t-md p-2 shadow-shadow1 border-1 border-orange",
-          isOpenChat ? "opacity-0" : "opacity-100 delay-200"
+          isOpenChat ? "opacity-0 hidden" : "opacity-100 delay-200 "
         )}
       >
         <span>
@@ -46,12 +52,12 @@ function Chat() {
       </div>
       <div
         className={cn(
-          "chat rounded-t-md shadow-shadow1 border-1 border-orange bg-grayF5 ",
-          isOpenChat ? "chat_open" : "chat_close"
+          "chat rounded-t-md shadow-shadow1 border-1 border-orange bg-grayE5 ",
+          firstLoad ? (isOpenChat ? "chat_open" : "chat_close") : "hidden"
         )}
       >
         <div className="w-full h-full">
-          <div className="flex leading-5 rounded-t-md p-3 justify-between items-center border-b-1 border-b-gray98 bg-white">
+          <div className="flex items-center justify-between p-3 leading-5 bg-white rounded-t-md border-b-1 border-b-gray98">
             <h1 className="text-xl font-semibold text-orangeFe ">Chat</h1>
             <Tooltip
               place="top"
@@ -66,7 +72,45 @@ function Chat() {
               <span>Thu gọn</span>
             </Tooltip>
           </div>
-          <div></div>
+          <div className="flex flex-col flex-shrink-0 h-full ">
+            <div className="message_list flex flex-col gap-y-1 px-2 max-h-[70%] overflow-y-scroll">
+              <Message messageByUser={false}></Message>
+              <Message messageByUser={true}></Message>
+              <Message messageByUser={false}></Message>
+              <Message messageByUser={true}></Message>
+              <Message messageByUser={false}></Message>
+              <Message messageByUser={true}></Message>
+              <Message messageByUser={true}></Message>
+              <Message messageByUser={true}></Message>
+              <Message messageByUser={false}></Message>
+              <Message messageByUser={false}></Message>
+              <Message messageByUser={false}></Message>
+              <Message messageByUser={true}></Message>
+            </div>
+            <div className="h-[30%] mt-auto bg-white border-t-1 border-t-gray98">
+              <div className="flex flex-col h-full p-3">
+                <div className="flex gap-x-2">
+                  <Input
+                    type="text"
+                    name="message"
+                    value={message}
+                    onChange={(e) => handleChangeMessage(e)}
+                    placeholder="Nhập nội dung tin nhắn"
+                    className={{ input: "rounded-xl border-gray98" }}
+                  ></Input>
+                  <Button
+                    variant="outLine-border"
+                    type="button"
+                    // disabled={message.length > 0 ? false : true}
+                    onClick={() => socketIo_client?.emit("send_message", "abc")}
+                    className="max-w-[40px] h-10 rounded-full text-white flex justify-center items-center bg-orange hover:bg-white"
+                  >
+                    <IconSendMessage size={20}></IconSendMessage>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

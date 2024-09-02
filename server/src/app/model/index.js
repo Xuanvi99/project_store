@@ -10,6 +10,8 @@ const codeOTPModel = require("./codeOTP.model");
 const addressModel = require("./address.model");
 const categoryModel = require("./category.model");
 const inventoryModel = require("./inventory.model");
+const roomChatModel = require("./roomChat.model");
+const messageModel = require("./message.model");
 
 module.exports = {
   cartModel,
@@ -25,4 +27,6 @@ module.exports = {
   productModel,
   productItemModel,
   inventoryModel,
+  roomChatModel,
+  messageModel,
 };

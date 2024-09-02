@@ -13,7 +13,7 @@ const listNavBarItem = [
     title: "Quản lý Sản Phẩm",
     path: "/dashboard/product",
     children: [
-      { title: "Danh Sách Sản Phẩm", path: "/dashboard/product/list" },
+      { title: "Danh Sách Sản Phẩm", path: "/dashboard/product/home" },
       {
         title: "Thêm Sản Phẩm",
         path: "/dashboard/product/create",

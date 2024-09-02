@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import { IconChevronLeft } from "@/components/icon";
 import { cn } from "@/utils";
 import Chat from "../chat";
+import { useAppSelector } from "@/hook";
+import { RootState } from "@/stores";
 
 function Footer() {
+  const { isLogin } = useAppSelector((state: RootState) => state.authSlice);
+
   const [scroll, setScroll] = useState<boolean>(false);
 
   useEffect(() => {
@@ -106,8 +110,7 @@ function Footer() {
             </span>
           </div>
         )}
-
-        <Chat></Chat>
+        {isLogin && <Chat></Chat>}
       </div>
     </footer>
   );

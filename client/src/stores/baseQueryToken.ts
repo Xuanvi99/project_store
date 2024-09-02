@@ -6,7 +6,7 @@ import { RootState } from "../stores";
 import { logOut, updateAuth } from "../stores/reducer/authReducer";
 import { IUser } from "@/types/user.type";
 
-type TRes = { user: IUser; accessToken: string };
+type TResponsive = { user: IUser; accessToken: string };
 // create a new mutex
 const mutex = new Mutex();
 const baseQuery = fetchBaseQuery({
@@ -37,7 +37,12 @@ const baseQueryWithAuth: BaseQueryFn<
           extraOptions
         );
         if (refreshResult.data) {
-          api.dispatch(updateAuth(refreshResult.data as TRes));
+          api.dispatch(
+            updateAuth({
+              ...(refreshResult.data as TResponsive),
+              isLogin: true,
+            })
+          );
           result = await baseQuery(args, api, extraOptions);
         } else {
           api.dispatch(logOut());

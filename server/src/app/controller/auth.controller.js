@@ -1,4 +1,4 @@
-const { userModel, tokenModel, cartModel } = require("../model");
+const { userModel, tokenModel, cartModel, roomChatModel } = require("../model");
 
 const jwt = require("jsonwebtoken");
 const codeOTPModel = require("../model/codeOTP.model");
@@ -44,6 +44,8 @@ class authController {
       const accessToken = user.generateAccessToken();
       const refreshToken = user.generateRefreshToken();
       await tokenModel.saveToken(user, refreshToken);
+      user.status = "online";
+      await user.save();
       const { password: pw, __v, ...others } = user._doc;
 
       return res
@@ -66,10 +68,13 @@ class authController {
   loginOauthGoogle = async function (req, res) {
     try {
       const user = req.user;
+      user.status = "online";
+      await user.save();
       const { password, _v, createdAt, updatedAt, ...others } = user._doc;
       const accessToken = await user.generateAccessToken();
       const refreshToken = await user.generateRefreshToken();
       await tokenModel.saveToken(user._doc, refreshToken);
+
       return res
         .status(200)
         .cookie("refreshToken", refreshToken, {
@@ -132,11 +137,13 @@ class authController {
           token: refreshToken,
         })
         .exec();
+
       if (!checkRfToken)
         return res
           .status(400)
           .clearCookie("refreshToken")
           .json({ errMessage: "token does not exist!" });
+
       jwt.verify(
         refreshToken,
         process.env.RF_PRIVATE_KEY,
@@ -155,6 +162,8 @@ class authController {
           const newRefreshToken = user.generateRefreshToken();
           await tokenModel.saveToken(user, newRefreshToken);
           await tokenModel.deleteToken(refreshToken);
+          const { password: pw, __v, ...others } = user._doc;
+
           return res
             .status(201)
             .cookie("refreshToken", newRefreshToken, {
@@ -163,7 +172,7 @@ class authController {
               sameSite: "strict",
               maxAge: 7 * 24 * 60 * 60 * 1000,
             })
-            .json({ user: user._doc, accessToken: newAccessToken });
+            .json({ user: others, accessToken: newAccessToken });
         }
       );
     } catch (error) {
