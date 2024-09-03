@@ -144,9 +144,8 @@ class authController {
           if (err || !decode)
             return res.status(401).json({ errMessage: "refreshToken expired" });
           const user = await userModel
-            .findById({ _id: decode.userID }, { password: 0, __v: 0 })
-            .populate("avatar")
-            .exec();
+            .findById(decode.userId)
+            .populate("avatar");
           if (!user)
             return res
               .status(401)
