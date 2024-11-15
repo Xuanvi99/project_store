@@ -23,6 +23,8 @@ const UserSchema = new Schema(
         "https://res.cloudinary.com/damahknfx/image/upload/v1709063132/avatar/quz06h6htrcrlrm5furt.png",
     },
     blocked: { type: Boolean, default: false },
+    status: { type: String, enum: ["online", "offline"] },
+    timeOffline: { type: Date },
     role: { type: String, enum: ["admin", "buyer", "staff"], default: "buyer" },
     deleted: { type: Boolean, default: false },
   },
@@ -63,7 +65,7 @@ UserSchema.statics.findOneUser = async function (phoneOrEmail, password) {
 
 UserSchema.methods.generateAccessToken = function () {
   const accessToken = jwt.sign(
-    { userID: this._id, role: this.role, type: "access_token" },
+    { userId: this._id, role: this.role, type: "access_token" },
     process.env.AC_PRIVATE_KEY,
     { expiresIn: "30m" }
   );
@@ -73,7 +75,7 @@ UserSchema.methods.generateAccessToken = function () {
 
 UserSchema.methods.generateRefreshToken = function () {
   const refreshToken = jwt.sign(
-    { userID: this._id, role: this.role, type: "refresh_token" },
+    { userId: this._id, role: this.role, type: "refresh_token" },
     process.env.RF_PRIVATE_KEY,
     { expiresIn: "7d" }
   );

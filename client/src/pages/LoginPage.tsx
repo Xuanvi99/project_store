@@ -61,7 +61,6 @@ function LoginPage() {
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
-  // console.log(errors, !Object.keys(errors).length);
 
   const [openModal, setOpenModal] = useState<boolean>(false);
 

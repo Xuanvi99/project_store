@@ -20,6 +20,7 @@ type TProps = {
   title: string;
   type: "create" | "change";
   codeEmail?: string;
+  onBack?: () => void;
 };
 
 function FormUpdatePassword({
@@ -28,6 +29,7 @@ function FormUpdatePassword({
   account,
   type,
   codeEmail,
+  onBack,
 }: TProps) {
   const [checkError, setCheckError] = useState<boolean>(true);
 
@@ -80,7 +82,7 @@ function FormUpdatePassword({
     <div className="w-full checkCode">
       <div className="flex items-center py-7">
         <div
-          onClick={() => handleActiveForm("1")}
+          onClick={onBack}
           className="flex w-[80px] items-center justify-center font-bold cursor-pointer gap-x-2 text-blue hover:text-orange"
         >
           <IconBack size={25}></IconBack>

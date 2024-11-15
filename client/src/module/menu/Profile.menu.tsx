@@ -36,9 +36,11 @@ function Profile({ displayName }: TProps) {
     dispatch(updateCart({ cart: null }));
     await logOutAuth()
       .unwrap()
-      .then((res) => console.log("logout", res.message));
-    const query = encodeURIComponent(redirectUrl);
-    navigate("/auth/login?next=" + query, { state: { path: pathname } });
+      .then((res) => {
+        console.log("logout", res.message);
+        const query = encodeURIComponent(redirectUrl);
+        navigate("/auth/login?next=" + query, { state: { path: pathname } });
+      });
   };
 
   return (

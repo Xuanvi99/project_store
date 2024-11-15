@@ -27,7 +27,7 @@ class Image {
     }
     try {
       const imageIds = await imageModel.uploadMultipleFile(files, folder);
-      console.log(imageIds);
+
       if (imageIds.length === 0)
         return res.status(400).json({ errorMessage: "upload image fail" });
       let images = [];

@@ -6,6 +6,7 @@ import { useAppSelector } from "@/hook";
 import { Button } from "@/components/button";
 import { ICart } from "@/types/cart.type";
 import Tooltip from "@/components/tooltip";
+import { Fragment } from "react";
 
 function Cart() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ function Cart() {
         content: "-translate-x-3/4",
       }}
     >
-      <>
+      <Fragment>
         {cart && cart.listProduct.length > 0 && (
           <div className="h-6 text-sm leading-6 text-grayCa">
             Sản phẩm đã thêm
@@ -88,7 +89,7 @@ function Cart() {
             </Button>
           </div>
         )}
-      </>
+      </Fragment>
     </Tooltip>
   );
 }

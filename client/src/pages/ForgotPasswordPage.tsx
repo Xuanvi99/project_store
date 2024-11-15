@@ -83,7 +83,7 @@ function ForgotPasswordPage() {
         if (email && code && !expired) {
           return (
             <FormStepChangePassword
-              indexForm="2"
+              activeForm="2"
               phoneOrEmail={account.phoneOrEmail}
               onBack={handleBack}
             ></FormStepChangePassword>

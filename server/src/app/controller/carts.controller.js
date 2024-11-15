@@ -45,7 +45,6 @@ class Cart {
       const { __v, ...others } = cart._doc;
       return res.status(200).json({ cart: others });
     } catch (error) {
-      console.log("error: ", error);
       return res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -117,7 +116,6 @@ class Cart {
         cartItem: newCart.listProduct[0],
       });
     } catch (error) {
-      console.log("error: ", error);
       return res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -149,7 +147,7 @@ class Cart {
             (p) =>
               p.productId.toString() === productId && p.size === size.toString()
           );
-          console.log(itemIndex);
+
           if (itemIndex > -1) {
             const productToCart = cart.listProduct[itemIndex];
             quantity += productToCart.quantity;
@@ -195,7 +193,6 @@ class Cart {
         listCartItem,
       });
     } catch (error) {
-      console.log("error: ", error);
       return res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -292,7 +289,6 @@ class Cart {
       const listProductCart = cart.listProduct.filter(
         (product) => !listIdProduct.includes(product._id.toString())
       );
-      console.log(listProductCart);
 
       await cart.updateOne({ $set: { listProduct: listProductCart } });
 
@@ -300,7 +296,6 @@ class Cart {
         message: "delete all item Cart successfully!",
       });
     } catch (error) {
-      console.log("error: ", error);
       return res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -324,7 +319,6 @@ class Cart {
         message: "delete all item Cart successfully!",
       });
     } catch (error) {
-      console.log("error: ", error);
       return res.status(500).json({ errMessage: "server error" });
     }
   };

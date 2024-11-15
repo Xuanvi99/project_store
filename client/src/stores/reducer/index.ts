@@ -15,6 +15,9 @@ import { transportApi } from "../service/transport.service";
 import { vnpayApi } from "../service/vnpay.service";
 import { orderApi } from "../service/order.service";
 import { authGoogleApi } from "../service/authGoogle.service";
+import chatSlice from "./chatReducer";
+import { roomChatApi } from "../service/roomChat.service";
+import { smsOtpApi } from "../service/sms.service";
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
@@ -31,8 +34,11 @@ const rootReducer = combineReducers({
   [vnpayApi.reducerPath]: vnpayApi.reducer,
   [orderApi.reducerPath]: orderApi.reducer,
   [authGoogleApi.reducerPath]: authGoogleApi.reducer,
-  authSlice: authSlice,
-  cartSlice: cartSlice,
+  [roomChatApi.reducerPath]: roomChatApi.reducer,
+  [smsOtpApi.reducerPath]: smsOtpApi.reducer,
+  authSlice,
+  cartSlice,
+  chatSlice,
 });
 
 export default rootReducer;

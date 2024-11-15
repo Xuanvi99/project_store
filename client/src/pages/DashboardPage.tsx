@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { Header, Sidebar } from "../module/dashboard";
+import { HeaderDashboard, Sidebar } from "../module/dashboard";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../hook";
 import { RootState } from "@/stores";
@@ -42,7 +42,7 @@ function DashboardPage() {
   );
 }
 
-DashboardPage.Header = Header;
+DashboardPage.Header = HeaderDashboard;
 DashboardPage.SideBar = Sidebar;
 
 export default DashboardPage;

@@ -12,7 +12,6 @@ export const authApi = createApi({
     credentials: "include",
   }),
   endpoints: (build) => ({
-    //generic type query<type Responsive, type argument>
     register: build.mutation<TRes, TArg>({
       query: ({ phoneOrEmail, password }) => ({
         url: "register",

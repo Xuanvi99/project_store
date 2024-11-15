@@ -14,6 +14,7 @@ export default {
         green: "#28a745",
         green66: "#66cc00",
         teal: "#20c997",
+        message: "#8cfde1",
         cyan: "#17a2b8",
         gray: "#6c757d",
         grayDark: "#222222",

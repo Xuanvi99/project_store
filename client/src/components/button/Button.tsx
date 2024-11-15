@@ -19,7 +19,7 @@ const styleVariant = (variant: string): string => {
     case "outLine-flex":
       return "flex justify-center items-center duration-300 gap-x-1 border-1 text-orange border-orange hover:text-white hover:bg-orangeLinear ";
     case "outLine-border":
-      return "rounded-md cursor-pointer text-gray98 hover:text-orangeFe border-1 text-center";
+      return "rounded-md text-gray98 hover:text-orangeFe  border-1 text-center";
     default:
       return "bg-orangeLinear text-white hover:opacity-80";
   }
@@ -37,10 +37,10 @@ function Button({
       {...props}
       className={cn(
         "px-3 py-2 rounded-md font-semibold",
+        styleVariant(variant),
         disabled
           ? "cursor-not-allowed opacity-60 hover:bg-white"
           : "cursor-pointer",
-        styleVariant(variant),
         className
       )}
       disabled={disabled}

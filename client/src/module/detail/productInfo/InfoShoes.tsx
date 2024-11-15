@@ -420,8 +420,8 @@ function InfoShoes() {
         </div>
       ) : (
         <div className="w-full max-h-[100px] flex justify-center items-center my-10">
-          <span className="p-2 text-lg font-semibold border-2 rounded-md border-orange">
-            Sản phẩm hết hàng
+          <span className="p-2 text-lg font-semibold italic text-danger border-2 rounded-md border-orange">
+            Sản phẩm hết hàng hoặc ngừng bán
           </span>
         </div>
       )}

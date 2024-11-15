@@ -12,6 +12,7 @@ const categoryRoutes = require("./category.routes");
 const imageRoutes = require("./image.routes");
 const vnpayRoutes = require("./vnpay.routes");
 const orderRoutes = require("./order.routes");
+const roomChatRoutes = require("./roomChat.routes");
 
 routes.use(uploadFile);
 routes.use(authRoutes);
@@ -25,5 +26,6 @@ routes.use(categoryRoutes);
 routes.use(imageRoutes);
 routes.use(vnpayRoutes);
 routes.use(orderRoutes);
+routes.use(roomChatRoutes);
 
 module.exports = routes;

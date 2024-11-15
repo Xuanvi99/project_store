@@ -55,7 +55,6 @@ class userController {
 
   getProfile = async (req, res) => {
     const userId = req.params.userId;
-    console.log("userId: ", userId);
     if (!userId) {
       res.status(400).json({ errMessage: "Invalid user ID" });
     }

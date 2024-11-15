@@ -16,7 +16,7 @@ class verify {
           if (err || !decode) {
             return res.status(401).json({ ErrorMessage: "Token expired" });
           }
-          const user = await userModel.findById(decode.userID);
+          const user = await userModel.findById(decode.userId);
           if (!user) {
             return res
               .status(401)

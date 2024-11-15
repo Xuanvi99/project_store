@@ -13,10 +13,10 @@ import { cn } from "./utils";
 import { ToastContainer } from "react-toastify";
 
 function App() {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useAppSelector((state: RootState) => state.authSlice);
   const [refreshToken] = useRefreshTokenMutation();
   const dispatch = useAppDispatch();
-  const effectRun = useRef(false);
+  const effectRun = useRef<boolean>(false);
   const id = user ? user._id : "";
   const { data: cart, status } = useGetCartQuery(id, { skip: !id });
 

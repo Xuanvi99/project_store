@@ -4,7 +4,7 @@ const { sendMail } = require("../../utils/sendMail");
 exports.sendCodeEmail = async (req, res) => {
   try {
     const { user, codeOTP } = req;
-    if (!user) {
+    if (!user || !user.email) {
       res.status(404).json({ errMessage: "Email not found!" });
     }
     const mailOptions = {
@@ -20,14 +20,6 @@ exports.sendCodeEmail = async (req, res) => {
               <tbody>
                 <tr>
                   <td align="center">
-                  <tr>
-                    <img
-                      alt=""
-                      src="http://res.cloudinary.com/damahknfx/image/upload/v1706559426/avatar/jrazcv59uoqhvdey9evn.png"
-                      width={"50"}
-                      height={"auto"}
-                    />
-                    </tr>
                     <tr align="center" style="font-weight: bolder;color:#fd7e14;font-size:20px">XVStore</tr>
                   </td>
                 </tr>
@@ -135,7 +127,7 @@ exports.sendCodeEmail = async (req, res) => {
           </td>
         </tr>
       </tbody>
-    </table>`,
+        </table>`,
     };
     sendMail(mailOptions);
     await codeOTPModel.saveCodeOTP(user.email, codeOTP);
@@ -161,15 +153,7 @@ exports.sendOTPEmail = async (req, res) => {
             <table width="60%">
               <tbody>
                 <tr>
-                  <td align="center">
-                  <tr>
-                    <img
-                      alt=""
-                      src="http://res.cloudinary.com/damahknfx/image/upload/v1706559426/avatar/jrazcv59uoqhvdey9evn.png"
-                      width={"50"}
-                      height={"auto"}
-                    />
-                    </tr>
+                  <td align="center">                 
                     <tr align="center" style="font-weight: bolder;color:#fd7e14;font-size:20px">XVStore</tr>
                   </td>
                 </tr>
@@ -249,6 +233,7 @@ exports.sendOTPEmail = async (req, res) => {
       </tbody>
     </table>`,
     };
+
     sendMail(mailOptions);
 
     await codeOTPModel.saveCodeOTP(user.email, OTP);
@@ -275,5 +260,22 @@ exports.notifyEmail = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ errMessage: "Server error" });
+  }
+};
+
+exports.sendCodeTest = async (req, res) => {
+  try {
+    const mailOptions = {
+      from: { name: "XVStore", address: process.env.EMAIL_USERNAME },
+      to: "traigiaotu123@gmail.com",
+      subject: "test sendmail",
+      text: "You recieved message from ",
+      html: "Mail of test sendmail ",
+    };
+    sendMail(mailOptions);
+
+    res.status(200).json({ message: "Email sent code successfully." });
+  } catch (error) {
+    res.status(500).json({ errMessage: "server error" });
   }
 };

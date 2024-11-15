@@ -9,7 +9,6 @@ const connection = mongoose.connection;
 
 class Order {
   getListOrderFilter = async (req, res) => {
-    console.log(req.query);
     try {
       const activePage = +req.query.activePage || 1;
       const search = req.query.search || "";
@@ -94,7 +93,6 @@ class Order {
 
       res.status(200).json({ data: listOrder, totalPage, amountOrder });
     } catch (error) {
-      console.log("error: ", error);
       res.status(500).json({ errMessage: "server error" });
     }
   };
@@ -264,7 +262,6 @@ class Order {
         });
         data[statistic] = ListOrder.length;
       }
-      console.log(data);
 
       res.status(200).json({ ...data });
     } catch (error) {
@@ -342,7 +339,6 @@ class Order {
         orderId: result._id,
       });
     } catch (error) {
-      console.log("error: ", error);
       session.abortTransaction();
       session.endSession();
       return res
@@ -406,7 +402,6 @@ class Order {
       }
       res.status(200).json({ message: "Cancelled order success" });
     } catch (error) {
-      console.log("error: ", error);
       return res
         .status(500)
         .json({ errMessage: error ? error : "server error" });

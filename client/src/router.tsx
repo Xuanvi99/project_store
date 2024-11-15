@@ -115,8 +115,8 @@ const router = createBrowserRouter([
         path: "/dashboard/product",
         children: [
           {
-            path: "/dashboard/product/list",
-            element: <Dashboard.Product.List></Dashboard.Product.List>,
+            path: "/dashboard/product/home",
+            element: <Dashboard.Product.Home></Dashboard.Product.Home>,
           },
           {
             path: "/dashboard/product/create",

@@ -109,12 +109,6 @@ function FormCheckPhoneOrEmail({
             id="phoneOrEmail"
             placeholder="Nhập..."
             error={errors["phoneOrEmail"] ? true : false}
-            className={{
-              input:
-                dirtyFields.phoneOrEmail && !errors["phoneOrEmail"]
-                  ? "border-green text-green"
-                  : "",
-            }}
           />
           <ErrorInput text={errors["phoneOrEmail"]?.message} />
         </Field>
