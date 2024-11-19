@@ -2,5 +2,6 @@ import Create from "./create";
 import Home from "./list";
 import Restore from "./restore";
 import Detail from "./detail";
+import Layout from "./layout";
 
-export { Create, Home, Restore, Detail };
+export { Create, Home, Restore, Detail, Layout };

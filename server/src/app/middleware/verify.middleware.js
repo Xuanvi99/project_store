@@ -52,6 +52,7 @@ class verify {
         .findOne({ email: email })
         .populate("avatar")
         .exec();
+       
       if (!user) {
         const newUser = new userModel({
           userName: userName,

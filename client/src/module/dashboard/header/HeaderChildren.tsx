@@ -32,7 +32,7 @@ function HeaderChildren({ children, handleSelectPathname }: IProps) {
         scroll ? "top-[0px]" : ""
       )}
     >
-      <h1 className="text-2xl font-semibold">
+      <h1 className="text-xl font-semibold">
         {handleSelectPathname(pathname || "")}
       </h1>
       {children}

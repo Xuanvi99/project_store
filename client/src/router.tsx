@@ -113,6 +113,7 @@ const router = createBrowserRouter([
       { path: "/dashboard/home", element: <Dashboard.Home></Dashboard.Home> },
       {
         path: "/dashboard/product",
+        element: <Dashboard.Product.Layout></Dashboard.Product.Layout>,
         children: [
           {
             path: "/dashboard/product/home",

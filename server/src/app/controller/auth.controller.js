@@ -127,11 +127,13 @@ class authController {
   refreshToken = async (req, res) => {
     try {
       const refreshToken = req.cookies.refreshToken;
+      console.log("refreshToken: ", refreshToken);
       if (!refreshToken)
         return res
           .status(400)
           .clearCookie("refreshToken")
           .json({ errMessage: "Invalid refreshToken" });
+
       const checkRfToken = await tokenModel
         .findOne({
           token: refreshToken,
@@ -148,12 +150,15 @@ class authController {
         refreshToken,
         process.env.RF_PRIVATE_KEY,
         async (err, decode) => {
-          if (err || !decode)
+          if (err || !decode) {
             return res.status(401).json({ errMessage: "refreshToken expired" });
+          }
+
           const user = await userModel
-            .findById({ _id: decode.userID }, { password: 0, __v: 0 })
+            .findById({ _id: decode.userId }, { password: 0, __v: 0 })
             .populate("avatar")
             .exec();
+
           if (!user)
             return res
               .status(401)
@@ -176,7 +181,7 @@ class authController {
         }
       );
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: "server error" });
     }
   };
 }

@@ -23,7 +23,7 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { reqCreateOrder } from "@/types/transport.type";
 import { ModalNotification } from "@/components/modal";
 import LoadingSpinner, { LoadingCallApi } from "@/components/loading";
-import HeaderOrder from "../header.order";
+
 
 type TParams = {
   [P in keyof reqCreateOrder]?: reqCreateOrder[P];
@@ -264,7 +264,7 @@ function OrderDetail() {
       >
         <span>{notify.message}</span>
       </ModalNotification>
-      <HeaderOrder></HeaderOrder>
+      {/* <HeaderOrder></HeaderOrder> */}
       <div className="detail-order px-6 mt-5">
         <div className="w-full p-5 bg-white border-b-1 border-b-grayCa">
           <div className="pb-5 border-b-1 border-b-grayCa">

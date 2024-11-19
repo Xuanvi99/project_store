@@ -1,5 +1,5 @@
 function Message() {
-  return <div>index</div>;
+  return <div className="">index</div>;
 }
 
 export default Message;
