@@ -22,10 +22,7 @@ interface IDropdownFormProps<T> {
     select?: string;
     option?: string;
   };
-  add?: {
-    display: boolean;
-    onClick?: () => void;
-  };
+  addBtnClick?: React.ReactNode;
   disable?: boolean;
   onClick: (option: T) => void;
 }
@@ -39,7 +36,7 @@ function DropdownForm<T extends FieldValues>({
   control,
   name,
   search,
-  add,
+  addBtnClick,
   onClick,
 }: IDropdownFormProps<options> & UseControllerProps<T>) {
   const selectValue = useWatch<T>({
@@ -141,11 +138,7 @@ function DropdownForm<T extends FieldValues>({
                 Không tìm thấy
               </div>
             )}
-            {add?.display && (
-              <div className="h-10 px-2 text-xs leading-10 text-center list-none cursor-pointer border-grayCa hover:text-orange">
-                +Thêm thương hiệu
-              </div>
-            )}
+            {addBtnClick}
           </div>
         </div>
       )}

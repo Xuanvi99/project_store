@@ -4,8 +4,8 @@ import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
 
 import { useLocation, useNavigate } from "react-router-dom";
-import { CartProvider } from "@/module/cart/context.cart";
-import Container from "../module/cart";
+import { CartProvider } from "@/module/cart/context";
+import CartContent from "../module/cart";
 
 function CartPage() {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
@@ -27,7 +27,7 @@ function CartPage() {
 
   return (
     <CartProvider>
-      <Container></Container>
+      <CartContent></CartContent>
     </CartProvider>
   );
 }

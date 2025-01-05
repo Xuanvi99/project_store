@@ -16,6 +16,8 @@ import InputRadio from "@/components/input/InputRadio";
 import { Button } from "@/components/button";
 import { IconChevronRight } from "@/components/icon";
 import { DropdownForm } from "@/components/dropdown";
+import { cn } from "@/utils";
+import ModalAddBrand from "./modal/ModalAddBrand";
 
 interface BlobInfo {
   id: () => string;
@@ -54,6 +56,8 @@ function General() {
 
   const [removeWithImageUrl] = useRemoveWithImageUrlMutation();
   const [checkName] = useCheckNameMutation();
+
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   const [brandOptions, setBrandOptions] = useState<
     {
@@ -174,6 +178,10 @@ function General() {
     }
   };
 
+  const handleOpenModal = () => {
+    setOpenModal(!openModal);
+  };
+
   const onSubmit = async (data: FormValues) => {
     handleSetData(data);
     handleActiveStep("2");
@@ -228,8 +236,20 @@ function General() {
             <ErrorInput text={errors["name"]?.message} />
           </Field>
           <Field variant="flex-col" className="basis-1/2 gap-y-2">
-            <Label htmlFor="category" className="font-semibold text-secondary">
-              Thương hiệu<strong className="text-danger">*</strong>
+            <Label
+              htmlFor="category"
+              className="font-semibold text-secondary flex gap-x-2 items-center"
+            >
+              <span>
+                Thương hiệu<strong className="text-danger">*</strong>
+              </span>
+
+              <span
+                onClick={handleOpenModal}
+                className="text-xs list-none cursor-pointer text-orange hover:underline"
+              >
+                ( +Thêm )
+              </span>
             </Label>
             <DropdownForm
               control={control}
@@ -238,12 +258,14 @@ function General() {
               options={brandOptions}
               error={errors.brand && !watch("brand")}
               search={{
-                display: true,
+                display: brandOptions.length > 0 ? true : false,
                 place: "top",
               }}
               className={{
-                option:
-                  "max-h-[160px] overflow-y-scroll rounded-none text-base font-bold",
+                option: cn(
+                  "max-h-[160px] rounded-none text-base font-bold",
+                  brandOptions.length > 0 ? "overflow-y-scroll" : ""
+                ),
                 select: "shadow-none border-1 border-grayCa rounded-md",
               }}
               onClick={(option) => {
@@ -384,6 +406,7 @@ function General() {
           <IconChevronRight size={20}></IconChevronRight>
         </Button>
       </form>
+      <ModalAddBrand openModal={openModal} handleOpenModal={handleOpenModal} />
     </div>
   );
 }

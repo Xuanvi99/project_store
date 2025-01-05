@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { IconChevronLeft } from "@/components/icon";
-import { cn } from "@/utils";
-import Chat from "../chat";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
+import Chat from "./Chat";
+import ScrollTop from "./scrollTop";
 
 function Footer() {
   const { isLogin } = useAppSelector((state: RootState) => state.authSlice);
@@ -89,29 +88,8 @@ function Footer() {
       <div className="mt-6 mb-[15px] text-center text-gray text-sm">
         Copyright 2024 © Team XV Store
       </div>
-      <div
-        className={cn(
-          "fixed z-50 right-0 flex flex-col items-center justify-center cursor-pointer bottom-3 gap-y-3"
-        )}
-      >
-        {scroll && (
-          <div
-            onClick={() => {
-              window.scrollTo({ behavior: "smooth", top: 0 });
-            }}
-            className={cn(
-              "flex items-center justify-center w-10 h-10 border-2 rounded-lg text-orange  border-orange",
-              "hover:bg-orange hover:text-white ",
-              "absolute right-2 bottom-14"
-            )}
-          >
-            <span className="rotate-90">
-              <IconChevronLeft size={20}></IconChevronLeft>
-            </span>
-          </div>
-        )}
-        {isLogin && <Chat></Chat>}
-      </div>
+      {scroll && <ScrollTop />}
+      {isLogin && <Chat />}
     </footer>
   );
 }

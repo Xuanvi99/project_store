@@ -23,10 +23,6 @@ function UpLoadImages() {
     uploadImage.listImages || []
   );
 
-  useEffect(() => {
-    window.scrollTo({ top: 0 });
-  }, []);
-
   const onChangeThumbnail = (imageList: ImageListType) => {
     handleSaveStep2({ thumbnail: imageList, listImages });
     setThumbnail(imageList);
@@ -43,6 +39,10 @@ function UpLoadImages() {
     handleSetData({ thumbnail: fileThumbnail, images: fileImages as File[] });
     handleActiveStep("3");
   };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   return (
     <div className="mt-7">

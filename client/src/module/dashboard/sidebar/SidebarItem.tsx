@@ -44,7 +44,7 @@ function SidebarItem({ value }: TProps) {
         )}
       </div>
       {active && children && children.length > 0 && (
-        <div className="flex flex-col gap-y-4 text-gray text-xs font-normal">
+        <div className="flex flex-col gap-y-4 text-white text-xs font-normal">
           {children.map((item, index) => {
             return (
               <Link

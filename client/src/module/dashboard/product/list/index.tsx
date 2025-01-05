@@ -54,7 +54,7 @@ function HomeProduct() {
           </div>
         )}
       </HeaderChildren>
-      <div className="w-full px-6 pb-10 mt-[80px]">
+      <div className="w-full px-6 pb-5 mt-[80px]">
         <StatisticsProduct></StatisticsProduct>
         <div className="p-5 mt-5 bg-white rounded-md">
           <ListProductProvider>

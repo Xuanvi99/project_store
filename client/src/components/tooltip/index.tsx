@@ -61,7 +61,7 @@ const Tooltip = ({
     <div
       onClick={onClick}
       className={cn(
-        "relative px-2 transition-all  cursor-pointer",
+        "relative px-2 transition-all cursor-pointer",
         isHover && selectCssPlace(place)?.select,
         className?.select
       )}

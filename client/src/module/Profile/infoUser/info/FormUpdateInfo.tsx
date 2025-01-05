@@ -112,7 +112,11 @@ function FormUpdateInfo() {
 
   return (
     <Fragment>
-      <ModalNotification isOpen={openModal} onClick={handleOpenModal}>
+      <ModalNotification
+        isOpenModal={openModal}
+        type={isSuccess ? "success" : "error"}
+        onClick={handleOpenModal}
+      >
         <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
           <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
           <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">

@@ -204,99 +204,103 @@ function ProductFilter() {
           </Label>
         </span>
       </div>
-      <div className="flex items-center justify-center cursor-pointer gap-x-3">
-        <span
-          onClick={() => {
-            setShowProduct("list");
-            searchParams.set("show", "list");
-            setSearchParams(searchParams);
-            handleSetFilter({ limit: 10 });
-          }}
-          className={cn(
-            `hover:text-orange`,
-            showProduct === "list" && "text-orange"
-          )}
-        >
-          <IconShowList size={25}></IconShowList>
-        </span>
-        <span className="w-[2px] h-[25px] bg-gray"></span>
-        <span
-          onClick={() => {
-            setShowProduct("grid");
-            searchParams.set("show", "grid");
-            setSearchParams(searchParams);
-            handleSetFilter({ limit: 8 });
-          }}
-          className={cn(
-            `hover:text-orange`,
-            showProduct === "grid" && "text-orange"
-          )}
-        >
-          <IconShowGrid size={25}></IconShowGrid>
-        </span>
-      </div>
-      <div className="flex justify-between text-sm">
-        <div className="flex items-center text-sm font-semibold text-end gap-x-2">
-          <span className="flex items-center gap-x-1">
-            <IconRightArrow size={10}></IconRightArrow>
-            <span>Hiện thị:</span>
-          </span>
-          {data.amountProductFound > 5 ? (
-            <Dropdown
-              className={{
-                wrap: "min-w-[50px]",
-                select: "h-7 rounded-md text-dark",
-                option: "min-w-[50px] text-center",
-              }}
-              title={"" + filter.limit}
-              value={"" + filter.limit}
-              options={
-                showProduct === "list" ? optionLimitList : optionLimitGrid
-              }
-              handleSelect={(option) => {
-                searchParams.set("limit", option.value);
+      {data.listProduct.length > 0 && (
+        <div className="display_Product">
+          <div className="flex items-center justify-center cursor-pointer gap-x-3">
+            <span
+              onClick={() => {
+                setShowProduct("list");
+                searchParams.set("show", "list");
                 setSearchParams(searchParams);
-                handleSetFilter({ limit: +option.value });
+                handleSetFilter({ limit: 10 });
               }}
-            />
-          ) : (
-            <span>{data.amountProductFound}</span>
-          )}
-          <span>/</span>
-          {isLoadingQuery ? (
-            <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
-          ) : (
-            <span className="font-semibold text-danger">
-              {data.amountProductFound}
+              className={cn(
+                `hover:text-orange`,
+                showProduct === "list" && "text-orange"
+              )}
+            >
+              <IconShowList size={25}></IconShowList>
             </span>
-          )}
-          <span> (sản phẩm)</span>
-        </div>
-        {resDeleted && resDeleted.amountProductFound > 0 && (
-          <div className="flex items-center justify-end gap-x-2">
-            <div className="flex items-center gap-x-1">
-              <span className="font-semibold">Thùng rác</span>(
-              {isFetching ? (
+            <span className="w-[2px] h-[25px] bg-gray"></span>
+            <span
+              onClick={() => {
+                setShowProduct("grid");
+                searchParams.set("show", "grid");
+                setSearchParams(searchParams);
+                handleSetFilter({ limit: 8 });
+              }}
+              className={cn(
+                `hover:text-orange`,
+                showProduct === "grid" && "text-orange"
+              )}
+            >
+              <IconShowGrid size={25}></IconShowGrid>
+            </span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <div className="flex items-center text-sm font-semibold text-end gap-x-2">
+              <span className="flex items-center gap-x-1">
+                <IconRightArrow size={10}></IconRightArrow>
+                <span>Hiện thị:</span>
+              </span>
+              {data.amountProductFound > 5 ? (
+                <Dropdown
+                  className={{
+                    wrap: "min-w-[50px]",
+                    select: "h-7 rounded-md text-dark",
+                    option: "min-w-[50px] text-center",
+                  }}
+                  title={"" + filter.limit}
+                  value={"" + filter.limit}
+                  options={
+                    showProduct === "list" ? optionLimitList : optionLimitGrid
+                  }
+                  handleSelect={(option) => {
+                    searchParams.set("limit", option.value);
+                    setSearchParams(searchParams);
+                    handleSetFilter({ limit: +option.value });
+                  }}
+                />
+              ) : (
+                <span>{data.amountProductFound}</span>
+              )}
+              <span>/</span>
+              {isLoadingQuery ? (
                 <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
               ) : (
-                <span className="flex font-semibold">
-                  <p className="text-danger">
-                    {resDeleted?.amountProductFound || 0}
-                  </p>
+                <span className="font-semibold text-danger">
+                  {data.amountProductFound}
                 </span>
               )}
-              )
+              <span> (sản phẩm)</span>
             </div>
-            <IconRightArrow size={10}></IconRightArrow>
-            <Link
-              to="/dashboard/product/restore"
-              className="flex items-center text-sm gap-x-1 text-blue hover:underline hover:text-orange"
-            >
-              <span>Khôi Phục</span>
-            </Link>
+            {resDeleted && resDeleted.amountProductFound > 0 && (
+              <div className="flex items-center justify-end gap-x-2">
+                <div className="flex items-center gap-x-1">
+                  <span className="font-semibold">Thùng rác</span>(
+                  {isFetching ? (
+                    <LoadingSpinner className="border-orange border-r-transparent"></LoadingSpinner>
+                  ) : (
+                    <span className="flex font-semibold">
+                      <p className="text-danger">
+                        {resDeleted?.amountProductFound || 0}
+                      </p>
+                    </span>
+                  )}
+                  )
+                </div>
+                <IconRightArrow size={10}></IconRightArrow>
+                <Link
+                  to="/dashboard/product/restore"
+                  className="flex items-center text-sm gap-x-1 text-blue hover:underline hover:text-orange"
+                >
+                  <span>Khôi Phục</span>
+                </Link>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

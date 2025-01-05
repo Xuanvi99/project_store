@@ -3,6 +3,16 @@ import { cn } from "@/utils";
 import { Link } from "react-router-dom";
 
 function Feature() {
+  // const { data, status } = useGetAllCategoryQuery();
+
+  // const [listFeatures, setListFeatures] = useState<ICategory[]>();
+
+  // useEffect(() => {
+  //   if (data && status === "fulfilled") {
+  //     setListFeatures(data.data);
+  //   }
+  // }, [data, status]);
+
   return (
     <section className="features-area w-full max-w-[1200px] px-[30px] bg-white p-4 mx-auto mt-10  rounded-md">
       <div className="container flex justify-between">

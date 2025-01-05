@@ -1,10 +1,11 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { cn } from "../../utils";
 
-type TTextAreaProps = {
+export type TTextAreaProps = {
   className?: string;
   textValue: string;
   handleChange: (value: string) => void;
+  maxHeight?: number;
 } & React.DetailedHTMLProps<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
   HTMLTextAreaElement
@@ -16,30 +17,34 @@ function TextArea({
   textValue,
   ...props
 }: TTextAreaProps) {
-  const [scrollTextArea, setScrollTextArea] = useState<"hidden" | "scroll">(
-    "hidden"
-  );
+  // const [scrollTextArea, setScrollTextArea] = useState<"hidden" | "scroll">(
+  //   "hidden"
+  // );
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleTextArea = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    handleChange(event.target.value);
-  };
-  useLayoutEffect(() => {
-    if (textAreaRef.current && textAreaRef.current.scrollHeight > 150) {
-      setScrollTextArea("scroll");
+  useEffect(() => {
+    const textArea = textAreaRef.current;
+    if (textArea) {
+      textArea.style.height = `36px`;
     }
-  }, [textValue]);
+  }, []);
 
   return (
     <textarea
       {...props}
       ref={textAreaRef}
       value={textValue}
-      onChange={(event) => handleTextArea(event)}
-      aria-required="true"
+      onChange={(event) => {
+        handleChange(event.target.value);
+        const textArea = textAreaRef.current;
+        if (textArea) {
+          console.log(textArea.scrollHeight);
+          textArea.style.height = `36px`;
+          textArea.style.height = `${textArea.scrollHeight}px`;
+        }
+      }}
       className={cn(
-        "w-full p-[10px] max-h-[150px] outline-none transition-all resize-none border-[1px] border-grayCa rounded-t ",
-        scrollTextArea === "hidden" ? "overflow-hidden" : "overflow-y-scroll",
+        "w-full outline-none transition-all resize-none rounded-xl",
         className
       )}
     />

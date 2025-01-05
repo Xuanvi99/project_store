@@ -3,15 +3,14 @@ import {
   UseControllerProps,
   useController,
 } from "react-hook-form";
-import { Input } from ".";
-import { IInputProps } from "../../types/InputType";
+import TextArea, { TTextAreaProps } from ".";
 
-type IInputFormProps = Omit<IInputProps, "ref">;
+type IInputFormProps = Omit<TTextAreaProps, "ref">;
 
 type Props<T extends FieldValues> = IInputFormProps & UseControllerProps<T>;
 
-const InputForm = <T extends FieldValues>(props: Props<T>) => {
-  const { type, name, control, children, onChange, onBlur, ...rest } = props;
+const TextAreaForm = <T extends FieldValues>(props: Props<T>) => {
+  const { name, control, children, onChange, onBlur, ...rest } = props;
 
   const { field } = useController<T>({
     control,
@@ -19,8 +18,7 @@ const InputForm = <T extends FieldValues>(props: Props<T>) => {
   });
 
   return (
-    <Input
-      type={type}
+    <TextArea
       {...field}
       {...rest}
       onBlur={(event) => {
@@ -37,8 +35,8 @@ const InputForm = <T extends FieldValues>(props: Props<T>) => {
       }}
     >
       {children}
-    </Input>
+    </TextArea>
   );
 };
 
-export default InputForm;
+export default TextAreaForm;

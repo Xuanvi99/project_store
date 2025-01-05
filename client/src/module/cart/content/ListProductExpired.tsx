@@ -1,5 +1,5 @@
 import useTestContext from "@/hook/useTestContext";
-import { CartContext, TCartProvider } from "../context.cart";
+import { CartContext, TCartProvider } from "../context";
 import CartItemExpired from "./CartItemExpired";
 import Modal from "@/components/modal";
 import { useState } from "react";

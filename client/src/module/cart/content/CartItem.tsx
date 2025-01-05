@@ -11,7 +11,7 @@ import { ICartItem } from "@/types/cart.type";
 import { cn, formatPrice } from "@/utils";
 import { debounce } from "lodash";
 import { useMemo, useRef, useState } from "react";
-import { CartContext, TCartProvider } from "../context.cart";
+import { CartContext, TCartProvider } from "../context";
 import { useNavigate } from "react-router-dom";
 import { useGetProductItemQuery } from "@/stores/service/product.service";
 import Modal from "@/components/modal";

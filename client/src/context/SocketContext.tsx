@@ -23,7 +23,7 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         transports: ["websocket"],
         withCredentials: true,
         auth: {
-          accessToken: accessToken,
+          id: user._id,
         },
       });
 

@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import Tooltip from "../../../components/tooltip/index";
 import PromotionDetail from "./PromotionDetail";
 import useTestContext from "@/hook/useTestContext";
-import { CartContext, TCartProvider } from "../context.cart";
+import { CartContext, TCartProvider } from "../context";
 import {
   useDeleteCartAllMutation,
   useDeleteCartMultipleMutation,

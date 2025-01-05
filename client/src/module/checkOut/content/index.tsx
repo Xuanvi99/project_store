@@ -5,12 +5,12 @@ import { RootState } from "@/stores";
 import { ICart } from "@/types/cart.type";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import OrderItem from "./OrderItem";
 import useTestContext from "@/hook/useTestContext";
 import { CheckoutContext, ICheckoutProvide } from "../context";
 import { IOrderItem } from "@/types/order.type";
 import TextArea from "@/components/textArea";
 import { formatPrice } from "@/utils";
+import OrderItem from "./OrderItem";
 
 type TSelectProductOrder = {
   id: string;

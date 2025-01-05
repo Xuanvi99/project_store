@@ -1,5 +1,5 @@
 import useTestContext from "@/hook/useTestContext";
-import { CartContext, TCartProvider } from "../context.cart";
+import { CartContext, TCartProvider } from "../context";
 import CartItem from "./CartItem";
 import { ICartItem } from "@/types/cart.type";
 import { Fragment } from "react";

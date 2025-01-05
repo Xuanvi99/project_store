@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { HeaderDashboard, Sidebar } from "../module/dashboard";
+import { Main, Sidebar } from "../module/dashboard";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../hook";
 import { RootState } from "@/stores";
@@ -30,19 +30,16 @@ function DashboardPage() {
   }, [handleLogin, navigate, pathname, user]);
 
   return (
-    <div className="w-full min-h-screen max-w-screen-2xl bg-light ">
-      <DashboardPage.Header></DashboardPage.Header>
-      <main className="min-h-[calc(100vh-80px)] content-page">
-        <DashboardPage.SideBar></DashboardPage.SideBar>
-        <section className="pt-[80px] min-h-full ml-auto w-[calc(100%-250px)] pb-10 ">
-          <Outlet></Outlet>
-        </section>
-      </main>
+    <div className="w-full min-h-screen max-w-screen-2xl bg-light">
+      <DashboardPage.SideBar></DashboardPage.SideBar>
+      <DashboardPage.Main>
+        <Outlet></Outlet>
+      </DashboardPage.Main>
     </div>
   );
 }
 
-DashboardPage.Header = HeaderDashboard;
+DashboardPage.Main = Main;
 DashboardPage.SideBar = Sidebar;
 
 export default DashboardPage;

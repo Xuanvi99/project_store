@@ -12,8 +12,26 @@ export const categoryApi = createApi({
         url: "category",
         method: "GET",
       }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(
+                ({ _id }) => ({ type: "Category", id: _id } as const)
+              ),
+              { type: "Category", id: "LIST" },
+            ]
+          : [{ type: "Category", id: "LIST" }],
+    }),
+    createBrandCategory: build.mutation<{ message: string }, FormData>({
+      query: (body) => ({
+        url: "category",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Category", id: "LIST" }],
     }),
   }),
 });
 
-export const { useGetAllCategoryQuery } = categoryApi;
+export const { useGetAllCategoryQuery, useCreateBrandCategoryMutation } =
+  categoryApi;

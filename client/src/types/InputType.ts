@@ -14,4 +14,5 @@ export interface IInputProps
   error?: boolean;
   children?: React.ReactNode;
   ref?: React.LegacyRef<HTMLInputElement>;
+  setInputRef?: (element: HTMLInputElement) => void;
 }

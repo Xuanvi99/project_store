@@ -5,7 +5,7 @@ import { cn } from "@/utils";
 
 type IProps = {
   children: React.ReactNode;
-  handleSelectPathname: (pathname: string) => string;
+  handleSelectPathname?: (pathname: string) => string;
 };
 
 function HeaderChildren({ children, handleSelectPathname }: IProps) {
@@ -15,7 +15,7 @@ function HeaderChildren({ children, handleSelectPathname }: IProps) {
 
   useEffect(() => {
     const handleScrollHeader = () => {
-      window.scrollY !== 0 ? setScroll(true) : setScroll(false);
+      window.scrollY > 10 ? setScroll(true) : setScroll(false);
     };
 
     window.addEventListener("scroll", () => handleScrollHeader());
@@ -28,13 +28,15 @@ function HeaderChildren({ children, handleSelectPathname }: IProps) {
   return (
     <header
       className={cn(
-        "fixed z-40 top-[80px] left-[250px] w-[calc(100%-250px)] flex items-center justify-between px-6 py-4 bg-white border-b-1 border-b-grayCa max-h-[60px] shadow-[5px_5px_10px_rgba(0,0,0,0.2)] transition-all",
+        "fixed z-40 top-[60px] left-[250px] w-[calc(100%-250px)] flex items-center justify-between px-6 py-4 bg-white border-b-1 border-b-grayCa max-h-[50px] shadow-sm transition-all",
         scroll ? "top-[0px]" : ""
       )}
     >
-      <h1 className="text-xl font-semibold">
-        {handleSelectPathname(pathname || "")}
-      </h1>
+      {handleSelectPathname && (
+        <h1 className="text-lg font-semibold">
+          {handleSelectPathname(pathname || "")}
+        </h1>
+      )}
       {children}
     </header>
   );

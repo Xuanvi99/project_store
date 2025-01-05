@@ -5,7 +5,7 @@ import { RootState } from "@/stores";
 import { useDeleteCartOneMutation } from "@/stores/service/cart.service";
 import { ICartItem } from "@/types/cart.type";
 import { cn, formatPrice } from "@/utils";
-import { CartContext, TCartProvider } from "../context.cart";
+import { CartContext, TCartProvider } from "../context";
 import { IProductRes } from "@/types/product.type";
 
 type TCartItemProps = {

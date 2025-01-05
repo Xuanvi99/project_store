@@ -1,15 +1,15 @@
 import { ModalNotification } from "@/components/modal";
 import useTestContext from "@/hook/useTestContext";
-import { CartContext, TCartProvider } from "./context.cart";
+import { CartContext, TCartProvider } from "./context";
 import { ProductSlideshow } from "@/components/product";
 import { useNavigate } from "react-router-dom";
 import LayoutMain from "@/layout/LayoutMain";
 import { Button } from "@/components/button";
-import Header from "./header.cart";
-import Content from "./content.cart";
-import Footer from "./footer.cart";
+import Header from "./header";
+import Content from "./content";
+import Footer from "./footer";
 
-function Container() {
+function CartContent() {
   const {
     openModal,
     handleOpenError,
@@ -63,4 +63,4 @@ const NoItemsToCart = () => {
     </LayoutMain>
   );
 };
-export default Container;
+export default CartContent;

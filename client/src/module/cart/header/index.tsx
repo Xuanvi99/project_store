@@ -1,6 +1,6 @@
 import { Input } from "@/components/input";
 import useTestContext from "@/hook/useTestContext";
-import { CartContext, TCartProvider } from "../context.cart";
+import { CartContext, TCartProvider } from "../context";
 
 function Header() {
   const { listProductActiveToCart, listCheckCart, handleCheckAllCart } =
