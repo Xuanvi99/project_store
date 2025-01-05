@@ -1,5 +1,4 @@
 const { userModel, tokenModel, cartModel, roomChatModel } = require("../model");
-
 const jwt = require("jsonwebtoken");
 const codeOTPModel = require("../model/codeOTP.model");
 class authController {
@@ -8,15 +7,24 @@ class authController {
       const { phone, password } = req.body;
       const newUser = new userModel({ phone, password });
       const result = await newUser.save();
+
       const newCart = new cartModel({
         userId: result._id,
       });
       await newCart.save();
+
+      const admin = await userModel.findOne({ role: "admin" }).lean();
+      const newRoomChat = new roomChatModel({
+        participants: [result._id, admin._id],
+      });
+      await newRoomChat.save();
+
       const accessToken = newUser.generateAccessToken();
       const refreshToken = newUser.generateRefreshToken();
       await tokenModel.saveToken(newUser, refreshToken);
       const { password: password1, __v, ...others } = newUser._doc;
-      res
+
+      return res
         .status(201)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
@@ -127,7 +135,7 @@ class authController {
   refreshToken = async (req, res) => {
     try {
       const refreshToken = req.cookies.refreshToken;
-      console.log("refreshToken: ", refreshToken);
+
       if (!refreshToken)
         return res
           .status(400)
@@ -159,10 +167,12 @@ class authController {
             .populate("avatar")
             .exec();
 
-          if (!user)
+          if (!user) {
             return res
               .status(401)
               .json({ errMessage: "refreshToken is not valid" });
+          }
+
           const newAccessToken = user.generateAccessToken();
           const newRefreshToken = user.generateRefreshToken();
           await tokenModel.saveToken(user, newRefreshToken);
@@ -177,7 +187,10 @@ class authController {
               sameSite: "strict",
               maxAge: 7 * 24 * 60 * 60 * 1000,
             })
-            .json({ user: others, accessToken: newAccessToken });
+            .json({
+              user: others,
+              accessToken: newAccessToken,
+            });
         }
       );
     } catch (error) {

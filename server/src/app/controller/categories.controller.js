@@ -9,6 +9,7 @@ class Category {
       if (categoryFound) {
         res.status(400).json({ errMessage: "Category already exist" });
       }
+
       const image = await imageModel.uploadSingleFile(file, "category");
 
       const listProduct = await productModel.find({ brand: body.name }).exec();
