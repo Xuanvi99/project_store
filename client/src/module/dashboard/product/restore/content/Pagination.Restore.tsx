@@ -1,5 +1,3 @@
-import useTestContext from "@/hook/useTestContext";
-import { IRestoreProductProvide, RestoreProductContext } from "../context";
 import { useToggle } from "@/hook";
 import { toast } from "react-toastify";
 import { Fragment } from "react";
@@ -8,6 +6,7 @@ import ReactPaginate from "react-paginate";
 import { IconChevronLeft, IconChevronRight } from "@/components/icon";
 import { useRestoreMultipleProductMutation } from "@/stores/service/product.service";
 import ModalVerify from "@/components/modal/ModalVerify";
+import useRestoreProductContext from "../context/useRestoreProductContext";
 
 function PaginationRestore() {
   const {
@@ -16,9 +15,7 @@ function PaginationRestore() {
     handleCheckAllProduct,
     listSelectProductId,
     setListSelectProductId,
-  } = useTestContext<IRestoreProductProvide>(
-    RestoreProductContext as React.Context<IRestoreProductProvide>
-  );
+  } = useRestoreProductContext();
 
   const { toggle: isOpenModal, handleToggle: handleOpenModal } = useToggle();
 

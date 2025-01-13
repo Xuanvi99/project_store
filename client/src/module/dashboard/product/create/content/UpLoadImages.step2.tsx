@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
-import { Button } from "../../../../../components/button";
-import useTestContext from "../../../../../hook/useTestContext";
-import { CreateProductContext, ICreateProductProvide } from "../context";
 import ImageUploading, { ImageListType } from "react-images-uploading";
-import IconUploadImage from "../../../../../components/icon/IconUploadImage";
-import { cn } from "../../../../../utils";
-import { IconRemoveBtn } from "../../../../../components/icon";
-import IconChevronRight from "../../../../../components/icon/IconChevronRight";
-import IconChevronLeft from "../../../../../components/icon/IconChevronLeft";
+import useCreateProductContext from "../context/useCreateProductContext";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconRemoveBtn,
+  IconUploadImage,
+} from "@/components/icon";
+import { cn } from "@/utils";
+import { Button } from "@/components/button";
 
 function UpLoadImages() {
   const { handleActiveStep, handleSetData, uploadImage, handleSaveStep2 } =
-    useTestContext<ICreateProductProvide>(
-      CreateProductContext as React.Context<ICreateProductProvide>
-    );
+    useCreateProductContext();
 
   const [thumbnail, setThumbnail] = useState<ImageListType>(
     uploadImage.thumbnail || []

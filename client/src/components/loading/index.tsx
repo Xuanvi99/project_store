@@ -12,21 +12,19 @@ export default function LoadingSpinner({ className }: { className?: string }) {
 
 export function LoadingCallApi({
   className,
-  size = 16,
 }: {
   className?: {
     wrap: string;
   };
-  size?: number;
 }) {
   return (
-    <div className={cn("flex justify-center w-full", className?.wrap)}>
-      <div className={`relative w-${size} h-${size}`}>
+    <div className={cn("flex justify-center w-full h-full", className?.wrap)}>
+      <div className={`relative w-full h-full`}>
         <div
-          className={`absolute inset-0 z-30 w-${size} h-${size} border-4 rounded-full border-grayCa`}
+          className={`absolute inset-0 z-30 w-full h-full border-4 rounded-full border-grayCa`}
         ></div>
         <LoadingSpinner
-          className={`absolute inset-0 z-40 w-${size} h-${size} border-4 border-r-orange border-l-transparent border-t-transparent border-b-transparent`}
+          className={`absolute inset-0 z-40 w-full h-full border-4 border-r-orange border-l-transparent border-t-transparent border-b-transparent`}
         ></LoadingSpinner>
       </div>
     </div>

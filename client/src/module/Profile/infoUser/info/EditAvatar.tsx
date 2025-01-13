@@ -8,6 +8,7 @@ import { Input } from "@/components/input";
 import { cn } from "@/utils";
 import { RootState } from "@/stores";
 import { useAppSelector } from "@/hook";
+import { toast } from "react-toastify";
 
 function EditAvatar() {
   const user = useAppSelector((state: RootState) => state.authSlice.user);
@@ -45,7 +46,14 @@ function EditAvatar() {
             const formData = new FormData();
             formData.append("avatar", file);
             if (user) {
-              await updateUser({ id: user._id, body: formData }).unwrap();
+              await updateUser({ id: user._id, body: formData })
+                .unwrap()
+                .then(() =>
+                  toast("Cập nhật avatar thành công", { type: "success" })
+                )
+                .catch(() =>
+                  toast("Cập nhật avatar thất bại", { type: "error" })
+                );
             }
           }
         },

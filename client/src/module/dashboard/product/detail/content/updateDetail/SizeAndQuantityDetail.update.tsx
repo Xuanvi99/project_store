@@ -3,8 +3,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useCallback, useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import * as Yup from "yup";
-import { DetailProductContext, IDetailProductProvide } from "../../context";
-import useTestContext from "@/hook/useTestContext";
 import { InputForm } from "@/components/input";
 import { IconDelete, IconError } from "@/components/icon";
 import { cn } from "@/utils";
@@ -13,14 +11,12 @@ import { toast } from "react-toastify";
 import ProductSizeAndQuantity from "../infoDetail/ProductSizeAndQuantity.info";
 import { useToggle } from "@/hook";
 import ModalVerify from "@/components/modal/ModalVerify";
+import useDetailProductContext from "../../context/useDetailProduct";
 
 type specs = { size: number; quantity: number };
 
 function SizeAndQuantityDetail() {
-  const { product, listProductItem, setShowTab } =
-    useTestContext<IDetailProductProvide>(
-      DetailProductContext as React.Context<IDetailProductProvide>
-    );
+  const { product, listProductItem, setShowTab } = useDetailProductContext();
 
   const [specs, setSpecs] = useState<specs[]>([{ size: 0, quantity: 0 }]);
 
@@ -236,7 +232,7 @@ function SizeAndQuantityDetail() {
       >
         <p className="mt-3 text-sm">
           Bạn có chắc chắn muốn cập nhật
-          <strong className="text-danger ml-1">size - số lượng</strong> sản phẩm
+          <strong className="ml-1 text-danger">size - số lượng</strong> sản phẩm
           ?
         </p>
       </ModalVerify>

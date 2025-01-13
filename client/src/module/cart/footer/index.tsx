@@ -230,31 +230,29 @@ function Footer() {
         </div>
         {listCheckCart.length > 0 ? (
           <Tooltip
-            place="top"
-            select={
-              <div className="flex flex-col justify-between gap-y-1">
-                <div ref={nodeRef} className="flex items-center gap-x-2">
-                  <span className="text-2xl text-red-600 ">
-                    {formatPrice(totalPrice - discount)}₫
-                  </span>
-                  <span className={isHover ? "rotate-0" : "rotate-180"}>
-                    <IconDown size={18}></IconDown>
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs gap-x-2">
-                  <span>Tiết kiệm</span>
-                  <span className={"text-red-600"}>
-                    {formatPrice(discount)}₫
-                  </span>
-                </div>
-              </div>
+            place="top-end"
+            title={
+              <PromotionDetail
+                totalPrice={totalPrice}
+                discount={discount}
+              ></PromotionDetail>
             }
-            className={{ select: "z-40", content: "-translate-x-3/4" }}
+            className={{ container: "z-40" }}
           >
-            <PromotionDetail
-              totalPrice={totalPrice}
-              discount={discount}
-            ></PromotionDetail>
+            <div className="flex flex-col justify-between gap-y-1">
+              <div ref={nodeRef} className="flex items-center gap-x-2">
+                <span className="text-2xl text-red-600 ">
+                  {formatPrice(totalPrice - discount)}₫
+                </span>
+                <span className={isHover ? "rotate-0" : "rotate-180"}>
+                  <IconDown size={18}></IconDown>
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs gap-x-2">
+                <span>Tiết kiệm</span>
+                <span className={"text-red-600"}>{formatPrice(discount)}₫</span>
+              </div>
+            </div>
           </Tooltip>
         ) : (
           <div className="text-2xl text-red-600 ">₫0</div>

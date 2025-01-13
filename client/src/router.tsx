@@ -160,7 +160,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard/message",
-        element: <Dashboard.Message></Dashboard.Message>,
+        element: <Dashboard.Chat></Dashboard.Chat>,
       },
     ],
   },

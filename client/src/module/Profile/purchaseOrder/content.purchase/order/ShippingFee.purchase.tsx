@@ -18,15 +18,17 @@ function ShippingFee({ data }: { data: IResOrder }) {
         {listProducts.length > 2 && (
           <Tooltip
             place="top"
-            select={<IconAlert size={20}></IconAlert>}
+            title={
+              <div className="min-w-[150px] h-10 text-xs text-center">
+                Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
+              </div>
+            }
             className={{
-              select: "z-40 text-danger",
+              container: "z-40 text-danger",
               content: "-translate-x-3/4",
             }}
           >
-            <div className="min-w-[150px] h-10 text-xs text-center">
-              Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
-            </div>
+            <IconAlert size={20}></IconAlert>
           </Tooltip>
         )}
       </span>

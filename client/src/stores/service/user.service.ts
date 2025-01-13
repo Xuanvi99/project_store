@@ -118,4 +118,5 @@ export const {
   useCheckPhoneOrEmailMutation,
   useVerifyPasswordMutation,
   useChangePasswordMutation,
+  useLazyGetProfileQuery,
 } = userApi;

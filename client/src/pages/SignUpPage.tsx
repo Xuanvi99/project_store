@@ -122,16 +122,17 @@ function SignUpPage() {
         </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col mt-5 gap-y-7"
+          className="flex flex-col mt-5 gap-y-5"
         >
           <Field variant="flex-col">
-            <Label htmlFor="phoneNumber"> Mật khẩu:</Label>
+            <Label htmlFor="phoneNumber">Số điện thoại:</Label>
             <InputForm
               control={control}
               type="text"
               name="phoneOrEmail"
               id="phoneOrEmail"
               placeholder="Nhập số..."
+              autoComplete="false"
               error={errors["phoneOrEmail"] ? true : false}
               className={{
                 input:
@@ -140,7 +141,9 @@ function SignUpPage() {
                     : "",
               }}
             />
-            <ErrorInput text={errors["phoneOrEmail"]?.message} />
+            <div className="h-4">
+              <ErrorInput text={errors["phoneOrEmail"]?.message} />
+            </div>
           </Field>
           <div className="w-full">
             <Button

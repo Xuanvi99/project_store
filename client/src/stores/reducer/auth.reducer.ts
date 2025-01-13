@@ -2,9 +2,9 @@ import { IUser } from "@/types/user.type";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 interface IPayload {
-  user: IUser | null;
-  accessToken: string;
-  isLogin: boolean;
+  user?: IUser | null;
+  accessToken?: string;
+  isLogin?: boolean;
 }
 
 const initialState: IPayload = {

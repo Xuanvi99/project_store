@@ -3,7 +3,6 @@ import { ErrorInput } from "@/components/error";
 import Field from "@/components/fields";
 import { InputForm } from "@/components/input";
 import { Label } from "@/components/label";
-import useTestContext from "@/hook/useTestContext";
 import { useGetAllCategoryQuery } from "@/stores/service/category.service";
 import { useRemoveWithImageUrlMutation } from "@/stores/service/image.service";
 import {
@@ -12,7 +11,6 @@ import {
 } from "@/stores/service/product.service";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as Yup from "yup";
-import { DetailProductContext, IDetailProductProvide } from "../../context";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "@/components/button";
@@ -22,8 +20,9 @@ import { cn, formatPrice } from "@/utils";
 import { toast } from "react-toastify";
 
 import { debounce } from "lodash";
-import ModalVerify from "../../../../../../components/modal/ModalVerify";
 import { useToggle } from "@/hook";
+import useDetailProductContext from "../../context/useDetailProduct";
+import ModalVerify from "@/components/modal/ModalVerify";
 
 interface BlobInfo {
   id: () => string;
@@ -71,9 +70,7 @@ type TBrandOptions = {
 type FormValues = Yup.InferType<typeof validationSchema>;
 
 function GeneralDetail() {
-  const { product, setShowTab } = useTestContext<IDetailProductProvide>(
-    DetailProductContext as React.Context<IDetailProductProvide>
-  );
+  const { product, setShowTab } = useDetailProductContext();
 
   const [brandOptions, setBrandOptions] = useState<TBrandOptions>([]);
   const [dataUpdate, setDataUpdate] = useState<FormValues | null>(null);
@@ -285,7 +282,7 @@ function GeneralDetail() {
       >
         <p className="mt-3 text-sm">
           Bạn có chắc chắn muốn cập nhật
-          <strong className="text-danger ml-1">thông tin</strong> sản phẩm ?
+          <strong className="ml-1 text-danger">thông tin</strong> sản phẩm ?
         </p>
       </ModalVerify>
       <form

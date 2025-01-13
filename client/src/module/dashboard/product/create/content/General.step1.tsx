@@ -2,9 +2,7 @@ import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { Editor } from "@tinymce/tinymce-react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { CreateProductContext, ICreateProductProvide } from "../context";
 import { useEffect, useState } from "react";
-import useTestContext from "@/hook/useTestContext";
 import { useRemoveWithImageUrlMutation } from "@/stores/service/image.service";
 import { useCheckNameMutation } from "@/stores/service/product.service";
 import { useGetAllCategoryQuery } from "@/stores/service/category.service";
@@ -18,6 +16,7 @@ import { IconChevronRight } from "@/components/icon";
 import { DropdownForm } from "@/components/dropdown";
 import { cn } from "@/utils";
 import ModalAddBrand from "./modal/ModalAddBrand";
+import useCreateProductContext from "../context/useCreateProductContext";
 
 interface BlobInfo {
   id: () => string;
@@ -49,10 +48,7 @@ const validationSchema = Yup.object({
 type FormValues = Yup.InferType<typeof validationSchema>;
 
 function General() {
-  const { data, handleActiveStep, handleSetData } =
-    useTestContext<ICreateProductProvide>(
-      CreateProductContext as React.Context<ICreateProductProvide>
-    );
+  const { data, handleActiveStep, handleSetData } = useCreateProductContext();
 
   const [removeWithImageUrl] = useRemoveWithImageUrlMutation();
   const [checkName] = useCheckNameMutation();
@@ -238,7 +234,7 @@ function General() {
           <Field variant="flex-col" className="basis-1/2 gap-y-2">
             <Label
               htmlFor="category"
-              className="font-semibold text-secondary flex gap-x-2 items-center"
+              className="flex items-center font-semibold text-secondary gap-x-2"
             >
               <span>
                 Thương hiệu<strong className="text-danger">*</strong>
@@ -314,9 +310,10 @@ function General() {
                 "visualblocks",
                 "accordion",
                 "table",
+                "emoticons",
               ],
               toolbar1:
-                "undo redo  | fontsizeinput  | bold italic underline strikethrough| backcolor forecolor | align bullist numlist |  link image table | charmap",
+                "undo redo  | fontsizeinput  | bold italic underline strikethrough| backcolor forecolor | align bullist numlist |  link image table | charmap emoticons",
               font_size_formats: "8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt",
               content_style:
                 "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",

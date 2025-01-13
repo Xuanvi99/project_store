@@ -1,10 +1,8 @@
-import useTestContext from "@/hook/useTestContext";
 import { debounce } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { IListProductProvide, ListProductContext } from "../context";
 import { Input } from "@/components/input";
-import { IconSearch } from "@/components/icon";
+import { IconSearch, IconShowGrid, IconShowList } from "@/components/icon";
 import {
   optionLimitGrid,
   optionLimitList,
@@ -18,8 +16,7 @@ import { IParamsFilterProductDashboard } from "@/types/product.type";
 import IconRightArrow from "@/components/icon/IconRightArrow";
 import { useGetListProductDeletedQuery } from "@/stores/service/product.service";
 import LoadingSpinner from "@/components/loading";
-import IconShowList from "../../../../../components/icon/IconShowList";
-import IconShowGrid from "../../../../../components/icon/IconShowGrid";
+import useListProductContext from "../context/useListProductContext";
 
 function ProductFilter() {
   const {
@@ -30,9 +27,7 @@ function ProductFilter() {
     setShowProduct,
     handleSetFilter,
     setScrollTop,
-  } = useTestContext<IListProductProvide>(
-    ListProductContext as React.Context<IListProductProvide>
-  );
+  } = useListProductContext();
 
   const filterRef = useRef<HTMLDivElement | null>(null);
 

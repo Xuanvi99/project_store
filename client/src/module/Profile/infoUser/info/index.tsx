@@ -1,10 +1,10 @@
 import { Fragment, useEffect } from "react";
-import FormUpdateInfo from "./FormUpdateInfo";
 import { useAppDispatch, useAppSelector } from "@/hook";
 import { useGetProfileQuery } from "@/stores/service/user.service";
-import { updateAuth } from "@/stores/reducer/authReducer";
+import { updateAuth } from "@/stores/reducer/auth.reducer";
 import Heading from "../../common/Heading";
 import { RootState } from "@/stores";
+import FormUpdateInfo from "./FormUpdateInfo";
 import EditAvatar from "./EditAvatar";
 
 function FormInfoUser() {
@@ -30,8 +30,8 @@ function FormInfoUser() {
           </p>
         </Heading>
         <div className="flex py-[30px]">
-          <FormUpdateInfo></FormUpdateInfo>
-          <EditAvatar></EditAvatar>
+          <FormUpdateInfo />
+          <EditAvatar />
         </div>
       </section>
     </Fragment>

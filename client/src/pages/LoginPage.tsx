@@ -14,8 +14,8 @@ import LayoutAuth from "../layout/LayoutAuth";
 import { useState } from "react";
 import { ModalNotification } from "../components/modal";
 import { useLoginMutation } from "../stores/service/auth.service";
-import { updateAuth } from "../stores/reducer/authReducer";
-import LoadingSpinner from "@/components/loading";
+import { updateAuth } from "../stores/reducer/auth.reducer";
+import { LoadingCallApi } from "@/components/loading";
 
 const validationSchema = Yup.object({
   phoneOrEmail: Yup.string()
@@ -142,30 +142,34 @@ function LoginPage() {
           </Field>
           <Link
             to={"/auth/forgot_password"}
-            className="inline text-sm font-semibold text-blue hover:text-orange"
+            className="text-sm font-semibold text-blue"
           >
-            Quên mật khẩu?
+            <span className="hover:text-orange">Quên mật khẩu?</span>
           </Link>
 
-          <div className="text-center">
-            <Button
-              disabled={
-                !Object.keys(errors).length &&
-                !!watch("phoneOrEmail") &&
-                !!watch("password")
-                  ? false
-                  : true
-              }
-              type="submit"
-              variant="default"
-            >
-              {isLoading ? (
-                <LoadingSpinner className="w-6 h-6 border-2 border-white rounded-full animate-spin border-r-transparent"></LoadingSpinner>
-              ) : (
-                "Đăng nhập"
-              )}
-            </Button>
-          </div>
+          {!isLoading ? (
+            <div className="text-center">
+              <Button
+                disabled={
+                  !Object.keys(errors).length &&
+                  !!watch("phoneOrEmail") &&
+                  !!watch("password")
+                    ? false
+                    : true
+                }
+                type="submit"
+                variant="default"
+              >
+                Đăng nhập
+              </Button>
+            </div>
+          ) : (
+            <div className="flex justify-center w-full">
+              <div className="w-10 h-10 ">
+                <LoadingCallApi />
+              </div>
+            </div>
+          )}
         </form>
         <div
           className={cn(

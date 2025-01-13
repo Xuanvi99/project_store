@@ -1,9 +1,9 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { userApi } from "../service/user.service";
-import authSlice from "./authReducer";
+import authSlice from "./auth.reducer";
 import { authApi } from "../service/auth.service";
 import { otpApi } from "../service/otp.service";
-import cartSlice from "./cartReducer";
+import cartSlice from "./cart.reducer";
 import { cartApi } from "../service/cart.service";
 import { addressApi } from "../service/address.service";
 import { imageApi } from "../service/image.service";
@@ -15,8 +15,8 @@ import { transportApi } from "../service/transport.service";
 import { vnpayApi } from "../service/vnpay.service";
 import { orderApi } from "../service/order.service";
 import { authGoogleApi } from "../service/authGoogle.service";
-import chatSlice from "./chatReducer";
-import { roomChatApi } from "../service/roomChat.service";
+import chatSlice from "./chat.reducer";
+import { roomChatApi } from "../service/chat.service";
 import { smsOtpApi } from "../service/sms.service";
 
 const rootReducer = combineReducers({

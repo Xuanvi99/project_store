@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --epr-emoji-size: 10;
+}
 @layer base {
   *,
   *::before,
@@ -12,6 +15,7 @@
     margin: 0;
     padding: 0;
   }
+
   @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap");
   body {
     font-family: "Roboto", sans-serif;
@@ -44,6 +48,16 @@
   }
   input[data-autocompleted] {
     background-color: transparent !important;
+  }
+
+  [contentEditable="true"] {
+    border: 1px solid grey;
+    outline-style: none;
+  }
+
+  [contentEditable="true"]:empty:before {
+    content: attr(aria-placeholder);
+    color: grey;
   }
 }
 
@@ -327,6 +341,19 @@
       opacity: 0;
       width: 0px;
       height: 0px;
+    }
+  }
+
+  .emojiPicker {
+    font-size: 14px;
+    .epr_-ucs3ns {
+      font-size: 14px;
+    }
+    .epr_-6npj90 {
+      --epr-emoji-size: 20px;
+      --epr-category-navigation-button-size: 20px;
+      --epr-horizontal-padding: 10px;
+      --epr-header-padding: 10px var(--epr-horizontal-padding);
     }
   }
 }

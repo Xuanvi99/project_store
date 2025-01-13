@@ -3,7 +3,7 @@ import { HeaderDashboard } from "./header";
 import * as Product from "./product";
 import * as Order from "./order";
 import Home from "./home";
-import Message from "./chat";
+import Chat from "./chat";
 import Comment from "./comment";
 import Inventory from "./inventory";
 
@@ -18,4 +18,4 @@ const Main = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export { Sidebar, Main, Home, Product, Order, Message, Comment, Inventory };
+export { Sidebar, Main, Home, Product, Order, Chat, Comment, Inventory };

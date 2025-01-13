@@ -146,16 +146,17 @@ function InfoOrder() {
                 </span>
                 {listProductOrder.length > 0 && quantityProductOrder > 1 && (
                   <Tooltip
-                    place="top"
-                    select={<IconAlert size={20}></IconAlert>}
+                    place="top-end"
+                    title={
+                      <div className="min-w-[150px] h-10 text-xs text-center">
+                        Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
+                      </div>
+                    }
                     className={{
-                      select: "z-40 text-danger",
-                      content: "-translate-x-3/4",
+                      container: "z-40 text-danger",
                     }}
                   >
-                    <div className="min-w-[150px] h-10 text-xs text-center">
-                      Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
-                    </div>
+                    <IconAlert size={20}></IconAlert>
                   </Tooltip>
                 )}
               </span>

@@ -3,7 +3,7 @@ import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 import type { BaseQueryFn, FetchArgs } from "@reduxjs/toolkit/query";
 import { Mutex } from "async-mutex";
 import { RootState } from "../stores";
-import { logOut, updateAuth } from "../stores/reducer/authReducer";
+import { logOut, updateAuth } from "./reducer/auth.reducer";
 import { IUser } from "@/types/user.type";
 
 type TResponsive = { user: IUser; accessToken: string };

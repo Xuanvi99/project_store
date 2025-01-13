@@ -3,17 +3,14 @@ import { IconCLose, IconExpand } from "@/components/icon";
 import Modal from "@/components/modal";
 import SlideSwiper from "@/components/slideshows";
 import { useToggle } from "@/hook";
-import useTestContext from "@/hook/useTestContext";
 import { cn } from "@/utils";
 import { useState } from "react";
 import { SwiperSlide } from "swiper/react";
-import { DetailProductContext, IDetailProductProvide } from "../../context";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import useDetailProductContext from "../../context/useDetailProduct";
 
 const ProductImages = () => {
-  const { product } = useTestContext<IDetailProductProvide>(
-    DetailProductContext as React.Context<IDetailProductProvide>
-  );
+  const { product } = useDetailProductContext();
 
   const { toggle: showModal, handleToggle: handleShowModal } = useToggle();
   const [slideSmallIndex, setSlideSmallIndex] = useState<number>(0);

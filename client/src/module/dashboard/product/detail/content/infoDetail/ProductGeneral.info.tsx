@@ -1,14 +1,11 @@
-import useTestContext from "@/hook/useTestContext";
-import { DetailProductContext, IDetailProductProvide } from "../../context";
 import { cn, formatPrice } from "@/utils";
 import { useEffect, useState } from "react";
 import { IconStar } from "@/components/icon";
 import { handleFormatStatusProduct } from "@/utils/product.utils";
+import useDetailProductContext from "../../context/useDetailProduct";
 
 function ProductGeneral() {
-  const { product } = useTestContext<IDetailProductProvide>(
-    DetailProductContext as React.Context<IDetailProductProvide>
-  );
+  const { product } = useDetailProductContext();
 
   const [star, setStar] = useState<string>("0");
 

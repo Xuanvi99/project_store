@@ -1,13 +1,10 @@
-import useTestContext from "@/hook/useTestContext";
-import { IListProductProvide, ListProductContext } from "../context";
 import { Fragment } from "react";
 import { ProductShowList } from "./productShow";
 import ProductShowGrid from "./productShow/ProductShowGrid";
+import useListProductContext from "../context/useListProductContext";
 
 function ProductContent() {
-  const { showProduct, data } = useTestContext<IListProductProvide>(
-    ListProductContext as React.Context<IListProductProvide>
-  );
+  const { showProduct, data } = useListProductContext();
 
   const selectShowProduct = (showProduct: "list" | "grid") => {
     switch (showProduct) {

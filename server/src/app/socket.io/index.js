@@ -1,58 +1,33 @@
-const { userModel, roomChatModel } = require("../model/index");
+const { userModel, conversationModel } = require("../model/index");
 class SocketIoService {
+  constructor() {
+    this.userSocketMap = {};
+  }
+
+  getUserSocketMap = (receiverId) => {
+    return this.userSocketMap[receiverId];
+  };
+
   connect = async (socket) => {
-    const id = socket.handshake.auth.id;
-
     console.log("Client connected " + socket.id);
+    const userId = socket.handshake.auth.id;
 
-    const user = await userModel.findById(id);
-    const admin = await userModel.findOne({ role: "admin" }).lean();
+    const user = await userModel.findById(userId);
 
-    let roomChat = "";
-    if (id && user && user.role === "buyer") {
-      roomChat = await roomChatModel
-        .findOne({
-          participants: { $in: [user._id] },
-        })
-        .lean();
-
-      if (!roomChat) {
-        const admin = await userModel.findOne({ role: "admin" }).lean();
-        const newRoom = new roomChatModel({
-          participants: [user._id, admin._id],
-        });
-        roomChat = await newRoom.save();
-      }
+    if (user) {
+      this.userSocketMap[userId] = socket.id;
+      await userModel.findByIdAndUpdate(userId, { status: "online" });
     }
 
-    if (id === admin._id.toString()) socket.join(admin._id.toString());
-
-    const listRoomChat = await roomChatModel
-      .find({ totalMessage: { $gte: 0 } })
-      .sort({ updateAt: -1 })
-      .populate({ path: "participants" });
-    _io.to(admin._id.toString()).emit("listRoomChat", listRoomChat);
-
-    socket.on("user_online", (data) => console.log(data));
-
-    socket.emit("getListUser", () => {});
-
-    socket.on("send_message", (data) => {
-      console.log("data: ", data);
-    });
+    _io.emit("getOnlineUsers", Object.keys(this.userSocketMap));
 
     socket.on("disconnect", async () => {
       const time = new Date();
       const updateUser = { status: "offline", timeOffline: time };
-      const result = await userModel.findByIdAndUpdate(id, updateUser);
-      if (result) {
-        const listRoomChat = await roomChatModel
-          .find({ totalMessage: { $gte: 0 } })
-          .sort({ updateAt: -1 })
-          .populate({ path: "participants" });
-        _io.to(admin._id.toString()).emit("listRoomChat", listRoomChat);
-      }
-      console.log("Client disconnected");
+      await userModel.findByIdAndUpdate(userId, updateUser);
+      console.log("Client disconnected", socket.id);
+      delete this.userSocketMap[userId];
+      _io.emit("getOnlineUsers", Object.keys(this.userSocketMap));
     });
   };
 }

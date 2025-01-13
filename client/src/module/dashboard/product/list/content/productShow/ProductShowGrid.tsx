@@ -1,14 +1,11 @@
-import useTestContext from "@/hook/useTestContext";
-import { IListProductProvide, ListProductContext } from "../../context";
 import { cn } from "@/utils";
 import PaginationListProduct from "../Pagination";
 import ProductItemGrid from "../productItem/ProductItemGrid";
 import { ProductItemGridSkeleton } from "../productSkeleton";
+import useListProductContext from "../../context/useListProductContext";
 
 function ProductShowGrid() {
-  const { data, statusQuery, filter } = useTestContext<IListProductProvide>(
-    ListProductContext as React.Context<IListProductProvide>
-  );
+  const { data, statusQuery, filter } = useListProductContext();
   return (
     <div className={cn("w-full mt-5 product_grid")}>
       {statusQuery === "pending" && (

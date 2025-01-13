@@ -3,17 +3,29 @@ import { cn } from "@/utils";
 import { useRef } from "react";
 
 type THoverDropdownProps = {
-  select: React.ReactNode;
+  title: React.ReactNode;
   children: React.ReactNode;
   className?: {
-    select?: string;
+    container?: string;
     content?: string;
   };
-  place: "top" | "bottom" | "left" | "right";
+  place:
+    | "top"
+    | "top-start"
+    | "top-end"
+    | "bottom"
+    | "bottom-start"
+    | "bottom-end"
+    | "left"
+    | "left-start"
+    | "left-end"
+    | "right"
+    | "right-start"
+    | "right-end";
   onClick?: () => void;
 };
 const Tooltip = ({
-  select,
+  title,
   children,
   className,
   onClick,
@@ -26,32 +38,80 @@ const Tooltip = ({
     switch (place) {
       case "top":
         return {
-          select:
-            " before:absolute before:hoverDropdown before:-top-[15px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-t-orange",
           content: "bottom-[calc(100%+15px)] left-1/2 -translate-x-1/2",
+          arrow:
+            "before:absolute before:hoverDropdown before:-top-[15px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-t-orange",
+        };
+      case "top-start":
+        return {
+          content: "bottom-[calc(100%+15px)] -left-5",
+          arrow:
+            "before:absolute before:hoverDropdown before:-top-[15px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-t-orange",
+        };
+      case "top-end":
+        return {
+          content: "bottom-[calc(100%+15px)] -right-5",
+          arrow:
+            "before:absolute before:hoverDropdown before:-top-[15px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-t-orange",
         };
 
       case "bottom":
         return {
-          select:
-            "before:absolute before:hoverDropdown before:-bottom-[15px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-t-transparent before:border-[15px] before:border-b-orange ",
           content: "top-[calc(100%+15px)] left-1/2 -translate-x-1/2",
+          arrow:
+            "before:absolute before:hoverDropdown before:-bottom-[15px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-t-transparent before:border-[15px] before:border-b-orange ",
+        };
+
+      case "bottom-start":
+        return {
+          content: "top-[calc(100%+15px)] -left-5",
+          arrow:
+            "before:absolute before:hoverDropdown before:-bottom-[15px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-t-transparent before:border-[15px] before:border-b-orange ",
+        };
+      case "bottom-end":
+        return {
+          content: "top-[calc(100%+15px)] -right-5",
+          arrow:
+            "before:absolute before:hoverDropdown before:-bottom-[15px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-t-transparent before:border-[15px] before:border-b-orange ",
         };
 
       case "left":
         return {
-          select:
-            "before:absolute before:hoverDropdown before:-left-[20%] before:top-1/2 before:-translate-y-1/2 before:border-t-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-l-orange",
           content: "right-[calc(100%+10px)] top-1/2 -translate-y-1/2",
+          arrow:
+            "before:absolute before:hoverDropdown before:-left-[20%] before:top-1/2 before:-translate-y-1/2 before:border-t-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-l-orange",
+        };
+      case "left-start":
+        return {
+          content: "right-[calc(100%+10px)] -top-5",
+          arrow:
+            "before:absolute before:hoverDropdown before:-left-[20%] before:top-1/2 before:-translate-y-1/2 before:border-t-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-l-orange",
+        };
+      case "left-end":
+        return {
+          content: "right-[calc(100%+10px)] -bottom-5",
+          arrow:
+            "before:absolute before:hoverDropdown before:-left-[20%] before:top-1/2 before:-translate-y-1/2 before:border-t-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-l-orange",
         };
 
       case "right":
         return {
-          select:
-            "before:absolute before:hoverDropdown before:-right-[20%] before:top-1/2 before:-translate-y-1/2 before:border-t-transparent before:border-l-transparent before:border-b-transparent before:border-[15px] before:border-r-orange",
           content: "left-[calc(100%+10px)] top-1/2 -translate-y-1/2",
+          arrow:
+            "before:absolute before:hoverDropdown before:-right-[20%] before:top-1/2 before:-translate-y-1/2 before:border-t-transparent before:border-l-transparent before:border-b-transparent before:border-[15px] before:border-r-orange",
         };
-
+      case "right-start":
+        return {
+          content: "left-[calc(100%+10px)] -top-5",
+          arrow:
+            "before:absolute before:hoverDropdown before:-right-[20%] before:top-1/2 before:-translate-y-1/2 before:border-t-transparent before:border-l-transparent before:border-b-transparent before:border-[15px] before:border-r-orange",
+        };
+      case "right-end":
+        return {
+          content: "left-[calc(100%+10px)] -bottom-5",
+          arrow:
+            "before:absolute before:hoverDropdown before:-right-[20%] before:top-1/2 before:-translate-y-1/2 before:border-t-transparent before:border-l-transparent before:border-b-transparent before:border-[15px] before:border-r-orange",
+        };
       default:
         break;
     }
@@ -61,26 +121,30 @@ const Tooltip = ({
     <div
       onClick={onClick}
       className={cn(
-        "relative px-2 transition-all cursor-pointer",
-        isHover && selectCssPlace(place)?.select,
-        className?.select
+        "relative transition-all cursor-pointer ",
+        className?.container
       )}
       ref={nodeRef}
     >
-      {select}
       {isHover && (
         <div
           className={cn(
-            "absolute transition-all border-2 rounded-lg z-50 hoverDropdown",
-            "border-orange bg-white shadow-shadowButton",
-            "flex flex-col p-2 gap-y-2",
+            "absolute transition-all border-1 rounded-lg z-40 hoverDropdown shadow-shadowButton",
+            "flex flex-col p-2 gap-y-2 border-orange bg-white",
             selectCssPlace(place)?.content,
             className?.content
           )}
         >
-          {children}
+          {title}
         </div>
       )}
+      {isHover && (
+        <div
+          className={cn("arrow before:z-50", selectCssPlace(place)?.arrow)}
+        ></div>
+      )}
+      {}
+      {children}
     </div>
   );
 };

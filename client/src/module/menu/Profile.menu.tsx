@@ -4,8 +4,8 @@ import { IconUser } from "@/components/icon";
 import { useLogOutAuthMutation } from "@/stores/service/auth.service";
 import { useAppDispatch, useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
-import { logOut } from "@/stores/reducer/authReducer";
-import { updateCart } from "@/stores/reducer/cartReducer";
+import { logOut } from "@/stores/reducer/auth.reducer";
+import { updateCart } from "@/stores/reducer/cart.reducer";
 import Tooltip from "@/components/tooltip";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
@@ -53,64 +53,66 @@ function Profile({ displayName }: TProps) {
         </div>
       ) : (
         <Tooltip
-          place="bottom"
-          select={
-            <div className="flex items-center h-9 tex-sm gap-x-3">
-              <span className="overflow-hidden rounded-full w-9 h-9">
-                {user && (
-                  <LazyLoadImage
-                    alt="avatar"
-                    placeholderSrc={user?.avatar?.url || user?.avatarDefault}
-                    srcSet={user?.avatar?.url || user?.avatarDefault}
-                    effect="blur"
-                    className="duration-500 "
-                  />
+          place="bottom-end"
+          title={
+            <>
+              <div className="flex text-xs text-slate-400 gap-x-2">
+                <span>
+                  <IconUser size={12}></IconUser>:
+                </span>
+                <span>{user?.userName}</span>
+              </div>
+              <div className="flex flex-col gap-y-5">
+                <Link
+                  to={"/user/account/profile"}
+                  className="inline-block whitespace-nowrap hover:text-orange"
+                >
+                  Tài khoản
+                </Link>
+                <Link
+                  to={"/user/account/purchaseOrder"}
+                  className="inline-block whitespace-nowrap hover:text-orange"
+                >
+                  Đơn mua
+                </Link>
+                {user?.role === "admin" && (
+                  <Link
+                    to={"/dashboard/home"}
+                    className="inline-block whitespace-nowrap hover:text-orange"
+                  >
+                    Quản lí Store
+                  </Link>
                 )}
-              </span>
-              {displayName && (
-                <div className="flex flex-col items-center justify-center text-sm">
-                  <span className="font-semibold">{user?.userName}</span>
-                  <span className="text-xs text-slate-600">
-                    {user?.role === "admin" ? "Quản lí" : ""}
-                  </span>
-                </div>
-              )}
-            </div>
+                <Button type="button" variant="outLine" onClick={handleLogOut}>
+                  Đăng xuất
+                </Button>
+              </div>
+            </>
           }
           className={{
-            content: "w-[200px] -translate-x-3/4",
+            content: "w-[200px]",
           }}
         >
-          <div className="flex text-xs text-slate-400 gap-x-2">
-            <span>
-              <IconUser size={12}></IconUser>:
+          <div className="flex items-center h-9 tex-sm gap-x-3 ">
+            <span className="overflow-hidden rounded-full w-9 h-9">
+              {user && (
+                <LazyLoadImage
+                  alt="avatar"
+                  placeholderSrc={user?.avatar?.url || user?.avatarDefault}
+                  srcSet={user?.avatar?.url || user?.avatarDefault}
+                  effect="blur"
+                  className="duration-500 "
+                />
+              )}
             </span>
-            <span>{user?.userName}</span>
-          </div>
-          <div className="flex flex-col gap-y-5">
-            <Link
-              to={"/user/account/profile"}
-              className="inline-block whitespace-nowrap hover:text-orange"
-            >
-              Tài khoản
-            </Link>
-            <Link
-              to={"/user/account/purchaseOrder"}
-              className="inline-block whitespace-nowrap hover:text-orange"
-            >
-              Đơn mua
-            </Link>
-            {user?.role === "admin" && (
-              <Link
-                to={"/dashboard/home"}
-                className="inline-block whitespace-nowrap hover:text-orange"
-              >
-                Quản lí Store
-              </Link>
+            {displayName && (
+              <div className="flex flex-col items-center justify-center text-sm">
+                <span className="font-semibold">{user?.userName}</span>
+                <span className="text-xs text-slate-600">
+                  {user?.role === "admin" ? "Quản lí" : ""}
+                </span>
+              </div>
             )}
-            <Button type="button" variant="outLine" onClick={handleLogOut}>
-              Đăng xuất
-            </Button>
           </div>
         </Tooltip>
       )}

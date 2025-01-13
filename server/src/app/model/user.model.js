@@ -7,7 +7,11 @@ const UserSchema = new Schema(
   {
     userName: {
       type: String,
-      default: "user" + Math.floor(Math.random() * 100000),
+      default: () => {
+        const number = Math.floor(Math.random() * 100000);
+        console.log("number: ", number);
+        return "user" + number;
+      },
       max: [16, "max length 16"],
     },
     phone: { type: String, default: "" },

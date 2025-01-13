@@ -1,10 +1,9 @@
 import { Input } from "@/components/input";
 import { cn } from "@/utils";
-import useTestContext from "@/hook/useTestContext";
-import { IListProductProvide, ListProductContext } from "../../context";
 import PaginationListProduct from "../Pagination";
 import { ProductItemList } from "../productItem";
 import { ProductItemListSkeleton } from "../productSkeleton";
+import useListProductContext from "../../context/useListProductContext";
 
 function ProductShowList() {
   const {
@@ -14,9 +13,7 @@ function ProductShowList() {
     listSelectProductId,
     setListSelectProductId,
     handleCheckAllProduct,
-  } = useTestContext<IListProductProvide>(
-    ListProductContext as React.Context<IListProductProvide>
-  );
+  } = useListProductContext();
 
   const handleCheckOneProduct = (checked: boolean, id: string) => {
     const listSelectProductIdCopy = [...listSelectProductId];

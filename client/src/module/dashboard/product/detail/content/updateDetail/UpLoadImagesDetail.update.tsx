@@ -1,10 +1,8 @@
 import { Button } from "@/components/button";
 import { IconRemoveBtn, IconRestore, IconUploadImage } from "@/components/icon";
-import useTestContext from "@/hook/useTestContext";
 import { cn } from "@/utils";
 import { useEffect, useState } from "react";
 import ImageUploading, { ImageListType } from "react-images-uploading";
-import { DetailProductContext, IDetailProductProvide } from "../../context";
 import { IImage } from "@/types/commonType";
 import { toast } from "react-toastify";
 import { useUpdateThumbnailAndImagesProductMutation } from "@/stores/service/product.service";
@@ -13,9 +11,7 @@ import { useToggle } from "@/hook";
 import ModalVerify from "@/components/modal/ModalVerify";
 
 function UpLoadImagesDetail() {
-  const { product, setShowTab } = useTestContext<IDetailProductProvide>(
-    DetailProductContext as React.Context<IDetailProductProvide>
-  );
+  const { product, setShowTab } = useDetailProductContext();
 
   const { toggle: isOpenModal, handleToggle: handleOpenModal } = useToggle();
 
@@ -150,7 +146,7 @@ function UpLoadImagesDetail() {
       >
         <p className="mt-3 text-sm">
           Bạn có chắc chắn muốn cập nhật
-          <strong className="text-danger ml-1">hình ảnh</strong> sản phẩm ?
+          <strong className="ml-1 text-danger">hình ảnh</strong> sản phẩm ?
         </p>
       </ModalVerify>
       <div className="p-5 bg-white shadow-shadow1">

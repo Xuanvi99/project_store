@@ -1,7 +1,7 @@
 import Conversation from "@/components/Chat/conversation";
 import HeaderView from "./header";
 
-function ViewChat() {
+function ViewConversation() {
   return (
     <div className="flex flex-col w-full overflow-hidden bg-white rounded-md basis-2/3">
       <HeaderView></HeaderView>
@@ -10,4 +10,4 @@ function ViewChat() {
   );
 }
 
-export default ViewChat;
+export default ViewConversation;

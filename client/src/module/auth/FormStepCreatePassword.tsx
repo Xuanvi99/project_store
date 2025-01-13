@@ -20,7 +20,7 @@ function FormStepCreatePassword({
   redirectUrl,
 }: TProps) {
   const [activeForm, setActiveForm] = useState<"1" | "2" | "3">(
-    indexForm ? indexForm : "1"
+    indexForm ? indexForm : "2"
   );
   const handleActiveForm = (form: "1" | "2" | "3") => {
     setActiveForm(form);

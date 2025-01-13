@@ -1,14 +1,10 @@
-import useTestContext from "@/hook/useTestContext";
-import { CreateProductContext, ICreateProductProvide } from "../context";
 import { Button } from "@/components/button";
+import useCreateProductContext from "../context/useCreateProductContext";
 
 const listProgress = ["Tổng quan", "Hình ảnh sản phẩm", "Size - Số lượng"];
 
 function Progress() {
-  const { activeStep, handleActiveStep } =
-    useTestContext<ICreateProductProvide>(
-      CreateProductContext as React.Context<ICreateProductProvide>
-    );
+  const { activeStep, handleActiveStep } = useCreateProductContext();
 
   return (
     <div className="flex w-full gap-x-6">

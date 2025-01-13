@@ -5,11 +5,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { InputForm } from "@/components/input";
 import { IconChevronLeft, IconDelete } from "@/components/icon";
 import { Button } from "@/components/button";
-import useTestContext from "@/hook/useTestContext";
 import Modal from "@/components/modal";
 import LoadingSpinner from "@/components/loading";
-import { CreateProductContext, ICreateProductProvide } from "../context";
 import { cn } from "@/utils";
+import useCreateProductContext from "../context/useCreateProductContext";
 
 function SizeAndQuantity() {
   const {
@@ -21,9 +20,7 @@ function SizeAndQuantity() {
     handleSetData,
     handleSaveStep3,
     handleSubmitProduct,
-  } = useTestContext<ICreateProductProvide>(
-    CreateProductContext as React.Context<ICreateProductProvide>
-  );
+  } = useCreateProductContext();
 
   const [watchData, setWatchData] = useState<
     { size: number; quantity: number }[]
@@ -213,7 +210,7 @@ function SizeAndQuantity() {
         <div className="flex justify-center mt-10">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col p-5 gap-y-5 border-2 border-grayCa rounded-md"
+            className="flex flex-col p-5 border-2 rounded-md gap-y-5 border-grayCa"
           >
             <h1 className="text-xl font-semibold text-center">
               Bảng Size - Số lượng

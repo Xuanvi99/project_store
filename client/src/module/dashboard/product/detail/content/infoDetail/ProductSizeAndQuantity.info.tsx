@@ -1,11 +1,8 @@
-import useTestContext from "@/hook/useTestContext";
-import { DetailProductContext, IDetailProductProvide } from "../../context";
 import { cn } from "@/utils";
+import useDetailProductContext from "../../context/useDetailProduct";
 
 function ProductSizeAndQuantity() {
-  const { listProductItem } = useTestContext<IDetailProductProvide>(
-    DetailProductContext as React.Context<IDetailProductProvide>
-  );
+  const { listProductItem } = useDetailProductContext();
   return (
     <div className="flex flex-col mt-5 gap-y-3">
       <span className="text-sm font-semibold">Chi tiết Size - Số lượng:</span>

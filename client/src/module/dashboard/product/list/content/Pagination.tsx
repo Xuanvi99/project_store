@@ -1,7 +1,5 @@
 import { IconChevronLeft, IconChevronRight } from "@/components/icon";
-import useTestContext from "@/hook/useTestContext";
 import ReactPaginate from "react-paginate";
-import { IListProductProvide, ListProductContext } from "../context";
 import { Input } from "@/components/input";
 import { useDeleteMultipleProductMutation } from "@/stores/service/product.service";
 import { useAppSelector, useToggle } from "@/hook";
@@ -10,6 +8,7 @@ import { toast } from "react-toastify";
 import ModalDeleteProduct from "./ModalDeleteProduct";
 import { Fragment, useState } from "react";
 import { cn } from "@/utils";
+import useListProductContext from "../context/useListProductContext";
 
 function PaginationListProduct() {
   const {
@@ -21,9 +20,7 @@ function PaginationListProduct() {
     listSelectProductId,
     setListSelectProductId,
     scrollTop,
-  } = useTestContext<IListProductProvide>(
-    ListProductContext as React.Context<IListProductProvide>
-  );
+  } = useListProductContext();
 
   const user = useAppSelector((state: RootState) => state.authSlice.user);
 

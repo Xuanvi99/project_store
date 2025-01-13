@@ -1,4 +1,4 @@
-const { userModel, tokenModel, cartModel, roomChatModel } = require("../model");
+const { userModel, tokenModel, cartModel } = require("../model");
 const jwt = require("jsonwebtoken");
 const codeOTPModel = require("../model/codeOTP.model");
 class authController {
@@ -12,12 +12,6 @@ class authController {
         userId: result._id,
       });
       await newCart.save();
-
-      const admin = await userModel.findOne({ role: "admin" }).lean();
-      const newRoomChat = new roomChatModel({
-        participants: [result._id, admin._id],
-      });
-      await newRoomChat.save();
 
       const accessToken = newUser.generateAccessToken();
       const refreshToken = newUser.generateRefreshToken();

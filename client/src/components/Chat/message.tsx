@@ -50,7 +50,7 @@ const selectMessageComponent = (props: TProps) => {
 
       <div
         className={cn(
-          "max-w-[70%] min-w-[20%] bg-white text-black px-[10px] py-1 text-[14px] rounded-lg flex flex-col relative"
+          "max-w-[70%] min-w-[20%] bg-grayE5 text-black px-[10px] py-1 text-[14px] rounded-lg flex flex-col relative"
         )}
       >
         <span className="text-start">{message.text}</span>

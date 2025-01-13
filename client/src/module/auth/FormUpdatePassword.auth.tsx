@@ -12,7 +12,8 @@ import {
   useRegisterMutation,
   useUpdatePasswordMutation,
 } from "../../stores/service/auth.service";
-import { updateAuth } from "../../stores/reducer/authReducer";
+import { updateAuth } from "../../stores/reducer/auth.reducer";
+import { toast } from "react-toastify";
 
 type TProps = {
   account: string;
@@ -65,7 +66,11 @@ function FormUpdatePassword({
           if (res.user) {
             dispatch(updateAuth({ ...res, isLogin: true }));
             handleActiveForm("3");
+            toast("Đăng ký thành công", { type: "success" });
           }
+        })
+        .catch(() => {
+          toast("Đăng ký thất bại", { type: "error" });
         });
     } else {
       await updatePassword({

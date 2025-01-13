@@ -31,15 +31,17 @@ function HeaderPurchase({
                 <span>Giao hàng thành công</span>
                 <Tooltip
                   place="bottom"
-                  select={<IconAlert size={15}></IconAlert>}
+                  title={
+                    <div className="min-w-[150px] h-10 text-xs text-center">
+                      Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
+                    </div>
+                  }
                   className={{
-                    select: "z-40 text-gray",
+                    container: "z-40 text-gray",
                     content: "-translate-x-3/4",
                   }}
                 >
-                  <div className="min-w-[150px] h-10 text-xs text-center">
-                    Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
-                  </div>
+                  <IconAlert size={15}></IconAlert>
                 </Tooltip>
               </div>
             </div>

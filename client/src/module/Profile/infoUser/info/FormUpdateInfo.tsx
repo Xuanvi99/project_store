@@ -12,7 +12,6 @@ import LoadingSpinner from "@/components/loading";
 import { useUpdateUserMutation } from "@/stores/service/user.service";
 import { Fragment, useEffect, useState } from "react";
 import { ModalNotification } from "@/components/modal";
-import { IconError, IconSuccess } from "@/components/icon";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
 
@@ -118,17 +117,7 @@ function FormUpdateInfo() {
         onClick={handleOpenModal}
       >
         <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
-          <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
           <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
-            {isSuccess && (
-              <span className={`${isSuccess ? "text-green" : "text-danger"}`}>
-                {isSuccess ? (
-                  <IconSuccess size={50}></IconSuccess>
-                ) : (
-                  <IconError size={50}></IconError>
-                )}
-              </span>
-            )}
             <span className="text-center">
               {isSuccess ? (
                 <p>Cập nhật thành công</p>

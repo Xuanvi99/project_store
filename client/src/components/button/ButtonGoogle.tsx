@@ -2,7 +2,7 @@ import { Button } from ".";
 import { cn } from "../../utils";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAppDispatch } from "../../hook";
-import { updateAuth } from "../../stores/reducer/authReducer";
+import { updateAuth } from "../../stores/reducer/auth.reducer";
 import { useNavigate } from "react-router-dom";
 import {
   useLazyGetInfoAuthGoogleQuery,

@@ -1,6 +1,9 @@
 import { Button } from "@/components/button";
 import { IconDown, IconSendMessage } from "@/components/icon";
-import { SocketContext, TSocketProvider } from "@/context/SocketContext";
+import {
+  SocketContext,
+  TSocketProvider,
+} from "@/context/socketIo/SocketContext";
 import useTestContext from "@/hook/useTestContext";
 import { cn } from "@/utils";
 import TextareaAutosize from "react-textarea-autosize";
@@ -13,6 +16,9 @@ import {
 } from "react";
 import { LoadingCallApi } from "@/components/loading";
 import Message from "./message";
+import EmojiPicker, { Categories } from "emoji-picker-react";
+import Tooltip from "../tooltip";
+import { useToggle } from "@/hook";
 
 function Conversation() {
   const socketIo_client = useTestContext<TSocketProvider>(
@@ -24,6 +30,9 @@ function Conversation() {
   const loadingRef = useRef<HTMLDivElement>(null);
 
   const messageItemRef = useRef<Record<string, HTMLDivElement>>({});
+
+  const { toggle: openEmojiPicker, handleToggle: handleOpenEmojiPicker } =
+    useToggle();
 
   const [conversationHeight, setConversationHeight] = useState<number>(0);
 
@@ -171,10 +180,10 @@ function Conversation() {
   };
 
   return (
-    <div className="conversation flex flex-col justify-end w-full h-full overflow-hidden">
+    <div className="flex flex-col justify-end w-full h-full conversation ">
       <div
         ref={containerRef}
-        className="message_list flex flex-col px-3 py-3 overflow-y-scroll gap-y-1  bg-grayF5 h-full"
+        className="flex flex-col h-full px-3 py-3 overflow-y-scroll bg-white message_list gap-y-1"
       >
         {openLoading && (
           <div ref={loadingRef} className={cn("w-full max-h-7")}>
@@ -183,10 +192,12 @@ function Conversation() {
         )}
         {handleRenderConversations()}
       </div>
-      <div className="relative mt-auto bg-white border-t-1 min-h-auto border-t-orange">
-        <div className="relative flex flex-col w-full h-full p-3 bg-white z-50">
-          <div className="flex items-end gap-x-2">
-            <div className="w-full border-1 h-full p-2 border-gray rounded-xl flex items-center">
+      <div className="relative mt-auto bg-white min-h-auto ">
+        <div className="relative z-50 flex flex-col w-full h-full p-3 bg-white">
+          <div className="flex items-center gap-x-2">
+            <div
+              className={cn("w-full p-2 rounded-xl flex bg-grayE5 items-end")}
+            >
               <TextareaAutosize
                 autoFocus
                 minRows={1}
@@ -194,8 +205,93 @@ function Conversation() {
                 placeholder="Nhập nội dung tin nhắn"
                 value={textMessage}
                 onChange={handleChangeMessage}
-                className="outline-none w-full resize-none text-sm"
+                className="w-full text-sm outline-none resize-none bg-grayE5"
               />
+              <div className="relative">
+                <Tooltip
+                  place="top"
+                  className={{
+                    content:
+                      "z-50 text-xs whitespace-nowrap bg-black bg-opacity-80 text-white ",
+                  }}
+                  onClick={handleOpenEmojiPicker}
+                  title={
+                    <p className="whitespace-nowrap">Chọn biểu tượng cảm xúc</p>
+                  }
+                >
+                  <div
+                    className={cn(
+                      "text-gray98 cursor-pointer",
+                      openEmojiPicker &&
+                        "before:absolute before:z-40 before:hoverDropdown before:bottom-[10px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-t-white"
+                    )}
+                  >
+                    <img
+                      src="https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f603.png"
+                      alt="😀"
+                      srcSet="https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f603.png"
+                      width={20}
+                    />
+                  </div>
+                </Tooltip>
+                <div
+                  className={cn(
+                    "emojiPicker shadow-shadow2 w-auto absolute -top-4 -translate-y-full -right-10"
+                  )}
+                >
+                  <EmojiPicker
+                    open={openEmojiPicker}
+                    width={300}
+                    height={350}
+                    searchPlaceHolder="Tìm kiếm biểu tượng cảm xúc"
+                    className="pb-3"
+                    onEmojiClick={(data) => {
+                      console.log(data);
+                    }}
+                    skinTonesDisabled={true}
+                    searchDisabled
+                    previewConfig={{ showPreview: false }}
+                    categories={[
+                      {
+                        category: Categories.SUGGESTED,
+                        name: "Gần đây",
+                      },
+                      {
+                        category: Categories.SMILEYS_PEOPLE,
+                        name: "Cảm xúc",
+                      },
+                      {
+                        category: Categories.ANIMALS_NATURE,
+                        name: "Động vật",
+                      },
+                      {
+                        category: Categories.FOOD_DRINK,
+                        name: "Ẩm thực",
+                      },
+                      {
+                        category: Categories.TRAVEL_PLACES,
+                        name: "đi lại & địa điểm",
+                      },
+                      {
+                        category: Categories.ACTIVITIES,
+                        name: "Hoạt động",
+                      },
+                      {
+                        category: Categories.OBJECTS,
+                        name: "công việc",
+                      },
+                      {
+                        category: Categories.SYMBOLS,
+                        name: "Biểu tượng",
+                      },
+                      {
+                        category: Categories.FLAGS,
+                        name: "Cờ",
+                      },
+                    ]}
+                  />
+                </div>
+              </div>
             </div>
             <Button
               variant="outLine-border"
@@ -212,9 +308,9 @@ function Conversation() {
                 setListMessage([...listMessage, text]);
                 setSenderMessage(true);
               }}
-              className="max-w-[40px] h-10 rounded-full text-white flex justify-center items-center bg-orange hover:bg-white"
+              className="flex items-center justify-center text-white rounded-full h-9 w-9 bg-orange hover:bg-white"
             >
-              <IconSendMessage size={20}></IconSendMessage>
+              <IconSendMessage size={28} />
             </Button>
           </div>
         </div>

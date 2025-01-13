@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema(
   {
-    roomChatId: {
+    conversationId: {
       type: Schema.Types.ObjectId,
       ref: "roomChats",
       require: true,

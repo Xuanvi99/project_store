@@ -1,8 +1,8 @@
 import { IImage } from "./commonType";
 
-export interface IRoomChat<T> {
+export interface IConversation {
   _id: string;
-  participants: T[];
+  participants: string[];
   totalMessage: number;
   messageLaster: IMessage;
 }

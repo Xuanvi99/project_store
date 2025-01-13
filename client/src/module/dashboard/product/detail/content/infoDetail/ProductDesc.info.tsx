@@ -2,13 +2,10 @@ import { IconChevronRight } from "@/components/icon";
 import { cn } from "@/utils";
 import { useEffect, useState } from "react";
 import * as marked from "marked";
-import useTestContext from "@/hook/useTestContext";
-import { DetailProductContext, IDetailProductProvide } from "../../context";
+import useDetailProductContext from "../../context/useDetailProduct";
 
 function ProductDesc() {
-  const { product } = useTestContext<IDetailProductProvide>(
-    DetailProductContext as React.Context<IDetailProductProvide>
-  );
+  const { product } = useDetailProductContext();
   const [heightDesc, setHeightDesc] = useState<string>("200px");
   const [openDesc, setOpenDesc] = useState(false);
 
