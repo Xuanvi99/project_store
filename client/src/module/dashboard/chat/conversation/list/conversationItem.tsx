@@ -1,49 +1,59 @@
-import { useAppDispatch, useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
-import {
-  setMessages,
-  setSelectedConversation,
-} from "@/stores/reducer/chat.reducer";
-import { useLazyGetMessagesQuery } from "@/stores/service/chat.service";
+import { useAppDispatch, useSelectorChatSlice } from "@/hook";
+import { setSelectedConversation } from "@/stores/reducer/chat.reducer";
+import { useLazyGetOneMessagesQuery } from "@/stores/service/chat.service";
 import { useLazyGetProfileQuery } from "@/stores/service/user.service";
-import { IConversation } from "@/types/chat.type";
+import { IConversation, IMessage } from "@/types/chat.type";
 import { IUser } from "@/types/user.type";
-import { cn } from "@/utils";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { cn, momentVi } from "@/utils";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 
 type TProps = {
   conversation: IConversation;
   currentUserId: string;
 };
 function ConversationItem({ conversation, currentUserId }: TProps) {
-  const { onlineUsers, selectedConversation } = useAppSelector(
-    (state: RootState) => state.chatSlice
-  );
+  const { messageLaster: messageId } = conversation;
+
+  const { onlineUsers, selectedConversation } = useSelectorChatSlice();
 
   const dispatch = useAppDispatch();
 
   const [getProfile] = useLazyGetProfileQuery();
-  const [getMessages] = useLazyGetMessagesQuery();
+
+  // const { data: DataResMessage, status, refetch } = useGetOneMessagesQuery(id);
+
+  const [getOneMessage] = useLazyGetOneMessagesQuery();
 
   const [receiver, setReceiver] = useState<IUser>();
+
+  const [message, setMessage] = useState<IMessage>();
+
+  const [timeSender, setTimeSender] = useState<string>("");
 
   const handleGetReceiver = useCallback(async () => {
     try {
       const receiverId = conversation.participants.find(
         (r) => r !== currentUserId
       );
-      if (receiverId) {
-        await getProfile(receiverId)
-          .unwrap()
-          .then((res) => {
-            setReceiver(res.user);
-          });
+      if (receiverId && messageId) {
+        await Promise.all([
+          getProfile(receiverId).unwrap(),
+          getOneMessage(messageId).unwrap(),
+        ]).then((res) => {
+          setReceiver(res[0].user);
+          setMessage(res[1]);
+        });
       }
     } catch (error) {
       console.log(error);
     }
-  }, [conversation.participants, currentUserId, getProfile]);
+  }, [
+    conversation.participants,
+    currentUserId,
+    getOneMessage,
+    getProfile,
+    messageId,
+  ]);
 
   const handleSelectConversation = () => {
     dispatch(setSelectedConversation(conversation));
@@ -53,47 +63,68 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
     handleGetReceiver();
   }, [handleGetReceiver]);
 
-  useEffect(() => {
-    if (selectedConversation) {
-      const handleGetMessages = async () => {
-        await getMessages({
-          conversationId: selectedConversation._id,
-          activePage: 1,
-        })
-          .unwrap()
-          .then((res) => {
-            dispatch(setMessages(res));
-          })
-          .catch(() => {
-            toast("Lỗi request dữ liệu", { type: "error" });
-          });
-      };
-      handleGetMessages();
+  useLayoutEffect(() => {
+    let timeRefetch = undefined;
+    if (message) {
+      timeRefetch = setInterval(() => {
+        setTimeSender(momentVi(message.createdAt).fromNow(true));
+      }, 1000);
     }
-  }, [dispatch, getMessages, selectedConversation]);
+    return () => clearInterval(timeRefetch);
+  }, [message]);
 
-  if (!receiver) return null;
+  if (!receiver || !message) return;
 
   return (
     <div
       className={cn(
-        "flex items-center space-x-2 max-h-[70px] transition-all p-3 cursor-pointer hover:bg-grayE5 rounded-lg",
-        selectedConversation?._id === conversation._id && "bg-grayCa"
+        "flex items-center space-x-2 max-h-[68] transition-all p-[10px] cursor-pointer hover:bg-grayE5 rounded-lg",
+        selectedConversation?._id === conversation._id && "bg-grayF0"
       )}
       onClick={handleSelectConversation}
     >
-      <div className="relative w-[50px] h-[50px] rounded-full">
+      <div className="relative w-12 h-12 rounded-full max-w-12">
         <img
-          alt=""
+          alt="error"
           srcSet={receiver.avatar?.url || receiver?.avatarDefault}
-          className="max-w-full rounded-full"
+          className="w-12 rounded-full"
         />
         {onlineUsers.includes(receiver._id) && (
           <div className="absolute bottom-0 right-0 w-4 h-4 border-2 border-white rounded-full bg-green66"></div>
         )}
       </div>
-      <div className="text-xs">
-        <span className="font-semibold">{receiver?.userName}</span>
+      <div className="flex justify-start w-[calc(100%-50px)] h-12">
+        <div className="flex flex-col w-full">
+          <div className="font-semibold ">{receiver?.userName}</div>
+          <div className="flex justify-start text-xs gap-x-1 text-secondary ">
+            <span className="max-w-[70%] flex gap-x-[2px]">
+              <span className="font-semibold">
+                {message.senderId !== receiver._id && "Bạn: "}
+              </span>
+              <span
+                className={cn(
+                  "line-clamp-1",
+                  message.senderId === receiver._id &&
+                    !message.seen &&
+                    "font-semibold text-black"
+                )}
+              >
+                {message.text}
+              </span>
+            </span>
+            <span className="basis-[30%]">
+              -{" "}
+              {timeSender
+                ? timeSender
+                : momentVi(message.createdAt).fromNow(true)}
+            </span>
+          </div>
+        </div>
+        {message.senderId === receiver._id && !message.seen && (
+          <div className="flex items-center w-[10px] h-full">
+            <span className="w-[10px] h-[10px] rounded-full bg-orange"></span>
+          </div>
+        )}
       </div>
     </div>
   );

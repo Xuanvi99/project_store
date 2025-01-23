@@ -1,10 +1,8 @@
 import Heading from "../../common/Heading";
-import { useAppSelector } from "../../../../hook";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { RootState } from "@/stores";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useCheckPhoneOrEmailMutation } from "@/stores/service/user.service";
 import { ModalNotification } from "@/components/modal";
@@ -14,12 +12,13 @@ import { InputForm } from "@/components/input";
 import { ErrorInput } from "@/components/error";
 import { Button } from "@/components/button";
 import LoadingSpinner from "@/components/loading";
+import { useSelectorAuthSlice } from "@/hook";
 
 function FormPhone() {
   const navigate = useNavigate();
   const { pathname, state: statePath } = useLocation();
 
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const validationSchema = Yup.object({
     phone: Yup.string()
@@ -102,6 +101,7 @@ function FormPhone() {
         <ModalNotification
           isOpenModal={openModal}
           onClick={handleOpenModal.current}
+          type="default"
         >
           <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
             <div className="absolute inset-0 z-50 bg-black opacity-75"></div>

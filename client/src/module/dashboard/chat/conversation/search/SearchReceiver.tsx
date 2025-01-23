@@ -1,7 +1,7 @@
 import { IUser } from "@/types/user.type";
 import { cn } from "@/utils";
-import SearchItem from "./searchItem";
 import { useEffect, useRef, useState } from "react";
+import SearchItem from "./SearchItem";
 
 type TProps = {
   receiver: IUser[];
@@ -17,6 +17,7 @@ function SearchReceiver({ receiver }: TProps) {
       setOpenScroll(height / 70 < receiver.length ? true : false);
     }
   }, [receiver]);
+
   return (
     <div
       ref={receiverRef}
@@ -25,7 +26,7 @@ function SearchReceiver({ receiver }: TProps) {
         openScroll && "overflow-y-scroll"
       )}
     >
-      <div className="mb-2 text-sm font-semibold">Kết quả tìm kiếm:</div>
+      <div className="m-2 text-sm font-semibold">Kết quả tìm kiếm:</div>
       {receiver.map((user) => (
         <SearchItem key={user._id} user={user}></SearchItem>
       ))}

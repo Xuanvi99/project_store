@@ -2,34 +2,37 @@ import { IUser } from "@/types/user.type";
 import { cn } from "@/utils";
 import useChatContext from "../../context/useChatContext";
 import { useLazyGetOneConversationQuery } from "@/stores/service/chat.service";
-import { setSelectedConversation } from "@/stores/reducer/chat.reducer";
+import { IConversation } from "@/types/chat.type";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useAppDispatch } from "@/hook";
+import { setSelectedConversation } from "@/stores/reducer/chat.reducer";
 
 type TProps = {
   user: IUser;
 };
 function SearchItem({ user }: TProps) {
-  const {
-    handleOpenSearchResult,
-    handleSetCheckConversation,
-    handleSelectReceiverId,
-  } = useChatContext();
+  const { handleOpenSearchResult } = useChatContext();
 
   const dispatch = useAppDispatch();
 
   const [getOneConversation] = useLazyGetOneConversationQuery();
 
-  const handleGetConversationByUser = async () => {
-    await getOneConversation(user._id)
-      .unwrap()
-      .then((res) => {
-        dispatch(setSelectedConversation(res));
-        handleSetCheckConversation(res ? true : false);
-        if (!res) {
-          handleSelectReceiverId(user._id);
-        }
-      });
-  };
+  const [conversation, setConversation] = useState<IConversation | null>(null);
+
+  useEffect(() => {
+    const handleGetOneConversation = async () => {
+      await getOneConversation(user._id)
+        .unwrap()
+        .then((res) => {
+          setConversation(res);
+        })
+        .catch(() => {
+          toast("Lỗi request data trò chuyện", { type: "error" });
+        });
+    };
+    handleGetOneConversation();
+  }, [getOneConversation, user._id]);
 
   return (
     <div
@@ -38,7 +41,7 @@ function SearchItem({ user }: TProps) {
       )}
       onClick={() => {
         handleOpenSearchResult(false);
-        handleGetConversationByUser();
+        dispatch(setSelectedConversation(conversation));
       }}
     >
       <div className="relative w-10 h-10 rounded-full">

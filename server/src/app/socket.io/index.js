@@ -1,4 +1,4 @@
-const { userModel, conversationModel } = require("../model/index");
+const { userModel } = require("../model/index");
 class SocketIoService {
   constructor() {
     this.userSocketMap = {};
@@ -20,6 +20,20 @@ class SocketIoService {
     }
 
     _io.emit("getOnlineUsers", Object.keys(this.userSocketMap));
+
+    socket.on("typing", async (data) => {
+      const { receiverId, typing } = data;
+      const receiverSocketId = this.userSocketMap[receiverId];
+      if (typing) {
+        _io
+          .to(receiverSocketId)
+          .emit("displayTyping", { typing: true, senderId: userId });
+      } else {
+        _io
+          .to(receiverSocketId)
+          .emit("displayTyping", { typing: false, senderId: userId });
+      }
+    });
 
     socket.on("disconnect", async () => {
       const time = new Date();

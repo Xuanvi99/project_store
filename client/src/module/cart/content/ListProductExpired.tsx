@@ -5,15 +5,14 @@ import Modal from "@/components/modal";
 import { useState } from "react";
 import { Button } from "@/components/button";
 import { useDeleteCartMultipleMutation } from "@/stores/service/cart.service";
-import { useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
+import { useSelectorAuthSlice } from "@/hook";
 
 function ListProductExpired() {
   const { listProductInactiveToCart, handleOpenError } =
     useTestContext<TCartProvider>(CartContext as React.Context<TCartProvider>);
   const [openModal, setOpenModal] = useState<boolean>(false);
 
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const [deleteCartMultiple] = useDeleteCartMultipleMutation();
 

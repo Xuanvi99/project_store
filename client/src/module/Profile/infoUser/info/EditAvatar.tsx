@@ -6,12 +6,11 @@ import LoadingSpinner from "@/components/loading";
 import { Button } from "@/components/button";
 import { Input } from "@/components/input";
 import { cn } from "@/utils";
-import { RootState } from "@/stores";
-import { useAppSelector } from "@/hook";
 import { toast } from "react-toastify";
+import { useSelectorAuthSlice } from "@/hook";
 
 function EditAvatar() {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
   const cropRef = useRef<AvatarEditor>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 

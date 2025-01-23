@@ -1,6 +1,8 @@
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
+import { setOnlineUsers } from "@/stores/reducer/chat.reducer";
 import { createContext, useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { io, Socket } from "socket.io-client";
 const DOMAIN_SERVER = import.meta.env.VITE_DOMAIN_SERVER;
 
@@ -12,6 +14,8 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, isLogin, accessToken } = useAppSelector(
     (state: RootState) => state.authSlice
   );
+
+  const dispatch = useDispatch();
 
   const socketRef = useRef<TSocketProvider>(null);
 
@@ -31,6 +35,10 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         console.log("Connected to server");
       });
 
+      socketRef.current.on("getOnlineUsers", (data) => {
+        dispatch(setOnlineUsers({ onlineUsers: data as string[] }));
+      });
+
       socketRef.current.on("disconnect", () => {
         console.log("Disconnected to server");
       });
@@ -40,9 +48,10 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setSocketIo(null);
     }
     return () => {
+      socketRef.current?.off("getOnlineUsers");
       socketRef.current?.disconnect();
     };
-  }, [accessToken, isLogin, user]);
+  }, [accessToken, dispatch, isLogin, user]);
 
   return (
     <SocketContext.Provider value={socketIo}>{children}</SocketContext.Provider>

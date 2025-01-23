@@ -4,8 +4,6 @@ import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEditCancelledOrderMutation } from "@/stores/service/order.service";
-import { RootState } from "@/stores";
-import { useAppSelector } from "@/hook";
 import { toast } from "react-toastify";
 import Field from "@/components/fields";
 import InputRadio from "@/components/input/InputRadio";
@@ -13,6 +11,7 @@ import { Label } from "@/components/label";
 import { Button } from "@/components/button";
 import LoadingSpinner from "@/components/loading";
 import Modal from "@/components/modal";
+import { useSelectorAuthSlice } from "@/hook";
 
 type TProps = {
   isOpenModal: boolean;
@@ -36,7 +35,7 @@ function ModalReasonCanceled({
   className,
   codeOrder,
 }: TProps) {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const { control, handleSubmit, watch, reset } = useForm<FormValues>({
     defaultValues: {

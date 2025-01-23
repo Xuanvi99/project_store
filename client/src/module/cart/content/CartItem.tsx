@@ -1,8 +1,7 @@
 import { IconDelete } from "@/components/icon";
 import { Input } from "@/components/input";
-import { useAppSelector } from "@/hook";
+import { useSelectorAuthSlice } from "@/hook";
 import useTestContext from "@/hook/useTestContext";
-import { RootState } from "@/stores";
 import {
   useDeleteCartOneMutation,
   useUpdateCartMutation,
@@ -34,7 +33,7 @@ function CartItem({
   handleUpdateCartItem,
   handleDeleteItem,
 }: TCartItemProps) {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const { handleOpenError } = useTestContext<TCartProvider>(
     CartContext as React.Context<TCartProvider>

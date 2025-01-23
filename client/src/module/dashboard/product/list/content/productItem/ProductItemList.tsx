@@ -6,8 +6,7 @@ import IconEye from "../../../../../../components/icon/IconEye";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import ModalDeleteProduct from "../ModalDeleteProduct";
 import { useDeleteOneProductMutation } from "@/stores/service/product.service";
-import { useAppSelector, useToggle } from "@/hook";
-import { RootState } from "@/stores";
+import { useSelectorAuthSlice, useToggle } from "@/hook";
 import { toast } from "react-toastify";
 import { Fragment } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -42,7 +41,7 @@ function ProductItemList({
 
   const { pathname, search } = useLocation();
 
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const { toggle: openModal, handleToggle: handleOpenModal } = useToggle();
 

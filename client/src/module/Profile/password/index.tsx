@@ -4,8 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Heading from "../common/Heading";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAppSelector, useToggle } from "@/hook";
-import { RootState } from "@/stores";
+import { useSelectorAuthSlice, useToggle } from "@/hook";
 import { useChangePasswordMutation } from "@/stores/service/user.service";
 import { IconError, IconEye, IconSuccess } from "@/components/icon";
 import { ModalNotification } from "@/components/modal";
@@ -37,8 +36,10 @@ type formValue = Yup.InferType<typeof validationSchema>;
 
 function ChangePassword() {
   const navigate = useNavigate();
+
   const { state } = useLocation();
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+
+  const { user } = useSelectorAuthSlice();
 
   const {
     control,
@@ -151,12 +152,10 @@ function ChangePassword() {
         <ModalNotification
           isOpenModal={openModal}
           onClick={handleOpenModal.current}
+          type={"default"}
         >
-          <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
-            <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
-            <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
-              {title}
-            </div>
+          <div className="relative z-[60] flex flex-col items-center text-white gap-y-5">
+            {title}
           </div>
         </ModalNotification>
         <form

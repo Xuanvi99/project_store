@@ -11,6 +11,7 @@ import { RootState } from "./stores";
 import LoadingSpinner from "./components/loading";
 import { cn } from "./utils";
 import { ToastContainer } from "react-toastify";
+import { resetChat } from "@/stores/reducer/chat.reducer";
 
 function App() {
   const { user } = useAppSelector((state: RootState) => state.authSlice);
@@ -29,6 +30,7 @@ function App() {
         })
         .catch(() => {
           dispatch(logOut());
+          dispatch(resetChat());
         });
     };
     if (!effectRun.current && !user) {

@@ -299,51 +299,6 @@
     border: 2px solid #fd7e14 !important;
   }
 
-  .chat_open {
-    width: 350px;
-    height: 450px;
-    opacity: 1;
-    animation: 0.2s chat_open linear;
-  }
-  @keyframes chat_open {
-    0% {
-      width: 0px;
-      height: 0px;
-      opacity: 0;
-    }
-    50% {
-      opacity: 0.5;
-    }
-    100% {
-      opacity: 1;
-      width: 350px;
-      height: 450px;
-    }
-  }
-
-  .chat_close {
-    width: 0px;
-    height: 0px;
-    opacity: 0;
-    animation: 0.2s chat_close linear;
-  }
-
-  @keyframes chat_close {
-    0% {
-      width: 350px;
-      height: 450px;
-      opacity: 1;
-    }
-    80% {
-      opacity: 0.2;
-    }
-    100% {
-      opacity: 0;
-      width: 0px;
-      height: 0px;
-    }
-  }
-
   .emojiPicker {
     font-size: 14px;
     .epr_-ucs3ns {
@@ -354,6 +309,41 @@
       --epr-category-navigation-button-size: 20px;
       --epr-horizontal-padding: 10px;
       --epr-header-padding: 10px var(--epr-horizontal-padding);
+    }
+  }
+
+  .typing-chat {
+    .typing__item {
+      width: 5px;
+      height: 5px;
+      background: #8d8c91;
+      border-radius: 100%;
+      opacity: 0.4;
+      animation: loadingFade 1s infinite;
+    }
+
+    .typing__item:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .typing__item:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing__item:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes loadingFade {
+      0% {
+        opacity: 0.4;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        opacity: 0.4;
+      }
     }
   }
 }

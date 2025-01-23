@@ -1,17 +1,16 @@
-import { Button } from "../../../components/button";
-import Field from "../../../components/fields";
-import { Label } from "../../../components/label";
-import Heading from "../common/Heading";
-import { ModalAddress } from "../../../components/modal/index";
-import { useAppSelector, useToggle } from "../../../hook";
-import { IconLocation, IconPlus } from "../../../components/icon";
-import { useGetAddressQuery } from "../../../stores/service/address.service";
 import { useLayoutEffect, useState } from "react";
-import { RootState } from "../../../stores";
 import { IAddress } from "@/types/address.type";
+import { useSelectorAuthSlice, useToggle } from "@/hook";
+import { useGetAddressQuery } from "@/stores/service/address.service";
+import { Button } from "@/components/button";
+import { IconLocation, IconPlus } from "@/components/icon";
+import Field from "@/components/fields";
+import { Label } from "@/components/label";
+import { ModalAddress } from "@/components/modal";
+import Heading from "../common/Heading";
 
 function FormAddress() {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
   const { toggle: openShow, handleToggle: handleShow } = useToggle();
 
   const [address, setAddress] = useState<IAddress>();

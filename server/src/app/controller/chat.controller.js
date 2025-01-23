@@ -6,14 +6,17 @@ const {
 } = require("../model");
 const SocketIoService = require("../socket.io");
 class chat {
-  getConversation = async (req, res) => {
+  getConversations = async (req, res) => {
     const userId = req.params.id;
     try {
       let listConversation = await conversationModel
         .find({
-          participants: { $in: [userId] },
+          $and: [
+            { participants: { $in: [userId] } },
+            { totalMessage: { $gt: 0 } },
+          ],
         })
-        .sort({ updateAt: -1 })
+        .sort({ updatedAt: -1 })
         .lean();
 
       res.status(200).json(listConversation);
@@ -25,13 +28,20 @@ class chat {
   getOneConversation = async (req, res) => {
     const userId = req.params.id;
     try {
-      let listConversation = await conversationModel
+      let conversation = await conversationModel
         .findOne({
           participants: { $in: [userId] },
         })
         .lean();
 
-      res.status(200).json(listConversation);
+      if (!conversation) {
+        const admin = await userModel.findOne({ role: "admin" }).lean();
+        conversation = await conversationModel.create({
+          participants: [id, admin._id],
+        });
+      }
+
+      res.status(200).json(conversation);
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
     }
@@ -62,26 +72,26 @@ class chat {
           ],
         })
         .populate([{ path: "avatar", select: "_id public_id url folder" }]);
-      res.status(200).json(users);
+      res.status(200).json(users ? users : []);
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
     }
   };
 
-  getMessage = async (req, res) => {
+  getMessages = async (req, res) => {
     const conversationId = req.params.conversationId;
     try {
-      const activePage = +req.query.activePage || 1;
-      const limit = +req.query.limit || 10;
-      const skip = (activePage - 1) * limit;
+      const userId = req.query.userId;
+      const limit = +req.query.limit;
+      const skip = +req.query.skip;
 
       const conversation = await conversationModel
         .findById(conversationId)
         .lean();
 
-      if (conversation) {
+      if (conversation && userId) {
         await messageModel.updateMany(
-          { conversationId },
+          { $and: [{ conversationId }, { receiverId: userId }] },
           { $set: { seen: true } }
         );
       } else {
@@ -97,11 +107,33 @@ class chat {
             select: "url",
           },
         ])
-        .sort({ $natural: -1 })
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
-      res.status(200).json(listMessage);
+      res.status(200).json(listMessage.reverse());
+    } catch (error) {
+      res.status(500).json({ errMessage: error | "server error" });
+    }
+  };
+
+  getOneMessage = async (req, res) => {
+    const messageId = req.params.messageId;
+    try {
+      const message = await messageModel.findById(messageId);
+      res.status(200).json(message);
+    } catch (error) {
+      res.status(500).json({ errMessage: error | "server error" });
+    }
+  };
+
+  seenMessage = async (req, res) => {
+    const messageId = req.params.messageId;
+    try {
+      const message = await messageModel.findByIdAndUpdate(messageId, {
+        seen: true,
+      });
+      res.status(200).json(message);
     } catch (error) {
       res.status(500).json({ errMessage: error | "server error" });
     }
@@ -109,17 +141,8 @@ class chat {
 
   sendMessageText = async (req, res) => {
     try {
-      const conversationId = req.params.id;
-      const { senderId, receiverId, text } = body;
-
-      let conversation = await conversationModel.findOne({
-        participants: { $all: [senderId, receiverId] },
-      });
-      if (!conversation) {
-        conversation = await conversationModel.create({
-          participants: [senderId, receiverId],
-        });
-      }
+      const conversationId = req.params.conversationId;
+      const { senderId, receiverId, text } = req.body;
 
       const newMessage = new messageModel({
         conversationId,
@@ -129,15 +152,29 @@ class chat {
         text,
       });
 
-      await Promise.all([conversation.save(), newMessage.save()]); // run parallel
+      const messageLaster = await newMessage.save();
+
+      if (messageLaster) {
+        const listMessage = await messageModel.find({
+          conversationId: { $in: conversationId },
+        });
+
+        const amountMessage = listMessage.length;
+
+        await conversationModel.findByIdAndUpdate(conversationId, {
+          totalMessage: amountMessage,
+          messageLaster: messageLaster._id,
+        });
+      }
 
       const receiverSocketId = SocketIoService.getUserSocketMap(receiverId);
+
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit("newMessage", newMessage);
+        _io.to(receiverSocketId).emit("newMessage", messageLaster._doc);
       }
-      res.status(201).json(newMessage);
-    } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(201).json(messageLaster._doc);
+    } catch (err) {
+      res.status(500).json({ error: "Internal server error" });
     }
   };
 
@@ -147,15 +184,6 @@ class chat {
       const conversationId = req.params.id;
       const { files, body } = req;
       const { senderId, receiverId } = body;
-
-      let conversation = await conversationModel.findOne({
-        participants: { $all: [senderId, receiverId] },
-      });
-      if (!conversation) {
-        conversation = await conversationModel.create({
-          participants: [senderId, receiverId],
-        });
-      }
 
       const imageIds = await imageModel.uploadMultipleFile(
         files.images,
@@ -170,7 +198,7 @@ class chat {
         imageIds,
       });
 
-      await Promise.all([conversation.save(), newMessage.save()]);
+      await newMessage.save();
 
       const receiverSocketId = SocketIoService.getUserSocketMap(receiverId);
       if (receiverSocketId) {

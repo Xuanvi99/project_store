@@ -1,7 +1,6 @@
 import { IconDelete } from "@/components/icon";
-import { useAppSelector } from "@/hook";
+import { useSelectorAuthSlice } from "@/hook";
 import useTestContext from "@/hook/useTestContext";
-import { RootState } from "@/stores";
 import { useDeleteCartOneMutation } from "@/stores/service/cart.service";
 import { ICartItem } from "@/types/cart.type";
 import { cn, formatPrice } from "@/utils";
@@ -13,7 +12,7 @@ type TCartItemProps = {
 };
 
 function CartItemExpired({ data }: TCartItemProps) {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const { handleOpenError } = useTestContext<TCartProvider>(
     CartContext as React.Context<TCartProvider>

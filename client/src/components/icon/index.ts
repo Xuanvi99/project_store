@@ -37,6 +37,7 @@ import IconShowGrid from "./IconShowGrid";
 import IconRestore from "./IconRestore";
 import IconMessage from "./IconMessage";
 import IconSendMessage from "./IconSendMessage";
+import IconArrowDown from "./IconArrowDown";
 
 export {
   IconSendMessage,
@@ -79,4 +80,5 @@ export {
   IconInfo,
   IconShowList,
   IconShowGrid,
+  IconArrowDown,
 };

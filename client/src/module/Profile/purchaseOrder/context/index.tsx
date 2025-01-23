@@ -1,6 +1,5 @@
 import { limitOrder, listHeaderOrder } from "@/constant/order.constant";
-import { useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
+import { useSelectorAuthSlice } from "@/hook";
 import { useGetListOrderUserQuery } from "@/stores/service/order.service";
 import { IResOrder, paramsGetListOrder } from "@/types/order.type";
 import { QueryStatus } from "@reduxjs/toolkit/query";
@@ -34,7 +33,7 @@ type TParams = {
 const PurchaseContext = createContext<IPurchaseProvide | null>(null);
 
 function PurchaseProvide({ children }: { children: React.ReactNode }) {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const [searchParams] = useSearchParams();
 

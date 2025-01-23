@@ -17,20 +17,18 @@ import {
   usePostCreateOrderMutation,
 } from "@/stores/service/transport.service";
 import { useGetAddressQuery } from "@/stores/service/address.service";
-import { useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
+import { useSelectorAuthSlice } from "@/hook";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { reqCreateOrder } from "@/types/transport.type";
 import { ModalNotification } from "@/components/modal";
 import LoadingSpinner, { LoadingCallApi } from "@/components/loading";
-
 
 type TParams = {
   [P in keyof reqCreateOrder]?: reqCreateOrder[P];
 };
 
 function OrderDetail() {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const { slug } = useParams();
 
@@ -236,7 +234,9 @@ function OrderDetail() {
 
   if (!dataOrderDetail || statusOrderDetail === "pending") {
     return (
-      <LoadingCallApi size={16} className={{ wrap: "mt-20" }}></LoadingCallApi>
+      <div className="w-4 h-4">
+        <LoadingCallApi className={{ wrap: "mt-20" }}></LoadingCallApi>
+      </div>
     );
   }
 
@@ -265,7 +265,7 @@ function OrderDetail() {
         <span>{notify.message}</span>
       </ModalNotification>
       {/* <HeaderOrder></HeaderOrder> */}
-      <div className="detail-order px-6 mt-5">
+      <div className="px-6 mt-5 detail-order">
         <div className="w-full p-5 bg-white border-b-1 border-b-grayCa">
           <div className="pb-5 border-b-1 border-b-grayCa">
             <h1 className="text-lg font-semibold">

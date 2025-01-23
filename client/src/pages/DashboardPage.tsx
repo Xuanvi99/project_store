@@ -1,13 +1,12 @@
 import { useCallback, useEffect } from "react";
 import { Main, Sidebar } from "../module/dashboard";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useAppSelector } from "../hook";
-import { RootState } from "@/stores";
+import { useSelectorAuthSlice } from "@/hook";
 
 function DashboardPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const handleLogin = useCallback(
     (pathname: string) => {

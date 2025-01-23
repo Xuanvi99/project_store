@@ -15,7 +15,7 @@ import { transportApi } from "./service/transport.service";
 import { vnpayApi } from "./service/vnpay.service";
 import { orderApi } from "./service/order.service";
 import { authGoogleApi } from "./service/authGoogle.service";
-import { roomChatApi } from "./service/chat.service";
+import { chatApi } from "./service/chat.service";
 import { smsOtpApi } from "./service/sms.service";
 
 export const store = configureStore({
@@ -39,7 +39,7 @@ export const store = configureStore({
       vnpayApi.middleware,
       orderApi.middleware,
       authGoogleApi.middleware,
-      roomChatApi.middleware,
+      chatApi.middleware,
       smsOtpApi.middleware,
     ]),
 });

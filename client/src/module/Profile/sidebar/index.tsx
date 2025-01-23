@@ -6,10 +6,9 @@ import {
   IconPassword,
   IconProfile,
 } from "@/components/icon/SidebarProfile";
-import { useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
 import { IconPurchase, IconWrite } from "@/components/icon";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { useSelectorAuthSlice } from "@/hook";
 
 const ListNavProfile = [
   {
@@ -38,7 +37,7 @@ function SidebarProfile() {
 
   const [checkPath, setCheckPath] = useState<boolean>(true);
 
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const avatar = user?.avatar || null;
 

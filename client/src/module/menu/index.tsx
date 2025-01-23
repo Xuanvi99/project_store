@@ -5,11 +5,10 @@ import Logo from "./Logo.menu";
 import Search from "./Search.menu";
 import { cn } from "@/utils";
 import Notification from "./Notification.menu";
-import { useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
+import { useSelectorAuthSlice } from "@/hook";
 
 function Menu({ type }: { type: "scroll" | "normal" }) {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
   const [scroll, setScroll] = useState<boolean>(false);
 
   useEffect(() => {
@@ -42,7 +41,7 @@ function Menu({ type }: { type: "scroll" | "normal" }) {
           <div className="flex items-center justify-between w-full menu">
             <Logo />
             <Search></Search>
-            <div className="flex items-center gap-x-3">
+            <div className="flex items-center gap-x-5">
               <Cart></Cart>
               {user && <Notification></Notification>}
               <Profile></Profile>

@@ -16,6 +16,6 @@ export interface IUser {
   avatarDefault: string;
   modifiedPassword: boolean;
   status: "online" | "offline";
-  timeOffline?: Date;
+  timeOffline: Date;
   role: string;
 }

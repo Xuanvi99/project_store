@@ -2,10 +2,9 @@ import { useEffect, useLayoutEffect } from "react";
 import LayoutProfile from "../layout/LayoutProfile";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import FormAddress from "../module/profile/address";
-import { useAppSelector } from "../hook";
 import { ChangePassword, ProfileInfo } from "../module/profile";
-import { RootState } from "@/stores";
 import PurchaseOrder from "@/module/profile/purchaseOrder";
+import { useSelectorAuthSlice } from "@/hook";
 
 function ProfilePage() {
   const { slug } = useParams();
@@ -13,7 +12,7 @@ function ProfilePage() {
 
   const navigate = useNavigate();
 
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const redirectUrl = import.meta.env.VITE_DOMAIN_CLIENT + pathname;
 

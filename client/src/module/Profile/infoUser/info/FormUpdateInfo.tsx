@@ -12,8 +12,7 @@ import LoadingSpinner from "@/components/loading";
 import { useUpdateUserMutation } from "@/stores/service/user.service";
 import { Fragment, useEffect, useState } from "react";
 import { ModalNotification } from "@/components/modal";
-import { useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
+import { useSelectorAuthSlice } from "@/hook";
 
 const validatingSchema = Yup.object({
   userName: Yup.string()
@@ -27,7 +26,7 @@ const validatingSchema = Yup.object({
 type formValues = Yup.InferType<typeof validatingSchema>;
 
 function FormUpdateInfo() {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
   const {
     control,
     handleSubmit,

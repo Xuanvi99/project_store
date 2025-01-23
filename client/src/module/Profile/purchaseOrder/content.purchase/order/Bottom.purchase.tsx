@@ -1,6 +1,5 @@
 import { Button } from "@/components/button";
-import { useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
+import { useSelectorAuthSlice } from "@/hook";
 import { useRepurchaseProductToCartMutation } from "@/stores/service/cart.service";
 import { IResOrder } from "@/types/order.type";
 import { cn } from "@/utils";
@@ -26,7 +25,7 @@ function BottomPurchase({ data }: TProps) {
     statusOrder,
   } = data;
 
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const navigate = useNavigate();
 

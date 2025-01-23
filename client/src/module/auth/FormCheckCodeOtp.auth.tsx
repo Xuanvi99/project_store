@@ -7,13 +7,12 @@ import {
 } from "react";
 // import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { useLocation, useNavigate } from "react-router-dom";
-import { RootState } from "@/stores";
 import {
   useSendOTPEmailMutation,
   useVerifyEmailMutation,
 } from "@/stores/service/otp.service";
 import { useUpdateUserMutation } from "@/stores/service/user.service";
-import { useAppSelector } from "@/hook";
+import { useSelectorAuthSlice } from "@/hook";
 import { IconBack, IconError } from "@/components/icon";
 import { cn } from "@/utils";
 import { Button } from "@/components/button";
@@ -51,7 +50,7 @@ function FormCheckCodeOTP({
   const timeRef = useRef<HTMLParagraphElement>(null);
   const effectRun = useRef<boolean>(false);
 
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -178,33 +177,36 @@ function FormCheckCodeOTP({
     setCodeOtpReceive("");
   }, []);
 
-  const handleSendCodeOTPInfobip = async (phoneNumber: string) => {
-    const phone = "84" + phoneNumber;
-    const codeOtpSend = generateUniqueId({
-      length: 6,
-      useLetters: false,
-      useNumbers: true,
-    });
-    setCodeOtpSend(codeOtpSend);
-    const raw: TReqSms = {
-      messages: [
-        {
-          destinations: [{ to: phone }],
-          from: "XVStore",
-          text: `XVStore: Nhập mã xác minh ${codeOtpSend}. Mã có hiệu lực trong 15 phút. Không chia sẻ mã với người khác`,
-        },
-      ],
-    };
-
-    await sendSmsOTP(raw)
-      .unwrap()
-      .then(() => {
-        toast("Đã gửi mã xác minh đến bạn", { type: "success" });
-      })
-      .catch(() => {
-        toast("Lỗi gửi mã xác minh", { type: "error" });
+  const handleSendCodeOTPInfobip = useCallback(
+    async (phoneNumber: string) => {
+      const phone = "84" + phoneNumber;
+      const codeOtpSend = generateUniqueId({
+        length: 6,
+        useLetters: false,
+        useNumbers: true,
       });
-  };
+      setCodeOtpSend(codeOtpSend);
+      const raw: TReqSms = {
+        messages: [
+          {
+            destinations: [{ to: phone }],
+            from: "XVStore",
+            text: `XVStore: Nhập mã xác minh ${codeOtpSend}. Mã có hiệu lực trong 15 phút. Không chia sẻ mã với người khác`,
+          },
+        ],
+      };
+
+      await sendSmsOTP(raw)
+        .unwrap()
+        .then(() => {
+          toast("Đã gửi mã xác minh đến bạn", { type: "success" });
+        })
+        .catch(() => {
+          toast("Lỗi gửi mã xác minh", { type: "error" });
+        });
+    },
+    [sendSmsOTP]
+  );
 
   useLayoutEffect(() => {
     // const sendOtpFireBase = (phoneNumber: string) => {
@@ -235,7 +237,13 @@ function FormCheckCodeOTP({
     return () => {
       effectRun.current = true;
     };
-  }, [account, phoneOrEmail, sendOTPEmail, sendSmsOTP]);
+  }, [
+    account,
+    handleSendCodeOTPInfobip,
+    phoneOrEmail,
+    sendOTPEmail,
+    sendSmsOTP,
+  ]);
 
   useEffect(() => {
     const focusDiv = focusRef.current;

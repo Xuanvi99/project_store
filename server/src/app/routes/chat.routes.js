@@ -3,14 +3,18 @@ const { chatCtrl } = require("../controller");
 const { uploadFileMdw } = require("../middleware");
 
 const routes = express.Router();
-routes.route("/api/chat/getConversation/:id").get(chatCtrl.getConversation);
+routes.route("/api/chat/getConversations/:id").get(chatCtrl.getConversations);
 routes
   .route("/api/chat/getOneConversation/:id")
   .get(chatCtrl.getOneConversation);
 
-routes.route("/api/chat/getMessages/:conversationId").get(chatCtrl.getMessage);
+routes.route("/api/chat/getMessages/:conversationId").get(chatCtrl.getMessages);
 
-routes.route("/api/chat/getUsers").get(chatCtrl.getUsersChat);
+routes.route("/api/chat/getOneMessages/:messageId").get(chatCtrl.getOneMessage);
+
+routes.route("/api/chat/seenMessage/:messageId").get(chatCtrl.seenMessage);
+
+routes.route("/api/chat/getUsersChat").get(chatCtrl.getUsersChat);
 
 routes
   .route("/api/chat/sendMessage/text/:conversationId")

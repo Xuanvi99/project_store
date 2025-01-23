@@ -20,6 +20,7 @@ export default {
         grayDark: "#222222",
         grayCa: "#cacaca",
         grayF5: "#f5f5f7",
+        grayF0: "#f0f0f0",
         grayF30: "#ffffff30",
         primary: "#007bff",
         secondary: "#6c757d",

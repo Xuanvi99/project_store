@@ -1,24 +1,22 @@
 function IconBack({ size }: { size: number }) {
   return (
     <svg
-      fill="currentColor"
-      height={size}
-      width={size}
-      version="1.1"
-      id="Layer_1"
       xmlns="http://www.w3.org/2000/svg"
-      xmlnsXlink="http://www.w3.org/1999/xlink"
-      viewBox="0 0 511.955 511.955"
-      xmlSpace="preserve"
+      fill="currentColor"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
     >
-      <g>
-        <g>
-          <path
-            d="M511.813,254.103c-0.96-5.227-5.653-8.853-10.88-8.853H36.293l195.2-195.093c4.053-4.267,3.947-10.987-0.213-15.04
-   c-4.16-3.947-10.667-3.947-14.827,0L3.12,248.45c-4.16,4.16-4.16,10.88,0,15.04l213.333,213.333
-   c4.267,4.053,10.987,3.947,15.04-0.213c3.947-4.16,3.947-10.667,0-14.827l-195.2-195.2h464.96
-   C507.76,266.583,512.88,260.717,511.813,254.103z"
+      <g data-name="Layer 2">
+        <g data-name="arrow-back">
+          <rect
+            width="24"
+            height="24"
+            transform="rotate(90 12 12)"
+            opacity="0"
           />
+
+          <path d="M19 11H7.14l3.63-4.36a1 1 0 1 0-1.54-1.28l-5 6a1.19 1.19 0 0 0-.09.15c0 .05 0 .08-.07.13A1 1 0 0 0 4 12a1 1 0 0 0 .07.36c0 .05 0 .08.07.13a1.19 1.19 0 0 0 .09.15l5 6A1 1 0 0 0 10 19a1 1 0 0 0 .64-.23 1 1 0 0 0 .13-1.41L7.14 13H19a1 1 0 0 0 0-2z" />
         </g>
       </g>
     </svg>

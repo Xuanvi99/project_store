@@ -1,27 +1,27 @@
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
-import { useAppDispatch, useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
-import { setOnlineUsers } from "@/stores/reducer/chat.reducer";
-import { useGetConversationQuery } from "@/stores/service/chat.service";
+import { useAppDispatch, useSelectorAuthSlice } from "@/hook";
+import { resetChat } from "@/stores/reducer/chat.reducer";
+import {
+  chatApi,
+  useGetConversationsQuery,
+} from "@/stores/service/chat.service";
 import { IConversation } from "@/types/chat.type";
 import { QueryStatus } from "@reduxjs/toolkit/query";
-import React, { createContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
 
 export type TChatProvider = {
   conversations: IConversation[] | undefined;
 
   status: QueryStatus;
 
+  isFetching: boolean;
+
   openSearchResult: boolean;
-
-  checkConversation: boolean;
-
-  selectedReceiverId: string;
-
-  handleSetConversations: (value: IConversation[]) => void;
-
-  handleSetCheckConversation: (value: boolean) => void;
-  handleSelectReceiverId: (id: string) => void;
 
   handleOpenSearchResult: (status: boolean) => void;
 };
@@ -32,68 +32,49 @@ function ChatProvide({ children }: { children: React.ReactNode }) {
 
   const dispatch = useAppDispatch();
 
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
-  const { data: ResGetConversations, status } = useGetConversationQuery(
-    user ? user._id : "",
-    {
-      skip: !user,
-    }
-  );
+  const {
+    data: dataGetConversations,
+    status,
+    isFetching,
+  } = useGetConversationsQuery(user ? user._id : "", {
+    skip: !user,
+  });
 
   const [openSearchResult, SetOpenSearchResult] = useState<boolean>(false);
+
   const [conversations, setConversations] = useState<IConversation[]>([]);
-
-  const [selectedReceiverId, setSelectedReceiverId] = useState<string>("");
-  console.log("selectedReceiverId: ", selectedReceiverId);
-
-  const [checkConversation, setCheckConversation] = useState<boolean>(false);
-
-  const handleSelectReceiverId = (id: string) => {
-    setSelectedReceiverId(id);
-  };
-
-  const handleSetConversations = (value: IConversation[]) => {
-    return setConversations(value);
-  };
-
-  const handleSetCheckConversation = (value: boolean) => {
-    setCheckConversation(value);
-  };
 
   const handleOpenSearchResult = (status: boolean) => {
     SetOpenSearchResult(status);
   };
 
-  useEffect(() => {
-    if (ResGetConversations && status === "fulfilled") {
-      setConversations(ResGetConversations);
+  useLayoutEffect(() => {
+    if (dataGetConversations && status === "fulfilled") {
+      setConversations(dataGetConversations);
     }
-  }, [ResGetConversations, status]);
+  }, [dataGetConversations, status]);
 
   useEffect(() => {
     if (socketIo_client) {
-      socketIo_client.on("getOnlineUsers", (data) => {
-        dispatch(setOnlineUsers({ onlineUsers: data as string[] }));
+      socketIo_client.on("newMessage", () => {
+        dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
       });
     }
 
     return () => {
-      socketIo_client?.off("getOnlineUsers");
+      dispatch(resetChat());
     };
   }, [dispatch, socketIo_client]);
 
   return (
     <ChatContext.Provider
       value={{
-        checkConversation,
         conversations,
         status,
+        isFetching,
         openSearchResult,
-        selectedReceiverId,
-        handleSelectReceiverId,
-        handleSetCheckConversation,
-        handleSetConversations,
         handleOpenSearchResult,
       }}
     >

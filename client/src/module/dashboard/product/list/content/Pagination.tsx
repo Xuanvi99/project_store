@@ -2,8 +2,7 @@ import { IconChevronLeft, IconChevronRight } from "@/components/icon";
 import ReactPaginate from "react-paginate";
 import { Input } from "@/components/input";
 import { useDeleteMultipleProductMutation } from "@/stores/service/product.service";
-import { useAppSelector, useToggle } from "@/hook";
-import { RootState } from "@/stores";
+import { useSelectorAuthSlice, useToggle } from "@/hook";
 import { toast } from "react-toastify";
 import ModalDeleteProduct from "./ModalDeleteProduct";
 import { Fragment, useState } from "react";
@@ -22,7 +21,7 @@ function PaginationListProduct() {
     scrollTop,
   } = useListProductContext();
 
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const { toggle: openModal, handleToggle: handleOpenModal } = useToggle();
   const [isScrollPage, setScrollPage] = useState<boolean>(false);

@@ -12,8 +12,7 @@ import { Fragment, useState } from "react";
 import { ModalNotification } from "@/components/modal";
 import LoadingSpinner from "../../../components/loading/index";
 import { useDeleteCartMultipleMutation } from "@/stores/service/cart.service";
-import { useAppDispatch, useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
+import { useAppDispatch, useSelectorAuthSlice } from "@/hook";
 import { useNavigate } from "react-router-dom";
 import { QueryStatus } from "@reduxjs/toolkit/query";
 import { productApi } from "@/stores/service/product.service";
@@ -32,7 +31,7 @@ function InfoOrder() {
     CheckoutContext as React.Context<ICheckoutProvide>
   );
 
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();

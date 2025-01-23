@@ -1,6 +1,24 @@
-const { userModel, tokenModel, cartModel } = require("../model");
+const {
+  userModel,
+  tokenModel,
+  cartModel,
+  conversationModel,
+} = require("../model");
 const jwt = require("jsonwebtoken");
 const codeOTPModel = require("../model/codeOTP.model");
+
+const createConversationChat = async (id) => {
+  const admin = await userModel.findOne({ role: "admin" }).lean();
+  let conversation = await conversationModel.findOne({
+    participants: { $all: [id, admin._id] },
+  });
+  if (!conversation) {
+    await conversationModel.create({
+      participants: [id, admin._id],
+    });
+  }
+};
+
 class authController {
   register = async function (req, res) {
     try {
@@ -17,6 +35,8 @@ class authController {
       const refreshToken = newUser.generateRefreshToken();
       await tokenModel.saveToken(newUser, refreshToken);
       const { password: password1, __v, ...others } = newUser._doc;
+
+      createConversationChat(others._id);
 
       return res
         .status(201)
@@ -76,6 +96,8 @@ class authController {
       const accessToken = await user.generateAccessToken();
       const refreshToken = await user.generateRefreshToken();
       await tokenModel.saveToken(user._doc, refreshToken);
+
+      createConversationChat(others._id);
 
       return res
         .status(200)

@@ -1,11 +1,15 @@
 import useChatContext from "../context/useChatContext";
+import SkeletonConversation from "../skeleton/SkeletonConversation";
 import ConversationsList from "./list";
 import ConversationSearch from "./search";
 
-function AllConversations() {
-  const { openSearchResult } = useChatContext();
+function ChatAllConversations() {
+  const { openSearchResult, status } = useChatContext();
+
+  if (status === "pending") return <SkeletonConversation />;
+
   return (
-    <aside className="flex w-full h-full overflow-hidden bg-white rounded-lg basis-1/3">
+    <aside className="flex basis-[30%] h-full overflow-hidden bg-white rounded-lg ">
       <div className="flex flex-col w-full p-3 gap-y-2">
         <div className="flex items-center gap-x-3">
           <p className="text-xl font-semibold">Danh sách tin nhắn</p>
@@ -17,4 +21,4 @@ function AllConversations() {
   );
 }
 
-export default AllConversations;
+export default ChatAllConversations;

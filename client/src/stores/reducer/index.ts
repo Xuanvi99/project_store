@@ -16,7 +16,7 @@ import { vnpayApi } from "../service/vnpay.service";
 import { orderApi } from "../service/order.service";
 import { authGoogleApi } from "../service/authGoogle.service";
 import chatSlice from "./chat.reducer";
-import { roomChatApi } from "../service/chat.service";
+import { chatApi } from "../service/chat.service";
 import { smsOtpApi } from "../service/sms.service";
 
 const rootReducer = combineReducers({
@@ -34,7 +34,7 @@ const rootReducer = combineReducers({
   [vnpayApi.reducerPath]: vnpayApi.reducer,
   [orderApi.reducerPath]: orderApi.reducer,
   [authGoogleApi.reducerPath]: authGoogleApi.reducer,
-  [roomChatApi.reducerPath]: roomChatApi.reducer,
+  [chatApi.reducerPath]: chatApi.reducer,
   [smsOtpApi.reducerPath]: smsOtpApi.reducer,
   authSlice,
   cartSlice,

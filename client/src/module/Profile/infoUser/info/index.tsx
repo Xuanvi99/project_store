@@ -1,14 +1,13 @@
 import { Fragment, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/hook";
+import { useAppDispatch, useSelectorAuthSlice } from "@/hook";
 import { useGetProfileQuery } from "@/stores/service/user.service";
 import { updateAuth } from "@/stores/reducer/auth.reducer";
 import Heading from "../../common/Heading";
-import { RootState } from "@/stores";
 import FormUpdateInfo from "./FormUpdateInfo";
 import EditAvatar from "./EditAvatar";
 
 function FormInfoUser() {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
   const dispatch = useAppDispatch();
 
   const id = user ? user._id : "";

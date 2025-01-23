@@ -1,15 +1,13 @@
-import { IMessage, IConversation } from "@/types/chat.type";
+import { IConversation } from "@/types/chat.type";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 interface IPayload {
   selectedConversation: IConversation | null;
-  messages: IMessage[];
   onlineUsers: string[];
 }
 
 const initialState: IPayload = {
   selectedConversation: null,
-  messages: [],
   onlineUsers: [],
 };
 
@@ -32,12 +30,6 @@ const chatSlice = createSlice({
         selectedConversation: action.payload,
       };
     },
-    setMessages: (state, action: PayloadAction<IMessage[]>) => {
-      return {
-        ...state,
-        messages: action.payload,
-      };
-    },
     setOnlineUsers: (
       state,
       action: PayloadAction<Pick<IPayload, "onlineUsers">>
@@ -47,14 +39,20 @@ const chatSlice = createSlice({
         ...action.payload,
       };
     },
+    resetChat: (state) => {
+      return {
+        ...state,
+        selectedConversation: null,
+      };
+    },
   },
 });
 
 export const {
   updateChat,
-  setMessages,
   setOnlineUsers,
   setSelectedConversation,
+  resetChat,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

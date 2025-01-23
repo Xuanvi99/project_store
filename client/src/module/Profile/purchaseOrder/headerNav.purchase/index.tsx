@@ -1,12 +1,11 @@
 import { listHeaderOrder } from "@/constant/order.constant";
-import { useAppSelector } from "@/hook";
-import { RootState } from "@/stores";
 import { useGetAmountOrderUserQuery } from "@/stores/service/order.service";
 import { cn } from "@/utils";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { IPurchaseProvide, PurchaseContext } from "../context";
 import useTestContext from "@/hook/useTestContext";
+import { useSelectorAuthSlice } from "@/hook";
 
 function HeaderNavPurchase() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,7 +46,7 @@ const NavItem = ({
   activeItem: boolean;
   onClick: () => void;
 }) => {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const { id, title, status } = data;
 

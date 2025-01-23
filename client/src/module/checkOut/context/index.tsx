@@ -1,7 +1,6 @@
-import { useAppSelector } from "@/hook";
+import { useSelectorAuthSlice } from "@/hook";
 import { IOrderItem, IReqOrder } from "@/types/order.type";
 import { createContext, useEffect, useState } from "react";
-import { RootState } from "../../../stores/index";
 
 export type ICheckoutProvide = {
   reqOrder: IReqOrder;
@@ -35,7 +34,7 @@ export type ICheckoutProvide = {
 const CheckoutContext = createContext<ICheckoutProvide | null>(null);
 
 const CheckoutProvide = ({ children }: { children: React.ReactNode }) => {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const [listProductOrder, setListProductOrder] = useState<IOrderItem[]>([]);
   console.log("listProductOrder: ", listProductOrder);

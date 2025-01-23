@@ -2,7 +2,7 @@ import { Button } from "@/components/button";
 import { IconDown } from "@/components/icon";
 import { Input } from "@/components/input";
 import Modal, { ModalNotification } from "@/components/modal";
-import { useAppSelector, useHover } from "@/hook";
+import { useHover, useSelectorAuthSlice } from "@/hook";
 import { useEffect, useRef, useState } from "react";
 import Tooltip from "../../../components/tooltip/index";
 import PromotionDetail from "./PromotionDetail";
@@ -12,12 +12,11 @@ import {
   useDeleteCartAllMutation,
   useDeleteCartMultipleMutation,
 } from "@/stores/service/cart.service";
-import { RootState } from "@/stores";
 import generateUniqueId from "generate-unique-id";
 import { useNavigate } from "react-router-dom";
 import { cn, formatPrice } from "@/utils";
 function Footer() {
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
   const {
     handleOpenError,
     listProductActiveToCart,

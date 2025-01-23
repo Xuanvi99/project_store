@@ -3,8 +3,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLocation, useNavigate } from "react-router-dom";
-import { RootState } from "@/stores";
-import { useAppSelector } from "@/hook";
+import { useSelectorAuthSlice } from "@/hook";
 import { useCheckPhoneOrEmailMutation } from "@/stores/service/user.service";
 import Heading from "../../common/Heading";
 import { ModalNotification } from "@/components/modal";
@@ -19,7 +18,7 @@ function FormEmail() {
   const navigate = useNavigate();
   const { pathname, state: statePath } = useLocation();
   console.log(useLocation());
-  const user = useAppSelector((state: RootState) => state.authSlice.user);
+  const { user } = useSelectorAuthSlice();
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -95,6 +94,7 @@ function FormEmail() {
         <ModalNotification
           isOpenModal={openModal}
           onClick={handleOpenModal.current}
+          type="default"
         >
           <div className="w-[300px] p-5 relative rounded-md overflow-hidden">
             <div className="absolute inset-0 z-50 bg-black opacity-75"></div>
