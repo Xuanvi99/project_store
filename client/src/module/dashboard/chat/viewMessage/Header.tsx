@@ -49,7 +49,7 @@ function HeaderView() {
           />
         )}
         {onlineUsers.includes(receiver._id) && (
-          <div className="absolute bottom-0 right-0 w-4 h-4 border-2 border-white rounded-full bg-green66"></div>
+          <div className="absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full bg-green66"></div>
         )}
       </div>
       <div className="flex flex-col justify-start">

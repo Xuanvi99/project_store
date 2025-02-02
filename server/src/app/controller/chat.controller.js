@@ -21,7 +21,7 @@ class chat {
 
       res.status(200).json(listConversation);
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -43,7 +43,7 @@ class chat {
 
       res.status(200).json(conversation);
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -55,7 +55,7 @@ class chat {
         .select("_id userName role")
         .lean();
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -74,14 +74,13 @@ class chat {
         .populate([{ path: "avatar", select: "_id public_id url folder" }]);
       res.status(200).json(users ? users : []);
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
   getMessages = async (req, res) => {
     const conversationId = req.params.conversationId;
     try {
-      const userId = req.query.userId;
       const limit = +req.query.limit;
       const skip = +req.query.skip;
 
@@ -89,31 +88,26 @@ class chat {
         .findById(conversationId)
         .lean();
 
-      if (conversation && userId) {
-        await messageModel.updateMany(
-          { $and: [{ conversationId }, { receiverId: userId }] },
-          { $set: { seen: true } }
-        );
+      let messages = [];
+      if (conversation) {
+        messages = await messageModel
+          .find({ conversationId })
+          .populate([
+            {
+              path: "imageIds",
+              model: "images",
+              select: "url",
+            },
+          ])
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit);
       } else {
         return res.status(201).json([]);
       }
-
-      const listMessage = await messageModel
-        .find({ conversationId })
-        .populate([
-          {
-            path: "imageIds",
-            model: "images",
-            select: "url",
-          },
-        ])
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
-
-      res.status(200).json(listMessage.reverse());
+      res.status(200).json(messages.reverse());
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -123,26 +117,37 @@ class chat {
       const message = await messageModel.findById(messageId);
       res.status(200).json(message);
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
-  seenMessage = async (req, res) => {
-    const messageId = req.params.messageId;
+  seenMessages = async (req, res) => {
+    const conversationId = req.params.conversationId;
     try {
-      const message = await messageModel.findByIdAndUpdate(messageId, {
-        seen: true,
-      });
-      res.status(200).json(message);
+      let userId = req.body.userId;
+
+      const conversation = await conversationModel
+        .findById(conversationId)
+        .lean();
+
+      if (conversation) {
+        await messageModel.updateMany(
+          {
+            $and: [{ conversationId: conversationId }, { receiverId: userId }],
+          },
+          { $set: { receiverSeen: true } }
+        );
+      }
+      res.status(200).json("update success");
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
   sendMessageText = async (req, res) => {
     try {
       const conversationId = req.params.conversationId;
-      const { senderId, receiverId, text } = req.body;
+      const { senderId, receiverId, text, receiverSeen } = req.body;
 
       const newMessage = new messageModel({
         conversationId,
@@ -150,29 +155,32 @@ class chat {
         receiverId,
         messageType: "text",
         text,
+        receiverSeen,
       });
 
-      const messageLaster = await newMessage.save();
+      const savedMessage = await newMessage.save();
 
-      if (messageLaster) {
-        const listMessage = await messageModel.find({
-          conversationId: { $in: conversationId },
+      if (savedMessage) {
+        // Cập nhật thông tin cuộc trò chuyện
+        const messageCount = await messageModel.countDocuments({
+          conversationId,
         });
-
-        const amountMessage = listMessage.length;
 
         await conversationModel.findByIdAndUpdate(conversationId, {
-          totalMessage: amountMessage,
-          messageLaster: messageLaster._id,
+          totalMessage: messageCount,
+          messageLasterId: savedMessage._id,
         });
-      }
 
-      const receiverSocketId = SocketIoService.getUserSocketMap(receiverId);
-
-      if (receiverSocketId) {
-        _io.to(receiverSocketId).emit("newMessage", messageLaster._doc);
+        // Gửi tin nhắn realtime qua Socket.IO
+        const receiverSocketId = SocketIoService.getUserSocketMap(receiverId);
+        if (receiverSocketId) {
+          _io.to(receiverSocketId).emit("receiveMessage", {
+            conversationId,
+            message: savedMessage._doc,
+          });
+        }
       }
-      res.status(201).json(messageLaster._doc);
+      res.status(201).json(savedMessage._doc);
     } catch (err) {
       res.status(500).json({ error: "Internal server error" });
     }
@@ -206,7 +214,7 @@ class chat {
       }
       res.status(201).json(newMessage);
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 }

@@ -1,18 +1,13 @@
-import ChatContainer from "@/components/Chat/ChatContainer";
+import ChatContainer from "@/components/Chat/chatContainer";
 import HeaderView from "./Header";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
 import NoConversation from "./NoConversation";
-import useChatContext from "../context/useChatContext";
 
 function ChatViewMessage() {
-  const { conversations } = useChatContext();
-
   const { selectedConversation } = useAppSelector(
     (state: RootState) => state.chatSlice
   );
-
-  if (!conversations) return;
 
   if (!selectedConversation) return <NoConversation />;
 

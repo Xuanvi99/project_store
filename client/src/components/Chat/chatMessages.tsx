@@ -3,14 +3,16 @@ import Message from "./Message";
 import { LoadingCallApi } from "../loading";
 import { cn } from "@/utils";
 import { useSelectorAuthSlice, useSelectorChatSlice } from "@/hook";
-import { forwardRef, Fragment, useCallback, useEffect, useState } from "react";
+import { forwardRef, useCallback, useEffect, useState } from "react";
 import { IUser } from "@/types/user.type";
 import { useLazyGetProfileQuery } from "@/stores/service/user.service";
+import ChatInfoReceiver from "./chatInfoReceiver";
 
 type TProps = {
   messages: IMessage[];
   isFetchingData: boolean;
   displayTyping: boolean;
+  receiverJoinCvs: boolean;
 };
 
 const ChatMessages = forwardRef<HTMLDivElement, TProps>(
@@ -19,7 +21,7 @@ const ChatMessages = forwardRef<HTMLDivElement, TProps>(
 
     const { selectedConversation } = useSelectorChatSlice();
 
-    const { messages, isFetchingData, displayTyping } = props;
+    const { messages, isFetchingData, displayTyping, receiverJoinCvs } = props;
 
     const [getProfile] = useLazyGetProfileQuery();
 
@@ -112,7 +114,16 @@ const ChatMessages = forwardRef<HTMLDivElement, TProps>(
 
         <FetchingDataMessagesFirst />
 
-        {messages.length > 0 && <RenderMessages messages={messages} />}
+        {messages.length === selectedConversation?.totalMessage && (
+          <ChatInfoReceiver></ChatInfoReceiver>
+        )}
+
+        {messages.length > 0 && (
+          <RenderMessages
+            messages={messages}
+            receiverJoinCvs={receiverJoinCvs}
+          />
+        )}
 
         <DisplayTyping />
       </div>
@@ -120,7 +131,13 @@ const ChatMessages = forwardRef<HTMLDivElement, TProps>(
   }
 );
 
-const RenderMessages = ({ messages }: { messages: IMessage[] }) => {
+const RenderMessages = ({
+  messages,
+  receiverJoinCvs,
+}: {
+  messages: IMessage[];
+  receiverJoinCvs: boolean;
+}) => {
   const { user } = useSelectorAuthSlice();
 
   const checkDisplayAvatarReceiver = (index: number): boolean => {
@@ -136,30 +153,54 @@ const RenderMessages = ({ messages }: { messages: IMessage[] }) => {
     return true;
   };
 
-  const checkDisplayTimeSendMessageLast = (index: number): boolean => {
+  const checkDisplayTimeSendMessage = (index: number): boolean => {
     if (user && index + 1 === messages.length) {
-      return user._id === messages[index].senderId && !messages[index].seen
+      return user._id === messages[index].senderId &&
+        !messages[index].receiverSeen
         ? true
         : false;
     }
     return false;
   };
 
+  const checkDisplayReceiverSeenMessage = () => {
+    if (receiverJoinCvs) {
+      return messages.length - 1;
+    }
+    if (user) {
+      let index = -1;
+      for (let i = 0; i < messages.length; i++) {
+        if (
+          messages[i].senderId === user._id &&
+          messages[i].receiverSeen === true
+        ) {
+          index = i;
+        }
+        if (messages[i].senderId !== user._id) {
+          index = i;
+        }
+      }
+      return index;
+    }
+    return -1;
+  };
+
   return (
-    <Fragment>
+    <div className="flex flex-col gap-y-1">
       {messages.map((item, index) => {
-        const displayAvatar = checkDisplayAvatarReceiver(index);
-        const displayTimeSend = checkDisplayTimeSendMessageLast(index);
         return (
           <Message
             key={item._id}
             message={item}
-            displayAvatar={displayAvatar}
-            displayTimeSend={displayTimeSend}
-          ></Message>
+            displayAvatar={checkDisplayAvatarReceiver(index)}
+            displayTimeSend={checkDisplayTimeSendMessage(index)}
+            displayReceiverSeen={
+              checkDisplayReceiverSeenMessage() === index ? true : false
+            }
+          />
         );
       })}
-    </Fragment>
+    </div>
   );
 };
 

@@ -1,18 +1,22 @@
 import { useAppDispatch, useSelectorChatSlice } from "@/hook";
 import { setSelectedConversation } from "@/stores/reducer/chat.reducer";
-import { useLazyGetOneMessagesQuery } from "@/stores/service/chat.service";
+import {
+  useGetOneMessagesQuery,
+  useSeenMessagesMutation,
+} from "@/stores/service/chat.service";
 import { useLazyGetProfileQuery } from "@/stores/service/user.service";
 import { IConversation, IMessage } from "@/types/chat.type";
 import { IUser } from "@/types/user.type";
 import { cn, momentVi } from "@/utils";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import SkeletonConversationItem from "../../skeleton/SkeletonConversationItem";
 
 type TProps = {
   conversation: IConversation;
   currentUserId: string;
 };
 function ConversationItem({ conversation, currentUserId }: TProps) {
-  const { messageLaster: messageId } = conversation;
+  const { messageLasterId: messageId } = conversation;
 
   const { onlineUsers, selectedConversation } = useSelectorChatSlice();
 
@@ -20,9 +24,9 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
 
   const [getProfile] = useLazyGetProfileQuery();
 
-  // const { data: DataResMessage, status, refetch } = useGetOneMessagesQuery(id);
+  const { data, status, refetch } = useGetOneMessagesQuery(messageId);
 
-  const [getOneMessage] = useLazyGetOneMessagesQuery();
+  const [seenMessages] = useSeenMessagesMutation();
 
   const [receiver, setReceiver] = useState<IUser>();
 
@@ -35,33 +39,46 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
       const receiverId = conversation.participants.find(
         (r) => r !== currentUserId
       );
-      if (receiverId && messageId) {
-        await Promise.all([
-          getProfile(receiverId).unwrap(),
-          getOneMessage(messageId).unwrap(),
-        ]).then((res) => {
-          setReceiver(res[0].user);
-          setMessage(res[1]);
-        });
+      if (receiverId) {
+        await getProfile(receiverId)
+          .unwrap()
+          .then((res) => {
+            setReceiver(res.user);
+          });
       }
     } catch (error) {
       console.log(error);
     }
-  }, [
-    conversation.participants,
-    currentUserId,
-    getOneMessage,
-    getProfile,
-    messageId,
-  ]);
+  }, [conversation.participants, currentUserId, getProfile]);
 
-  const handleSelectConversation = () => {
-    dispatch(setSelectedConversation(conversation));
+  const handleSelectConversation = async () => {
+    try {
+      dispatch(setSelectedConversation(conversation));
+      await seenMessages({
+        conversationId: conversation._id,
+        userId: currentUserId,
+      })
+        .unwrap()
+        .then(() => {
+          refetch();
+        })
+        .catch(() => {
+          throw Error("Failed to fetch");
+        });
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
   useEffect(() => {
     handleGetReceiver();
   }, [handleGetReceiver]);
+
+  useEffect(() => {
+    if (data && status === "fulfilled") {
+      setMessage(data);
+    }
+  }, [data, status]);
 
   useLayoutEffect(() => {
     let timeRefetch = undefined;
@@ -73,7 +90,7 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
     return () => clearInterval(timeRefetch);
   }, [message]);
 
-  if (!receiver || !message) return;
+  if (!receiver || !message) return <SkeletonConversationItem />;
 
   return (
     <div
@@ -105,7 +122,7 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
                 className={cn(
                   "line-clamp-1",
                   message.senderId === receiver._id &&
-                    !message.seen &&
+                    !message.receiverSeen &&
                     "font-semibold text-black"
                 )}
               >
@@ -120,7 +137,7 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
             </span>
           </div>
         </div>
-        {message.senderId === receiver._id && !message.seen && (
+        {message.senderId === receiver._id && !message.receiverSeen && (
           <div className="flex items-center w-[10px] h-full">
             <span className="w-[10px] h-[10px] rounded-full bg-orange"></span>
           </div>

@@ -26,7 +26,6 @@ function SearchReceiver({ receiver }: TProps) {
         openScroll && "overflow-y-scroll"
       )}
     >
-      <div className="m-2 text-sm font-semibold">Kết quả tìm kiếm:</div>
       {receiver.map((user) => (
         <SearchItem key={user._id} user={user}></SearchItem>
       ))}

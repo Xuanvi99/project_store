@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 type TProps = {
   textMessage: string;
   openBtnScrollDown: boolean;
+  receiverJoinCvs: boolean;
   handleChangeTextMessage: (value: string) => void;
   handleBtnScrollToBottom: () => void;
   handleSenderMessage: (msg: IMessage) => void;
@@ -29,6 +30,7 @@ type TProps = {
 function ChatInput({
   textMessage,
   openBtnScrollDown,
+  receiverJoinCvs,
   handleChangeTextMessage,
   handleBtnScrollToBottom,
   handleSenderMessage,
@@ -53,10 +55,10 @@ function ChatInput({
   const handleChangeMessage = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     handleChangeTextMessage(e.target.value);
     setMessage(e.target.value);
-    if (socketIo_client && e.target.value.length > 0) {
+    if (socketIo_client) {
       socketIo_client.emit("typing", {
         receiverId,
-        typing: true,
+        typing: e.target.value.length === 0 ? false : true,
       });
     }
   };
@@ -67,12 +69,19 @@ function ChatInput({
         const receiverId = selectedConversation.participants.find(
           (r) => r !== user._id
         );
+        if (socketIo_client) {
+          socketIo_client.emit("typing", {
+            receiverId,
+            typing: false,
+          });
+        }
         if (receiverId) {
           const message: IReqSendMessageText = {
             conversationId: selectedConversation._id,
             senderId: user._id,
             receiverId: receiverId,
             text: textMessage,
+            receiverSeen: receiverJoinCvs,
           };
           await sendMessageText(message)
             .unwrap()
@@ -84,6 +93,12 @@ function ChatInput({
       } catch (error) {
         console.log("error: ", error);
       }
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter") {
+      handleSendMessage();
     }
   };
 
@@ -123,6 +138,7 @@ function ChatInput({
               placeholder="Nhập nội dung tin nhắn"
               value={textMessage}
               onChange={handleChangeMessage}
+              onKeyDown={handleKeyDown}
               className="w-full text-sm outline-none resize-none bg-grayE5"
             />
             <div className="relative">

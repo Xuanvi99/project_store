@@ -25,7 +25,7 @@ const MessageSchema = new Schema(
         ref: "images",
       },
     ],
-    seen: { type: Boolean, default: false },
+    receiverSeen: { type: Boolean, default: false },
   },
   { timestamps: true, versionKey: false }
 );

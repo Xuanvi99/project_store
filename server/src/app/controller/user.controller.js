@@ -49,7 +49,7 @@ class userController {
 
       res.status(200).json({ listUser, totalPage });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -91,7 +91,7 @@ class userController {
       await newUser.save();
       res.status(200).json({ message: "Tạo user thành công" });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -116,7 +116,7 @@ class userController {
         .exec();
       res.status(200).json({ message: "update user success" });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -133,7 +133,7 @@ class userController {
       await cartModel.deleteOne({ userId });
       res.status(200).json({ message: "delete user success" });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -148,7 +148,7 @@ class userController {
         .exec();
       res.status(200).json({ message: " Blocked user success" });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -163,7 +163,7 @@ class userController {
         .exec();
       res.status(200).json({ message: "update Admin user success" });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -177,7 +177,7 @@ class userController {
           .json({ errMessage: "Tài khoản hoặc mật khẩu không đúng!" });
       res.status(200).json({ message: "Verify password success!" });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 

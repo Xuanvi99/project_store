@@ -7,17 +7,17 @@ import {
 } from "@/hook";
 import { IMessage } from "@/types/chat.type";
 import {
-  chatApi,
   IReqGetMessage,
   useGetMessagesQuery,
 } from "@/stores/service/chat.service";
 import ChatMessages from "./chatMessages";
-import ChatInput from "./ChatInput";
+import ChatInput from "./chatInput";
 
 type TParamsGetMessages<Type> = {
   [Property in keyof Type]?: Type[Property];
 };
 const LIMIT = 15;
+
 function ChatContainer() {
   const socketIo_client = useSocketIoContext();
 
@@ -29,7 +29,6 @@ function ChatContainer() {
 
   const [paramsGetMessages, setParamsGetMessages] = useState<IReqGetMessage>({
     conversationId: null,
-    userId: null,
     limit: LIMIT,
     skip: 0,
   });
@@ -61,7 +60,11 @@ function ChatContainer() {
 
   const [statusSender, setStatusSender] = useState<boolean>(false);
 
+  const [receiveMessage, setReceiveMessage] = useState<boolean>(false);
+
   const [displayTyping, setDisplayTyping] = useState<boolean>(false);
+
+  const [receiverJoinCvs, setReceiverJoinCvs] = useState<boolean>(false);
 
   const handleChangeTextMessage = (value: string) => {
     setTextMessage(value);
@@ -104,7 +107,6 @@ function ChatContainer() {
       handleSetParamsGetMessage({
         conversationId: selectedConversation._id,
         skip: 0,
-        userId: user._id,
       });
     }
     setMessages([]);
@@ -115,7 +117,8 @@ function ChatContainer() {
     setStatusSender(false);
     setOpenBtnScrollDown(false);
     setDisplayTyping(false);
-  }, [dispatch, selectedConversation, user]);
+    setReceiveMessage(false);
+  }, [selectedConversation, user]);
 
   useLayoutEffect(() => {
     if (dataGetMessage && status === "fulfilled") {
@@ -124,7 +127,7 @@ function ChatContainer() {
       });
       setCountCallApi((count) => count + 1);
     }
-  }, [dataGetMessage, dispatch, status]);
+  }, [dataGetMessage, status]);
 
   //set scrollHeight in chat when scroll to top
   useLayoutEffect(() => {
@@ -133,7 +136,6 @@ function ChatContainer() {
       container &&
       selectedConversation &&
       countCallApi >= 1 &&
-      messages.length < selectedConversation.totalMessage &&
       !statusSender
     ) {
       if (isFetching) {
@@ -142,13 +144,7 @@ function ChatContainer() {
         setContainerScrollHeight(container.scrollHeight);
       }
     }
-  }, [
-    messages.length,
-    selectedConversation,
-    countCallApi,
-    isFetching,
-    statusSender,
-  ]);
+  }, [selectedConversation, countCallApi, isFetching, statusSender]);
 
   // scroll down first load chat message
   useEffect(() => {
@@ -215,7 +211,7 @@ function ChatContainer() {
       if (container && selectedConversation && messages.length > 0) {
         setOpenBtnScrollDown(
           container.scrollTop + container.clientHeight <
-            container.scrollHeight - 40
+            container.scrollHeight - 50
             ? true
             : false
         );
@@ -243,38 +239,104 @@ function ChatContainer() {
     selectedConversation,
   ]);
 
+  // scroll when typing and scroll to bottom
   useEffect(() => {
     const container = containerRef.current;
-    if (container && displayTyping) {
+    if (
+      container &&
+      displayTyping &&
+      container.scrollTop + container.clientHeight === container.scrollHeight
+    ) {
       const top = container.scrollHeight;
       handleScrollTo(top, "smooth");
     }
   }, [displayTyping]);
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (
+      container &&
+      receiveMessage &&
+      container.scrollTop + container.clientHeight === containerScrollHeight
+    ) {
+      const top = container.scrollHeight;
+      handleScrollTo(top, "smooth");
+      setReceiveMessage(false);
+    }
+  }, [containerScrollHeight, receiveMessage]);
+
   // socket IO
   useEffect(() => {
-    if (socketIo_client) {
-      socketIo_client.on("newMessage", (data: IMessage) => {
-        setMessages((messages) => [...messages, data]);
-        dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
+    let receiverId = "";
+    if (socketIo_client && selectedConversation && user) {
+      receiverId =
+        selectedConversation.participants.find((r) => r !== user._id) || "";
+
+      socketIo_client.emit("checkReceiverJoinConversation", {
+        receiverId,
+        conversationId: selectedConversation._id,
       });
+
+      socketIo_client.emit("joinConversation", {
+        join: true,
+        conversationId: selectedConversation._id,
+        receiverId,
+      });
+
+      socketIo_client.on(
+        "checkReceiverJoinConversation",
+        (data: { conversationId: string }) => {
+          const { conversationId } = data;
+          socketIo_client.emit("resultCheckJoinCvs", {
+            join: conversationId === selectedConversation._id ? true : false,
+            conversationId: selectedConversation._id,
+            receiverId,
+          });
+        }
+      );
+
+      socketIo_client.on(
+        "statusReceiverJoin",
+        (data: { join: boolean; conversationId: string }) => {
+          const { conversationId, join } = data;
+          if (conversationId === selectedConversation._id) {
+            setReceiverJoinCvs(join);
+          }
+        }
+      );
+
+      socketIo_client.on(
+        "receiveMessage",
+        (data: { conversationId: string; message: IMessage }) => {
+          const { conversationId, message } = data;
+          if (conversationId === selectedConversation._id) {
+            setMessages((messages) => [...messages, message]);
+            setReceiveMessage(true);
+          }
+        }
+      );
+
       socketIo_client.on(
         "displayTyping",
         (data: { typing: boolean; senderId: string }) => {
-          if (
-            selectedConversation &&
-            selectedConversation.participants.includes(data.senderId)
-          ) {
+          if (selectedConversation.participants.includes(data.senderId)) {
             setDisplayTyping(data.typing);
           }
         }
       );
     }
     return () => {
-      socketIo_client?.off("newMessage");
+      socketIo_client?.off("receiveMessage");
       socketIo_client?.off("displayTyping");
+      socketIo_client?.off("statusReceiverJoin");
+      socketIo_client?.off("checkReceiverJoinConversation");
+      socketIo_client?.emit("joinConversation", {
+        join: false,
+        conversationId: selectedConversation?._id,
+        receiverId,
+      });
     };
-  }, [dispatch, selectedConversation, socketIo_client]);
+  }, [dispatch, selectedConversation, socketIo_client, user]);
 
   return (
     <div className="flex flex-col justify-end w-full h-full conversation">
@@ -283,10 +345,12 @@ function ChatContainer() {
         messages={messages}
         isFetchingData={isFetching}
         displayTyping={displayTyping}
+        receiverJoinCvs={receiverJoinCvs}
       />
       <ChatInput
         openBtnScrollDown={openBtnScrollDown}
         textMessage={textMessage}
+        receiverJoinCvs={receiverJoinCvs}
         handleChangeTextMessage={handleChangeTextMessage}
         handleBtnScrollToBottom={handleBtnScrollToBottom}
         handleSenderMessage={handleSenderMessage}

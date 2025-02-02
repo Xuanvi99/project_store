@@ -21,6 +21,8 @@ export type TChatProvider = {
 
   isFetching: boolean;
 
+  isLoading: boolean;
+
   openSearchResult: boolean;
 
   handleOpenSearchResult: (status: boolean) => void;
@@ -38,6 +40,7 @@ function ChatProvide({ children }: { children: React.ReactNode }) {
     data: dataGetConversations,
     status,
     isFetching,
+    isLoading,
   } = useGetConversationsQuery(user ? user._id : "", {
     skip: !user,
   });
@@ -58,13 +61,14 @@ function ChatProvide({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (socketIo_client) {
-      socketIo_client.on("newMessage", () => {
+      socketIo_client.on("receiveMessage", () => {
         dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
       });
     }
 
     return () => {
       dispatch(resetChat());
+      socketIo_client?.off("receiveMessage");
     };
   }, [dispatch, socketIo_client]);
 
@@ -74,6 +78,7 @@ function ChatProvide({ children }: { children: React.ReactNode }) {
         conversations,
         status,
         isFetching,
+        isLoading,
         openSearchResult,
         handleOpenSearchResult,
       }}

@@ -6,7 +6,9 @@ import ChatFooter from "./Chat";
 import ScrollTop from "./scrollTop";
 
 function Footer() {
-  const { isLogin } = useAppSelector((state: RootState) => state.authSlice);
+  const { isLogin, user } = useAppSelector(
+    (state: RootState) => state.authSlice
+  );
 
   const [scroll, setScroll] = useState<boolean>(false);
 
@@ -89,7 +91,7 @@ function Footer() {
         Copyright 2024 © Team XV Store
       </div>
       {scroll && <ScrollTop />}
-      {isLogin && <ChatFooter />}
+      {isLogin && user?.role === "buyer" && <ChatFooter />}
     </footer>
   );
 }

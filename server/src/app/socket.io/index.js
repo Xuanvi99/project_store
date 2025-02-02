@@ -35,6 +35,30 @@ class SocketIoService {
       }
     });
 
+    socket.on("joinConversation", async (data) => {
+      const { receiverId, join, conversationId } = data;
+      const receiverSocketId = this.userSocketMap[receiverId];
+      _io
+        .to(receiverSocketId)
+        .emit("statusReceiverJoin", { join, conversationId });
+    });
+
+    socket.on("checkReceiverJoinConversation", async (data) => {
+      const { receiverId, conversationId } = data;
+      const receiverSocketId = this.userSocketMap[receiverId];
+      _io
+        .to(receiverSocketId)
+        .emit("checkReceiverJoinConversation", { conversationId });
+    });
+
+    socket.on("resultCheckJoinCvs", async (data) => {
+      const { receiverId, join, conversationId } = data;
+      const receiverSocketId = this.userSocketMap[receiverId];
+      _io
+        .to(receiverSocketId)
+        .emit("statusReceiverJoin", { join, conversationId });
+    });
+
     socket.on("disconnect", async () => {
       const time = new Date();
       const updateUser = { status: "offline", timeOffline: time };

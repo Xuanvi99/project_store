@@ -23,7 +23,6 @@ function ConversationSearch() {
       await getUsersChat(value)
         .unwrap()
         .then((res) => {
-          console.log("res: ", res);
           setUsersChat(res);
         })
         .catch(() => {
@@ -37,11 +36,7 @@ function ConversationSearch() {
 
   const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTextSearch(event.target.value);
-    if (event.target.value.length === 0) {
-      setUsersChat([]);
-    } else {
-      debounceFn(event.target.value);
-    }
+    debounceFn(event.target.value);
   };
 
   useEffect(() => {
@@ -53,13 +48,13 @@ function ConversationSearch() {
 
   return (
     <Fragment>
-      <div className="flex items-center gap-x-3 w-full">
+      <div className="flex items-center w-full gap-x-3">
         {openSearchResult && (
           <div
             onClick={() => {
               handleOpenSearchResult(false);
             }}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-orange cursor-pointer hover:bg-orange hover:text-white"
+            className="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer text-orange hover:bg-orange hover:text-white"
           >
             <IconBack size={50}></IconBack>
           </div>
@@ -81,6 +76,7 @@ function ConversationSearch() {
             autoComplete="false"
             onFocus={() => {
               handleOpenSearchResult(true);
+              debounceFn("");
             }}
             className={{
               input:
@@ -89,9 +85,12 @@ function ConversationSearch() {
           />
         </div>
       </div>
+
       {openSearchResult && (
-        <SearchReceiver receiver={usersChat}></SearchReceiver>
+        <div className="m-2 text-sm font-semibold">Kết quả tìm kiếm:</div>
       )}
+
+      {openSearchResult && <SearchReceiver receiver={usersChat} />}
     </Fragment>
   );
 }

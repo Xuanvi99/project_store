@@ -4,9 +4,9 @@ import ConversationsList from "./list";
 import ConversationSearch from "./search";
 
 function ChatAllConversations() {
-  const { openSearchResult, status } = useChatContext();
+  const { openSearchResult, isLoading } = useChatContext();
 
-  if (status === "pending") return <SkeletonConversation />;
+  if (isLoading) return <SkeletonConversation />;
 
   return (
     <aside className="flex basis-[30%] h-full overflow-hidden bg-white rounded-lg ">

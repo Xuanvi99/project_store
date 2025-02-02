@@ -1,6 +1,6 @@
 import { IconCLose, IconMessage } from "@/components/icon";
 import { cn } from "@/utils";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import {
   useAppDispatch,
   useSelectorAuthSlice,
@@ -8,9 +8,12 @@ import {
   useToggle,
 } from "@/hook";
 import { toast } from "react-toastify";
-import { useLazyGetOneConversationQuery } from "@/stores/service/chat.service";
+import {
+  useLazyGetOneConversationQuery,
+  useSeenMessagesMutation,
+} from "@/stores/service/chat.service";
 import { setSelectedConversation } from "@/stores/reducer/chat.reducer";
-import ChatContainer from "@/components/Chat/ChatContainer";
+import ChatContainer from "@/components/Chat/chatContainer";
 
 function ChatFooter() {
   const { user } = useSelectorAuthSlice();
@@ -21,11 +24,31 @@ function ChatFooter() {
 
   const [getOneConversation] = useLazyGetOneConversationQuery();
 
+  const [seenMessages] = useSeenMessagesMutation();
+
   const [firstLoad, setFirstLoad] = useState<boolean>(false);
 
   const { toggle: openChat, handleToggle: handleOpenChat } = useToggle();
 
   const [receiverId, setReceiverId] = useState<string>("");
+
+  const handleOnclickChat = useCallback(async () => {
+    try {
+      if (selectedConversation && user) {
+        await seenMessages({
+          conversationId: selectedConversation._id,
+          userId: user._id,
+        })
+          .unwrap()
+          .then(() => {
+            handleOpenChat();
+            setFirstLoad(true);
+          });
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  }, [handleOpenChat, seenMessages, selectedConversation, user]);
 
   useLayoutEffect(() => {
     if (user) {
@@ -55,10 +78,7 @@ function ChatFooter() {
   return (
     <div className={cn("fixed right-3 bottom-0 z-40")}>
       <div
-        onClick={() => {
-          handleOpenChat();
-          setFirstLoad(true);
-        }}
+        onClick={handleOnclickChat}
         className={cn(
           "absolute right-0 bottom-2 flex justify-center items-center transition-opacity gap-x-2 text-lg font-semibold ",
           "text-orange bg-white rounded-full p-3 border-1 border-orange cursor-pointer hover:text-white hover:bg-orange",

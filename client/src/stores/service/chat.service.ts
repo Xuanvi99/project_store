@@ -9,7 +9,6 @@ import { IUser } from "@/types/user.type";
 
 export interface IReqGetMessage {
   conversationId: string | null;
-  userId: string | null;
   limit: number;
   skip: number;
 }
@@ -17,6 +16,11 @@ export interface IReqGetMessage {
 interface IReqSendMessageImages {
   conversationId: string;
   data: FormData;
+}
+
+interface IReqSeenMessages {
+  conversationId: string | null;
+  userId: string | null;
 }
 
 export const chatApi = createApi({
@@ -94,6 +98,13 @@ export const chatApi = createApi({
         params: { search },
       }),
     }),
+    seenMessages: build.mutation<string, IReqSeenMessages>({
+      query: ({ conversationId, ...body }) => ({
+        url: "chat/seenMessages/" + conversationId,
+        method: "PUT",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -108,4 +119,5 @@ export const {
   useLazyGetOneConversationQuery,
   useGetOneMessagesQuery,
   useLazyGetOneMessagesQuery,
+  useSeenMessagesMutation,
 } = chatApi;

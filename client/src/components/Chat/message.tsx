@@ -9,12 +9,13 @@ type TProps = {
   message: IMessage;
   displayAvatar: boolean;
   displayTimeSend: boolean;
+  displayReceiverSeen: boolean;
 };
 
 const Message = forwardRef<HTMLDivElement, TProps>((props, ref) => {
   const { user } = useAppSelector((state) => state.authSlice);
 
-  const { message, displayTimeSend } = props;
+  const { message, displayTimeSend, displayReceiverSeen } = props;
 
   const [timeSender, setTimeSender] = useState<string>("");
 
@@ -35,7 +36,7 @@ const Message = forwardRef<HTMLDivElement, TProps>((props, ref) => {
       ) : (
         <MessageOfReceiver {...props} />
       )}
-      {displayTimeSend && (
+      {displayTimeSend && !displayReceiverSeen && (
         <div className="pt-1 pr-2 text-xs text-gray text-end">
           Đã gửi{" "}
           {timeSender ? timeSender : momentVi(message.createdAt).fromNow()}
@@ -46,13 +47,23 @@ const Message = forwardRef<HTMLDivElement, TProps>((props, ref) => {
 });
 
 const MessageOfSender = (props: TProps) => {
-  const { message } = props;
+  const { message, displayReceiverSeen } = props;
+
+  const { data, status } = useGetProfileQuery(message.receiverId);
+
+  const [receiver, setReceiver] = useState<IUser>();
+
+  useLayoutEffect(() => {
+    if (data && status === "fulfilled") {
+      setReceiver(data.user);
+    }
+  }, [data, status]);
 
   return (
-    <div className={"message flex flex-col w-full items-end"}>
+    <div className={"message flex flex-col w-full items-end gap-y-1"}>
       <div
         className={cn(
-          "relative min-w-[10%] max-w-[70%] bg-orangeFe p-2 text-[14px] rounded-lg flex flex-col text-white",
+          "relative min-w-[75px] max-w-[70%] bg-orangeFe p-2 text-[14px] rounded-lg flex flex-col text-white",
           "before:w-0 before:h-0 before:border-b-[20px] before:border-b-transparent before:border-l-[20px] before:border-l-orangeFe",
           "before:absolute before:-right-[7px] before:top-0 before:z-20"
         )}
@@ -62,12 +73,22 @@ const MessageOfSender = (props: TProps) => {
           {momentVi(message.createdAt).format("HH:mm")}
         </span>
       </div>
+
+      {displayReceiverSeen && (
+        <div className="float-right w-4 h-4 overflow-hidden rounded-full">
+          <img
+            alt="error"
+            srcSet={receiver?.avatar?.url || receiver?.avatarDefault}
+            className="object-cover"
+          />
+        </div>
+      )}
     </div>
   );
 };
 
 const MessageOfReceiver = (props: TProps) => {
-  const { message, displayAvatar } = props;
+  const { message, displayAvatar, displayReceiverSeen } = props;
 
   const { data, status } = useGetProfileQuery(message.senderId);
 
@@ -80,31 +101,42 @@ const MessageOfReceiver = (props: TProps) => {
   }, [data, status]);
 
   return (
-    <div className="flex items-end justify-start w-full message gap-x-2">
-      <div
-        className={cn(
-          "flex flex-col justify-end h-full invisible",
-          displayAvatar && "visible"
-        )}
-      >
-        <span className="overflow-hidden rounded-full w-7 h-7">
+    <div className="flex flex-col">
+      <div className="flex items-end justify-start w-full message gap-x-2">
+        <div
+          className={cn(
+            "flex flex-col justify-end h-full invisible",
+            displayAvatar && "visible"
+          )}
+        >
+          <span className="overflow-hidden rounded-full w-7 h-7">
+            <img
+              alt="error"
+              srcSet={receiver?.avatar?.url || receiver?.avatarDefault}
+              className="object-cover"
+            />
+          </span>
+        </div>
+        <div
+          className={cn(
+            "min-w-[75px] max-w-[70%] bg-grayE5 text-black p-2 text-[14px] rounded-lg flex flex-col "
+          )}
+        >
+          <span className="text-start">{message.text}</span>
+          <span className="text-[10px] text-end text-gray">
+            {momentVi(message.createdAt).format("HH:mm")}
+          </span>
+        </div>
+      </div>
+      {displayReceiverSeen && (
+        <div className="w-4 h-4 ml-auto overflow-hidden rounded-full">
           <img
             alt="error"
             srcSet={receiver?.avatar?.url || receiver?.avatarDefault}
             className="object-cover"
           />
-        </span>
-      </div>
-      <div
-        className={cn(
-          "min-w-[10%] max-w-[70%] bg-grayE5 text-black p-2 text-[14px] rounded-lg flex flex-col "
-        )}
-      >
-        <span className="text-start">{message.text}</span>
-        <span className="text-[10px] text-end text-gray">
-          {momentVi(message.createdAt).format("HH:mm")}
-        </span>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

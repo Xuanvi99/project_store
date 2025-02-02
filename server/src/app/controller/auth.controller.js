@@ -51,7 +51,7 @@ class authController {
           accessToken,
         });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -131,7 +131,7 @@ class authController {
       }
       res.status(200).json({ message: "update password success" });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 
@@ -144,7 +144,7 @@ class authController {
       res.clearCookie("refreshToken");
       res.status(200).json({ message: "Logged out successfully!" });
     } catch (error) {
-      res.status(500).json({ errMessage: error | "server error" });
+      res.status(500).json({ errMessage: error || "server error" });
     }
   };
 

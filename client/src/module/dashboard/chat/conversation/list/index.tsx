@@ -6,6 +6,7 @@ import { useSelectorAuthSlice } from "@/hook";
 
 function ConversationsList() {
   const { user } = useSelectorAuthSlice();
+
   const { conversations } = useChatContext();
 
   const conversationRef = useRef<HTMLDivElement>(null);

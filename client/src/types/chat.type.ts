@@ -4,7 +4,7 @@ export interface IConversation {
   _id: string;
   participants: string[];
   totalMessage: number;
-  messageLaster: string;
+  messageLasterId: string;
 }
 
 export interface IMessage {
@@ -15,7 +15,7 @@ export interface IMessage {
   messageType: ["text", "image"];
   text?: string;
   imageIds?: IImage[];
-  seen: boolean;
+  receiverSeen: boolean;
   createdAt: Date;
 }
 
@@ -24,4 +24,5 @@ export interface IReqSendMessageText {
   senderId: string;
   receiverId: string;
   text: string;
+  receiverSeen: boolean;
 }

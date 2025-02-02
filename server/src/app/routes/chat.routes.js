@@ -12,7 +12,9 @@ routes.route("/api/chat/getMessages/:conversationId").get(chatCtrl.getMessages);
 
 routes.route("/api/chat/getOneMessages/:messageId").get(chatCtrl.getOneMessage);
 
-routes.route("/api/chat/seenMessage/:messageId").get(chatCtrl.seenMessage);
+routes
+  .route("/api/chat/seenMessages/:conversationId")
+  .put(chatCtrl.seenMessages);
 
 routes.route("/api/chat/getUsersChat").get(chatCtrl.getUsersChat);
 
