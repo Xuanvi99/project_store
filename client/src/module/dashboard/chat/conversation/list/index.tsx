@@ -7,7 +7,7 @@ import { useSelectorAuthSlice } from "@/hook";
 function ConversationsList() {
   const { user } = useSelectorAuthSlice();
 
-  const { conversations } = useChatContext();
+  const { conversations, openSearchResult } = useChatContext();
 
   const conversationRef = useRef<HTMLDivElement>(null);
 
@@ -25,7 +25,8 @@ function ConversationsList() {
       ref={conversationRef}
       className={cn(
         "w-full h-full flex flex-col mt-auto",
-        openScroll && "overflow-y-scroll pr-2"
+        openScroll && "overflow-y-scroll pr-2",
+        openSearchResult && "hidden"
       )}
     >
       {user &&

@@ -4,7 +4,7 @@ import ConversationsList from "./list";
 import ConversationSearch from "./search";
 
 function ChatAllConversations() {
-  const { openSearchResult, isLoading } = useChatContext();
+  const { isLoading } = useChatContext();
 
   if (isLoading) return <SkeletonConversation />;
 
@@ -15,7 +15,7 @@ function ChatAllConversations() {
           <p className="text-xl font-semibold">Danh sách tin nhắn</p>
         </div>
         <ConversationSearch />
-        {!openSearchResult && <ConversationsList />}
+        <ConversationsList />
       </div>
     </aside>
   );

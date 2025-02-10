@@ -12,7 +12,9 @@ import LoadingSpinner from "@/components/loading";
 import { useUpdateUserMutation } from "@/stores/service/user.service";
 import { Fragment, useEffect, useState } from "react";
 import { ModalNotification } from "@/components/modal";
-import { useSelectorAuthSlice } from "@/hook";
+import { useSelectorAuthSlice, useSelectorChatSlice } from "@/hook";
+import { toast } from "react-toastify";
+import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
 
 const validatingSchema = Yup.object({
   userName: Yup.string()
@@ -26,7 +28,12 @@ const validatingSchema = Yup.object({
 type formValues = Yup.InferType<typeof validatingSchema>;
 
 function FormUpdateInfo() {
+  const socketIo_client = useSocketIoContext();
+
   const { user } = useSelectorAuthSlice();
+
+  const { receiverId } = useSelectorChatSlice();
+
   const {
     control,
     handleSubmit,
@@ -105,7 +112,26 @@ function FormUpdateInfo() {
     for (const [keys, value] of Object.entries(data)) {
       formData.append(keys, value);
     }
-    if (user) await updateUser({ id: user._id, body: formData }).unwrap();
+    try {
+      if (user)
+        await updateUser({ id: user._id, body: formData })
+          .unwrap()
+          .then(() => {
+            if (socketIo_client && user.role === "buyer" && receiverId) {
+              socketIo_client.emit("updateInfoUser", {
+                receiverId: receiverId,
+                updateUserId: user._id,
+              });
+            }
+            toast("Cập nhật thông tin thành công", { type: "success" });
+          })
+          .catch((error) => {
+            toast("Cập nhật thông tin thất bại", { type: "error" });
+            throw new Error(error);
+          });
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
   return (

@@ -18,21 +18,6 @@ import LayoutRoot from "./layout/LayoutRoot";
 import LayoutRequireAuth from "./layout/LayoutRequireAuth";
 import * as Dashboard from "./module/dashboard";
 
-// async function loader() {
-//   await store
-//     .dispatch(
-//       productApi.endpoints.getListProduct.initiate({
-//         search: "adidas",
-//         activePage: 1,
-//         limit: 10,
-//       })
-//     )
-//     .unwrap()
-//     .then((response) => {
-//       return response;
-//     });
-// }
-
 const router = createBrowserRouter([
   {
     path: "",

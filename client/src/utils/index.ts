@@ -17,7 +17,7 @@ export const momentVi = (
     relativeTime: {
       future: "trong %s",
       past: "%s trước",
-      s: "1 phút",
+      s: "vài giây",
       ss: "%d giây",
       m: "1 phút",
       mm: "%d phút",

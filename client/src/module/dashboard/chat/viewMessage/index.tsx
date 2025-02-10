@@ -1,4 +1,4 @@
-import ChatContainer from "@/components/Chat/chatContainer";
+import ChatContainer from "@/components/Chat/ChatContainer";
 import HeaderView from "./Header";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";

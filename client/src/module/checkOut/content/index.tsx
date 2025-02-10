@@ -33,8 +33,6 @@ function ListProductOrder() {
     CheckoutContext as React.Context<ICheckoutProvide>
   );
 
-  console.log("ca", deliveryTime.getTime() - new Date().getTime());
-
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 

@@ -1,18 +1,19 @@
 import { IconSearch, IconBack } from "@/components/icon";
 import { Input } from "@/components/input";
 import { cn } from "@/utils";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useLayoutEffect, useMemo, useState } from "react";
 import { useLazyGetUsersChatQuery } from "@/stores/service/chat.service";
 import { IUser } from "@/types/user.type";
 import { toast } from "react-toastify";
 import SearchReceiver from "./SearchReceiver";
 import useChatContext from "../../context/useChatContext";
 import { debounce } from "lodash";
+import LoadingSpinner from "@/components/loading";
 
 function ConversationSearch() {
   const { openSearchResult, handleOpenSearchResult } = useChatContext();
 
-  const [getUsersChat] = useLazyGetUsersChatQuery();
+  const [getUsersChat, { isFetching }] = useLazyGetUsersChatQuery();
 
   const [textSearch, setTextSearch] = useState<string>("");
 
@@ -39,7 +40,7 @@ function ConversationSearch() {
     debounceFn(event.target.value);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!openSearchResult) {
       setTextSearch("");
       setUsersChat([]);
@@ -89,8 +90,14 @@ function ConversationSearch() {
       {openSearchResult && (
         <div className="m-2 text-sm font-semibold">Kết quả tìm kiếm:</div>
       )}
-
-      {openSearchResult && <SearchReceiver receiver={usersChat} />}
+      {openSearchResult && isFetching && (
+        <div className="flex items-center justify-center h-full">
+          <LoadingSpinner></LoadingSpinner>
+        </div>
+      )}
+      {openSearchResult && !isFetching && usersChat.length > 0 && (
+        <SearchReceiver receiver={usersChat} />
+      )}
     </Fragment>
   );
 }

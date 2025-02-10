@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-import NavItem from "./NavItem";
 import { useEffect, useState } from "react";
 import {
   IconAddress,
@@ -9,6 +8,7 @@ import {
 import { IconPurchase, IconWrite } from "@/components/icon";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useSelectorAuthSlice } from "@/hook";
+import NavItem from "./NavItem";
 
 const ListNavProfile = [
   {
@@ -30,6 +30,19 @@ const ListNavProfile = [
     title: "Đơn mua",
     path: "/user/account/purchaseOrder",
     icon: <IconPurchase size={20}></IconPurchase>,
+  },
+];
+
+const ListNavProfileAdmin = [
+  {
+    title: "Hồ sơ",
+    path: "/user/account/profile",
+    icon: <IconProfile size={20}></IconProfile>,
+  },
+  {
+    title: "Đổi mật khẩu",
+    path: "/user/account/password",
+    icon: <IconPassword size={20}></IconPassword>,
   },
 ];
 function SidebarProfile() {
@@ -55,11 +68,6 @@ function SidebarProfile() {
           to={"/user/profile/info"}
           className="w-12 h-12 overflow-hidden rounded-full cursor-pointer basis-12"
         >
-          {/* <img
-            alt="error"
-            srcSet={avatar?.url || user?.avatarDefault}
-            className={"w-full h-full bg-center"}
-          /> */}
           <LazyLoadImage
             alt="avatar"
             placeholderSrc={avatar?.url || user?.avatarDefault}
@@ -79,27 +87,50 @@ function SidebarProfile() {
         </div>
       </div>
       <div className="flex flex-col mt-5 gap-y-5 text-gray">
-        {ListNavProfile.map((data, index) => {
-          if (checkPath) {
-            return (
-              <NavItem
-                key={index}
-                data={data}
-                activePath={data.path === pathname ? true : false}
-              ></NavItem>
-            );
-          } else {
-            if (data.path === "/user/account/profile") {
+        {user?.role === "buyer" &&
+          ListNavProfile.map((data, index) => {
+            if (checkPath) {
               return (
-                <NavItem key={index} data={data} activePath={true}></NavItem>
+                <NavItem
+                  key={index}
+                  data={data}
+                  activePath={data.path === pathname ? true : false}
+                ></NavItem>
               );
             } else {
-              return (
-                <NavItem key={index} data={data} activePath={false}></NavItem>
-              );
+              if (data.path === "/user/account/profile") {
+                return (
+                  <NavItem key={index} data={data} activePath={true}></NavItem>
+                );
+              } else {
+                return (
+                  <NavItem key={index} data={data} activePath={false}></NavItem>
+                );
+              }
             }
-          }
-        })}
+          })}
+        {user?.role === "admin" &&
+          ListNavProfileAdmin.map((data, index) => {
+            if (checkPath) {
+              return (
+                <NavItem
+                  key={index}
+                  data={data}
+                  activePath={data.path === pathname ? true : false}
+                ></NavItem>
+              );
+            } else {
+              if (data.path === "/user/account/profile") {
+                return (
+                  <NavItem key={index} data={data} activePath={true}></NavItem>
+                );
+              } else {
+                return (
+                  <NavItem key={index} data={data} activePath={false}></NavItem>
+                );
+              }
+            }
+          })}
       </div>
     </aside>
   );

@@ -69,12 +69,14 @@ function Profile({ displayName }: TProps) {
                 >
                   Tài khoản
                 </Link>
-                <Link
-                  to={"/user/account/purchaseOrder"}
-                  className="inline-block whitespace-nowrap hover:text-orange"
-                >
-                  Đơn mua
-                </Link>
+                {user?.role === "buyer" && (
+                  <Link
+                    to={"/user/account/purchaseOrder"}
+                    className="inline-block whitespace-nowrap hover:text-orange"
+                  >
+                    Đơn mua
+                  </Link>
+                )}
                 {user?.role === "admin" && (
                   <Link
                     to={"/dashboard/home"}

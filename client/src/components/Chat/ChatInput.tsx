@@ -12,28 +12,32 @@ import {
 } from "@/hook";
 import {
   chatApi,
+  useGetUnreadMessageQuery,
   useSendMessageTextMutation,
 } from "@/stores/service/chat.service";
 import { IMessage, IReqSendMessageText } from "@/types/chat.type";
 import { categoriesConfigEmoji } from "@/constant/chat.constant";
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { IUser } from "@/types/user.type";
 
 type TProps = {
   textMessage: string;
   openBtnScrollDown: boolean;
-  receiverJoinCvs: boolean;
+  receiverSeenCvs: boolean;
   handleChangeTextMessage: (value: string) => void;
   handleBtnScrollToBottom: () => void;
-  handleSenderMessage: (msg: IMessage) => void;
+  handleSenderMessage: (msg: IMessage<IUser>) => void;
+  handleWaitSenderMessage: (msg: IReqSendMessageText) => void;
 };
 function ChatInput({
   textMessage,
   openBtnScrollDown,
-  receiverJoinCvs,
+  receiverSeenCvs,
   handleChangeTextMessage,
   handleBtnScrollToBottom,
   handleSenderMessage,
+  handleWaitSenderMessage,
 }: TProps) {
   const socketIo_client = useSocketIoContext();
 
@@ -41,16 +45,24 @@ function ChatInput({
 
   const dispatch = useAppDispatch();
 
-  const { selectedConversation } = useSelectorChatSlice();
+  const { selectedConversation, receiverId } = useSelectorChatSlice();
 
   const [sendMessageText] = useSendMessageTextMutation();
+
+  const { data: dataUnreadMessage, status } = useGetUnreadMessageQuery(
+    {
+      conversationId: selectedConversation?._id || "",
+      userId: user?._id || "",
+    },
+    { skip: !selectedConversation || !user }
+  );
 
   const { toggle: openEmojiPicker, handleToggle: handleOpenEmojiPicker } =
     useToggle();
 
-  const [receiverId, setReceiverId] = useState<string>("");
-
   const [message, setMessage] = useState<string>("");
+
+  const [amountUnreadMessage, setAmountUnreadMessage] = useState<number>(0);
 
   const handleChangeMessage = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     handleChangeTextMessage(e.target.value);
@@ -64,11 +76,13 @@ function ChatInput({
   };
 
   const handleSendMessage = async () => {
-    if (user && selectedConversation) {
+    if (
+      user &&
+      selectedConversation &&
+      receiverId &&
+      message.trim().length > 0
+    ) {
       try {
-        const receiverId = selectedConversation.participants.find(
-          (r) => r !== user._id
-        );
         if (socketIo_client) {
           socketIo_client.emit("typing", {
             receiverId,
@@ -81,13 +95,17 @@ function ChatInput({
             senderId: user._id,
             receiverId: receiverId,
             text: textMessage,
-            receiverSeen: receiverJoinCvs,
+            receiverSeen: receiverSeenCvs,
           };
+          handleWaitSenderMessage({ ...message });
           await sendMessageText(message)
             .unwrap()
             .then((res) => {
               handleSenderMessage(res);
               dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
+            })
+            .catch((err) => {
+              throw new Error(err);
             });
         }
       } catch (error) {
@@ -97,17 +115,18 @@ function ChatInput({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && message.trim().length > 0) {
+      event.preventDefault();
       handleSendMessage();
+      return false;
     }
   };
 
-  useEffect(() => {
-    if (selectedConversation && user) {
-      const id = selectedConversation.participants.find((r) => r !== user._id);
-      setReceiverId(id || "");
+  useLayoutEffect(() => {
+    if (dataUnreadMessage && status === "fulfilled") {
+      setAmountUnreadMessage(dataUnreadMessage.amount);
     }
-  }, [selectedConversation, user]);
+  }, [dataUnreadMessage, status]);
 
   useEffect(() => {
     let typingTimer = undefined;
@@ -202,13 +221,18 @@ function ChatInput({
       <Button
         variant="outLine"
         className={cn(
-          "absolute -top-20 left-1/2 -translate-x-1/2 transition-all duration-300 z-30",
+          "absolute -top-16 left-1/2 -translate-x-1/2 transition-all duration-300 z-30",
           "w-10 h-10 rounded-full bg-grayF5 flex justify-center items-center text-orange shadow-sm shadow-gray98 cursor-pointer",
           !openBtnScrollDown && "top-0"
         )}
         onClick={handleBtnScrollToBottom}
       >
         <IconArrowDown size={30} />
+        {amountUnreadMessage > 0 && (
+          <div className="absolute -right-1 top-0 text-[8px] w-4 h-4 bg-danger rounded-full text-white flex justify-center items-center">
+            {amountUnreadMessage}
+          </div>
+        )}
       </Button>
     </div>
   );

@@ -3,8 +3,8 @@ import LayoutProfile from "../layout/LayoutProfile";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import FormAddress from "../module/profile/address";
 import { ChangePassword, ProfileInfo } from "../module/profile";
-import PurchaseOrder from "@/module/profile/purchaseOrder";
 import { useSelectorAuthSlice } from "@/hook";
+import PurchaseOrder from "@/module/Profile/purchaseOrder";
 
 function ProfilePage() {
   const { slug } = useParams();

@@ -35,28 +35,33 @@ class SocketIoService {
       }
     });
 
-    socket.on("joinConversation", async (data) => {
-      const { receiverId, join, conversationId } = data;
+    // check receiver seen message
+    socket.on("seenConversation", async (data) => {
+      const { receiverId, seen, conversationId } = data;
       const receiverSocketId = this.userSocketMap[receiverId];
       _io
         .to(receiverSocketId)
-        .emit("statusReceiverJoin", { join, conversationId });
+        .emit("statusReceiverSeen", { seen, conversationId });
     });
 
-    socket.on("checkReceiverJoinConversation", async (data) => {
+    socket.on("checkReceiverSeenCvs", async (data) => {
       const { receiverId, conversationId } = data;
       const receiverSocketId = this.userSocketMap[receiverId];
-      _io
-        .to(receiverSocketId)
-        .emit("checkReceiverJoinConversation", { conversationId });
+      _io.to(receiverSocketId).emit("checkReceiverSeenCvs", { conversationId });
     });
 
-    socket.on("resultCheckJoinCvs", async (data) => {
-      const { receiverId, join, conversationId } = data;
+    socket.on("resultCheckSeenCvs", async (data) => {
+      const { receiverId, seen, conversationId } = data;
       const receiverSocketId = this.userSocketMap[receiverId];
       _io
         .to(receiverSocketId)
-        .emit("statusReceiverJoin", { join, conversationId });
+        .emit("statusReceiverSeen", { seen, conversationId });
+    });
+
+    socket.on("updateInfoUser", (data) => {
+      const { receiverId, updateUserId } = data;
+      const receiverSocketId = this.userSocketMap[receiverId];
+      _io.to(receiverSocketId).emit("receiverUpdateInfoUser", { updateUserId });
     });
 
     socket.on("disconnect", async () => {

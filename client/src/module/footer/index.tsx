@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
-import ChatFooter from "./Chat";
+import ChatMini from "./ChatMini";
 import ScrollTop from "./scrollTop";
 
 function Footer() {
@@ -91,7 +91,7 @@ function Footer() {
         Copyright 2024 © Team XV Store
       </div>
       {scroll && <ScrollTop />}
-      {isLogin && user?.role === "buyer" && <ChatFooter />}
+      {isLogin && user?.role === "buyer" && <ChatMini />}
     </footer>
   );
 }

@@ -16,6 +16,17 @@ class chat {
             { totalMessage: { $gt: 0 } },
           ],
         })
+        .populate([
+          {
+            path: "participants",
+            model: "users",
+            populate: {
+              path: "avatar",
+              model: "images",
+              select: "url",
+            },
+          },
+        ])
         .sort({ updatedAt: -1 })
         .lean();
 
@@ -32,15 +43,39 @@ class chat {
         .findOne({
           participants: { $in: [userId] },
         })
+        .populate([
+          {
+            path: "participants",
+            model: "users",
+            populate: {
+              path: "avatar",
+              model: "images",
+              select: "url",
+            },
+          },
+        ])
         .lean();
 
       if (!conversation) {
         const admin = await userModel.findOne({ role: "admin" }).lean();
-        conversation = await conversationModel.create({
+        const newConversation = await conversationModel.create({
           participants: [id, admin._id],
         });
+        conversation = await conversationModel
+          .findById(newConversation._id)
+          .populate([
+            {
+              path: "participants",
+              model: "users",
+              populate: {
+                path: "avatar",
+                model: "images",
+                select: "url",
+              },
+            },
+          ])
+          .lean();
       }
-
       res.status(200).json(conversation);
     } catch (error) {
       res.status(500).json({ errMessage: error || "server error" });
@@ -98,10 +133,28 @@ class chat {
               model: "images",
               select: "url",
             },
+            {
+              path: "senderId",
+              model: "users",
+              populate: {
+                path: "avatar",
+                model: "images",
+                select: "url",
+              },
+            },
+            {
+              path: "receiverId",
+              model: "users",
+              populate: {
+                path: "avatar",
+                model: "images",
+                select: "url",
+              },
+            },
           ])
           .sort({ createdAt: -1 })
-          .skip(skip)
-          .limit(limit);
+          .limit(limit)
+          .lean();
       } else {
         return res.status(201).json([]);
       }
@@ -114,7 +167,31 @@ class chat {
   getOneMessage = async (req, res) => {
     const messageId = req.params.messageId;
     try {
-      const message = await messageModel.findById(messageId);
+      const message = await messageModel.findById(messageId).populate([
+        {
+          path: "imageIds",
+          model: "images",
+          select: "url",
+        },
+        {
+          path: "senderId",
+          model: "users",
+          populate: {
+            path: "avatar",
+            model: "images",
+            select: "url",
+          },
+        },
+        {
+          path: "receiverId",
+          model: "users",
+          populate: {
+            path: "avatar",
+            model: "images",
+            select: "url",
+          },
+        },
+      ]);
       res.status(200).json(message);
     } catch (error) {
       res.status(500).json({ errMessage: error || "server error" });
@@ -171,16 +248,46 @@ class chat {
           messageLasterId: savedMessage._id,
         });
 
+        const newMessage = await messageModel
+          .findById(savedMessage._id)
+          .populate([
+            {
+              path: "imageIds",
+              model: "images",
+              select: "url",
+            },
+            {
+              path: "senderId",
+              model: "users",
+              populate: {
+                path: "avatar",
+                model: "images",
+                select: "url",
+              },
+            },
+            {
+              path: "receiverId",
+              model: "users",
+              populate: {
+                path: "avatar",
+                model: "images",
+                select: "url",
+              },
+            },
+          ])
+          .lean();
+
         // Gửi tin nhắn realtime qua Socket.IO
         const receiverSocketId = SocketIoService.getUserSocketMap(receiverId);
         if (receiverSocketId) {
           _io.to(receiverSocketId).emit("receiveMessage", {
             conversationId,
-            message: savedMessage._doc,
+            message: newMessage,
           });
         }
+        return res.status(201).json(newMessage);
       }
-      res.status(201).json(savedMessage._doc);
+      res.status(400).json({ errorMessage: "eror sender mesage" });
     } catch (err) {
       res.status(500).json({ error: "Internal server error" });
     }
@@ -213,6 +320,29 @@ class chat {
         io.to(receiverSocketId).emit("newMessage", newMessage);
       }
       res.status(201).json(newMessage);
+    } catch (error) {
+      res.status(500).json({ errMessage: error || "server error" });
+    }
+  };
+
+  unreadMessage = async (req, res) => {
+    try {
+      const conversationId = req.params.conversationId;
+      const userId = req.query.userId;
+      const conversation = await conversationModel.findById(conversationId);
+      if (conversation) {
+        const unreadMessages = await messageModel
+          .countDocuments({
+            $and: [
+              { conversationId },
+              { receiverId: userId },
+              { receiverSeen: false },
+            ],
+          })
+          .exec();
+        return res.status(200).json({ amount: unreadMessages });
+      }
+      res.status(404).json({ errorMessage: "conversation not found" });
     } catch (error) {
       res.status(500).json({ errMessage: error || "server error" });
     }

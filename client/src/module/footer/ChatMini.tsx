@@ -9,28 +9,53 @@ import {
 } from "@/hook";
 import { toast } from "react-toastify";
 import {
+  useGetUnreadMessageQuery,
   useLazyGetOneConversationQuery,
   useSeenMessagesMutation,
 } from "@/stores/service/chat.service";
-import { setSelectedConversation } from "@/stores/reducer/chat.reducer";
-import ChatContainer from "@/components/Chat/chatContainer";
+import {
+  setChat,
+  setSelectedConversation,
+} from "@/stores/reducer/chat.reducer";
+import ChatContainer from "@/components/Chat/ChatContainer";
+import { useLazyGetProfileQuery } from "@/stores/service/user.service";
+import { IUser } from "@/types/user.type";
+import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
 
-function ChatFooter() {
+function ChatMini() {
   const { user } = useSelectorAuthSlice();
 
   const { onlineUsers, selectedConversation } = useSelectorChatSlice();
+
+  const socketIo_client = useSocketIoContext();
 
   const dispatch = useAppDispatch();
 
   const [getOneConversation] = useLazyGetOneConversationQuery();
 
+  const [getProfile] = useLazyGetProfileQuery();
+
+  const {
+    data: dataUnreadMessage,
+    status,
+    refetch: refetchUnreadMessage,
+  } = useGetUnreadMessageQuery(
+    {
+      conversationId: selectedConversation?._id as string,
+      userId: user?._id as string,
+    },
+    { skip: !selectedConversation || !user }
+  );
+
+  const [amountUnreadMessage, setAmountUnreadMessage] = useState<number>(0);
+
   const [seenMessages] = useSeenMessagesMutation();
+
+  const [receiverInfo, setReceiverInfo] = useState<IUser>();
 
   const [firstLoad, setFirstLoad] = useState<boolean>(false);
 
   const { toggle: openChat, handleToggle: handleOpenChat } = useToggle();
-
-  const [receiverId, setReceiverId] = useState<string>("");
 
   const handleOnclickChat = useCallback(async () => {
     try {
@@ -43,12 +68,22 @@ function ChatFooter() {
           .then(() => {
             handleOpenChat();
             setFirstLoad(true);
+            refetchUnreadMessage();
+          })
+          .catch(() => {
+            throw new Error("Failed to seen message");
           });
       }
     } catch (error) {
       console.log("error: ", error);
     }
-  }, [handleOpenChat, seenMessages, selectedConversation, user]);
+  }, [
+    handleOpenChat,
+    refetchUnreadMessage,
+    seenMessages,
+    selectedConversation,
+    user,
+  ]);
 
   useLayoutEffect(() => {
     if (user) {
@@ -66,14 +101,51 @@ function ChatFooter() {
     }
   }, [dispatch, getOneConversation, user]);
 
+  useLayoutEffect(() => {
+    if (dataUnreadMessage && status === "fulfilled") {
+      setAmountUnreadMessage(dataUnreadMessage.amount);
+    }
+  }, [dataUnreadMessage, status]);
+
   useEffect(() => {
     if (selectedConversation && user) {
-      const receiverId = selectedConversation.participants.find(
-        (r) => r !== user._id
+      const receiver = selectedConversation.participants.find(
+        (r) => r._id !== user._id
       );
-      setReceiverId(receiverId as string);
+      if (receiver) {
+        const handleGetReceiver = async () => {
+          try {
+            await getProfile(receiver._id)
+              .unwrap()
+              .then((res) => {
+                setReceiverInfo(res.user);
+                dispatch(
+                  setChat({ receiverId: receiver._id, receiverInfo: res.user })
+                );
+              });
+          } catch (error) {
+            console.log(error);
+          }
+        };
+        handleGetReceiver();
+      }
     }
-  }, [selectedConversation, user]);
+  }, [dispatch, getProfile, selectedConversation, user]);
+
+  useEffect(() => {
+    if (socketIo_client && !openChat) {
+      socketIo_client.on("receiveMessage", () => {
+        refetchUnreadMessage();
+      });
+    }
+    return () => {
+      if (socketIo_client) {
+        socketIo_client.off("receiveMessage");
+      }
+    };
+  }, [dispatch, openChat, refetchUnreadMessage, socketIo_client]);
+
+  if (!receiverInfo) return;
 
   return (
     <div className={cn("fixed right-3 bottom-0 z-40")}>
@@ -88,11 +160,19 @@ function ChatFooter() {
         <span>
           <IconMessage size={30}></IconMessage>
         </span>
-
+        {amountUnreadMessage > 0 && (
+          <div
+            className={cn(
+              "absolute -top-2 right-0 w-6 h-6 text-xs flex justify-center items-center text-white border-2 border-white rounded-full bg-danger"
+            )}
+          >
+            {amountUnreadMessage}
+          </div>
+        )}
         <div
           className={cn(
             "absolute bottom-0 right-0 w-4 h-4 border-2 border-white rounded-full bg-danger",
-            onlineUsers.includes(receiverId) && "bg-green66"
+            onlineUsers.includes(receiverInfo._id) && "bg-green66"
           )}
         ></div>
       </div>
@@ -111,7 +191,7 @@ function ChatFooter() {
             <h1 className="flex items-center text-lg font-semibold text-orangeFe gap-x-2">
               <span className="flex">
                 <IconMessage size={30}></IconMessage>
-                {onlineUsers.includes(receiverId) && (
+                {onlineUsers.includes(receiverInfo._id) && (
                   <div className="w-4 h-4 border-2 border-white rounded-full bg-green66"></div>
                 )}
               </span>
@@ -131,4 +211,4 @@ function ChatFooter() {
   );
 }
 
-export default ChatFooter;
+export default ChatMini;

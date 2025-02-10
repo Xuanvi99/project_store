@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "@/hook";
 import { setSelectedConversation } from "@/stores/reducer/chat.reducer";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 type TProps = {
   user: IUser;
@@ -44,12 +45,19 @@ function SearchItem({ user }: TProps) {
         dispatch(setSelectedConversation(conversation));
       }}
     >
-      <div className="relative w-10 h-10 rounded-full">
-        <img
-          alt=""
-          srcSet={user.avatar?.url || user?.avatarDefault}
-          className="max-w-full rounded-full"
-        />
+      <div className="relative w-10 h-10">
+        <div className="w-10 h-10 overflow-hidden rounded-full">
+          <LazyLoadImage
+            alt="image"
+            placeholderSrc={"/public/userName.png"}
+            srcSet={user.avatar?.url || user?.avatarDefault}
+            effect="blur"
+            className="object-cover max-w-full "
+            height={40}
+            width={40}
+            threshold={100}
+          />
+        </div>
         {user.status === "online" && (
           <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green66"></div>
         )}

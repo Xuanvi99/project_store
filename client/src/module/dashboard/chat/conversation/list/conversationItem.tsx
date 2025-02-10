@@ -1,59 +1,61 @@
 import { useAppDispatch, useSelectorChatSlice } from "@/hook";
-import { setSelectedConversation } from "@/stores/reducer/chat.reducer";
+import { setChat } from "@/stores/reducer/chat.reducer";
 import {
   useGetOneMessagesQuery,
   useSeenMessagesMutation,
 } from "@/stores/service/chat.service";
-import { useLazyGetProfileQuery } from "@/stores/service/user.service";
+
 import { IConversation, IMessage } from "@/types/chat.type";
 import { IUser } from "@/types/user.type";
 import { cn, momentVi } from "@/utils";
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import SkeletonConversationItem from "../../skeleton/SkeletonConversationItem";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import { useGetProfileQuery } from "@/stores/service/user.service";
 
 type TProps = {
-  conversation: IConversation;
+  conversation: IConversation<IUser>;
   currentUserId: string;
 };
 function ConversationItem({ conversation, currentUserId }: TProps) {
-  const { messageLasterId: messageId } = conversation;
+  const { messageLasterId } = conversation;
 
   const { onlineUsers, selectedConversation } = useSelectorChatSlice();
 
   const dispatch = useAppDispatch();
 
-  const [getProfile] = useLazyGetProfileQuery();
-
-  const { data, status, refetch } = useGetOneMessagesQuery(messageId);
+  const {
+    data: dataMessage,
+    status: statusGetMessage,
+    refetch,
+  } = useGetOneMessagesQuery(messageLasterId);
 
   const [seenMessages] = useSeenMessagesMutation();
 
   const [receiver, setReceiver] = useState<IUser>();
 
-  const [message, setMessage] = useState<IMessage>();
+  const [receiverId, setReceiverId] = useState<string>("");
+
+  const [message, setMessage] = useState<IMessage<IUser>>();
 
   const [timeSender, setTimeSender] = useState<string>("");
 
-  const handleGetReceiver = useCallback(async () => {
-    try {
-      const receiverId = conversation.participants.find(
-        (r) => r !== currentUserId
-      );
-      if (receiverId) {
-        await getProfile(receiverId)
-          .unwrap()
-          .then((res) => {
-            setReceiver(res.user);
-          });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [conversation.participants, currentUserId, getProfile]);
+  const { data: dataGetProfile, status: statusGetProfile } = useGetProfileQuery(
+    receiverId,
+    { skip: !receiverId }
+  );
 
   const handleSelectConversation = async () => {
     try {
-      dispatch(setSelectedConversation(conversation));
+      if (conversation && receiver) {
+        dispatch(
+          setChat({
+            selectedConversation: conversation,
+            receiverId: receiver._id,
+            receiverInfo: receiver,
+          })
+        );
+      }
       await seenMessages({
         conversationId: conversation._id,
         userId: currentUserId,
@@ -63,34 +65,59 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
           refetch();
         })
         .catch(() => {
-          throw Error("Failed to fetch");
+          throw new Error("Failed to fetch");
         });
     } catch (error) {
       console.log("error: ", error);
     }
   };
 
-  useEffect(() => {
-    handleGetReceiver();
-  }, [handleGetReceiver]);
-
-  useEffect(() => {
-    if (data && status === "fulfilled") {
-      setMessage(data);
+  useLayoutEffect(() => {
+    if (conversation) {
+      const receiver = conversation.participants.find(
+        (r) => r._id !== currentUserId
+      );
+      if (receiver) setReceiverId(receiver._id);
     }
-  }, [data, status]);
+  }, [conversation, currentUserId]);
 
   useLayoutEffect(() => {
+    if (dataMessage && statusGetMessage === "fulfilled") {
+      setMessage(dataMessage);
+    }
+  }, [dataMessage, statusGetMessage]);
+
+  useLayoutEffect(() => {
+    if (dataGetProfile && statusGetProfile === "fulfilled") {
+      setReceiver(dataGetProfile.user);
+      const id = dataGetProfile.user._id;
+
+      if (selectedConversation) {
+        const result = selectedConversation.participants.findIndex(
+          (r) => r._id === id
+        );
+        if (result > -1) {
+          dispatch(
+            setChat({
+              receiverInfo: dataGetProfile.user,
+            })
+          );
+        }
+      }
+    }
+  }, [dataGetProfile, dispatch, selectedConversation, statusGetProfile]);
+
+  useEffect(() => {
     let timeRefetch = undefined;
     if (message) {
       timeRefetch = setInterval(() => {
         setTimeSender(momentVi(message.createdAt).fromNow(true));
-      }, 1000);
+      }, 60000);
     }
     return () => clearInterval(timeRefetch);
   }, [message]);
 
-  if (!receiver || !message) return <SkeletonConversationItem />;
+  if (!message) return <SkeletonConversationItem />;
 
   return (
     <div
@@ -100,13 +127,20 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
       )}
       onClick={handleSelectConversation}
     >
-      <div className="relative w-12 h-12 rounded-full max-w-12">
-        <img
-          alt="error"
-          srcSet={receiver.avatar?.url || receiver?.avatarDefault}
-          className="w-12 rounded-full"
-        />
-        {onlineUsers.includes(receiver._id) && (
+      <div className="relative w-12 h-12 max-w-12">
+        <div className="w-12 h-12 overflow-hidden rounded-full ">
+          <LazyLoadImage
+            alt="image"
+            placeholderSrc={"/public/userName.png"}
+            srcSet={receiver?.avatar?.url || receiver?.avatarDefault}
+            effect="blur"
+            className="object-cover max-w-full "
+            height={48}
+            width={48}
+            threshold={100}
+          />
+        </div>
+        {onlineUsers.includes(receiverId) && (
           <div className="absolute bottom-0 right-0 w-4 h-4 border-2 border-white rounded-full bg-green66"></div>
         )}
       </div>
@@ -116,32 +150,34 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
           <div className="flex justify-start text-xs gap-x-1 text-secondary ">
             <span className="max-w-[70%] flex gap-x-[2px]">
               <span className="font-semibold">
-                {message.senderId !== receiver._id && "Bạn: "}
+                {message?.senderId._id !== receiverId && "Bạn: "}
               </span>
               <span
                 className={cn(
                   "line-clamp-1",
-                  message.senderId === receiver._id &&
-                    !message.receiverSeen &&
+                  message?.senderId._id === receiverId &&
+                    !message?.receiverSeen &&
                     "font-semibold text-black"
                 )}
               >
-                {message.text}
+                {message?.text}
               </span>
             </span>
             <span className="basis-[30%]">
               -{" "}
               {timeSender
                 ? timeSender
-                : momentVi(message.createdAt).fromNow(true)}
+                : momentVi(message?.createdAt).fromNow(true)}
             </span>
           </div>
         </div>
-        {message.senderId === receiver._id && !message.receiverSeen && (
-          <div className="flex items-center w-[10px] h-full">
-            <span className="w-[10px] h-[10px] rounded-full bg-orange"></span>
-          </div>
-        )}
+        {message &&
+          message.senderId._id === receiverId &&
+          !message.receiverSeen && (
+            <div className="flex items-center w-[10px] h-full">
+              <span className="w-[10px] h-[10px] rounded-full bg-orange"></span>
+            </div>
+          )}
       </div>
     </div>
   );

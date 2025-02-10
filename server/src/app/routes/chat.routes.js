@@ -29,4 +29,8 @@ routes
     chatCtrl.sendMessageImages
   );
 
+routes
+  .route("/api/chat/unreadMessage/:conversationId")
+  .get(chatCtrl.unreadMessage);
+
 module.exports = routes;

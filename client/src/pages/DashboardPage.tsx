@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useLayoutEffect } from "react";
 import { Main, Sidebar } from "../module/dashboard";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSelectorAuthSlice } from "@/hook";
@@ -18,7 +18,7 @@ function DashboardPage() {
     [navigate]
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!user) {
       handleLogin(pathname);
     } else {

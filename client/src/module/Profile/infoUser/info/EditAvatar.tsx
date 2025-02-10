@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import Slider from "rc-slider";
 import { useUpdateUserMutation } from "@/stores/service/user.service";
@@ -7,10 +7,16 @@ import { Button } from "@/components/button";
 import { Input } from "@/components/input";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
-import { useSelectorAuthSlice } from "@/hook";
+import { useSelectorAuthSlice, useSelectorChatSlice } from "@/hook";
+import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
 
 function EditAvatar() {
+  const socketIo_client = useSocketIoContext();
+
+  const { receiverId } = useSelectorChatSlice();
+
   const { user } = useSelectorAuthSlice();
+
   const cropRef = useRef<AvatarEditor>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -47,9 +53,17 @@ function EditAvatar() {
             if (user) {
               await updateUser({ id: user._id, body: formData })
                 .unwrap()
-                .then(() =>
-                  toast("Cập nhật avatar thành công", { type: "success" })
-                )
+                .then(() => {
+                  toast("Cập nhật avatar thành công", { type: "success" });
+                  if (socketIo_client) {
+                    if (user.role === "buyer" && receiverId) {
+                      socketIo_client.emit("updateInfoUser", {
+                        receiverId: receiverId,
+                        updateUserId: user._id,
+                      });
+                    }
+                  }
+                })
                 .catch(() =>
                   toast("Cập nhật avatar thất bại", { type: "error" })
                 );
@@ -61,6 +75,10 @@ function EditAvatar() {
       );
     }
   };
+
+  useEffect(() => {
+    if (socketIo_client) return () => {};
+  }, []);
 
   return (
     <div className="flex flex-col items-center basis-2/5 gap-y-5 border-l-1 border-l-grayCa ">
@@ -130,7 +148,7 @@ function EditAvatar() {
               className="px-5 text-xs"
               onClick={() => handleSave()}
             >
-              Lưu
+              Thay đổi
             </Button>
           </div>
         </div>

@@ -1,11 +1,14 @@
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
-import { useAppDispatch, useSelectorAuthSlice } from "@/hook";
-import { resetChat } from "@/stores/reducer/chat.reducer";
 import {
-  chatApi,
-  useGetConversationsQuery,
-} from "@/stores/service/chat.service";
+  useAppDispatch,
+  useSelectorAuthSlice,
+  useSelectorChatSlice,
+} from "@/hook";
+import { resetChat } from "@/stores/reducer/chat.reducer";
+import { useGetConversationsQuery } from "@/stores/service/chat.service";
+import { userApi } from "@/stores/service/user.service";
 import { IConversation } from "@/types/chat.type";
+import { IUser } from "@/types/user.type";
 import { QueryStatus } from "@reduxjs/toolkit/query";
 import React, {
   createContext,
@@ -15,7 +18,7 @@ import React, {
 } from "react";
 
 export type TChatProvider = {
-  conversations: IConversation[] | undefined;
+  conversations: IConversation<IUser>[] | undefined;
 
   status: QueryStatus;
 
@@ -30,11 +33,13 @@ export type TChatProvider = {
 
 const ChatContext = createContext<TChatProvider | null>(null);
 function ChatProvide({ children }: { children: React.ReactNode }) {
-  const socketIo_client = useSocketIoContext();
-
   const dispatch = useAppDispatch();
 
+  const socketIo_client = useSocketIoContext();
+
   const { user } = useSelectorAuthSlice();
+
+  const { selectedConversation } = useSelectorChatSlice();
 
   const {
     data: dataGetConversations,
@@ -47,7 +52,9 @@ function ChatProvide({ children }: { children: React.ReactNode }) {
 
   const [openSearchResult, SetOpenSearchResult] = useState<boolean>(false);
 
-  const [conversations, setConversations] = useState<IConversation[]>([]);
+  const [conversations, setConversations] = useState<IConversation<IUser>[]>(
+    []
+  );
 
   const handleOpenSearchResult = (status: boolean) => {
     SetOpenSearchResult(status);
@@ -60,15 +67,34 @@ function ChatProvide({ children }: { children: React.ReactNode }) {
   }, [dataGetConversations, status]);
 
   useEffect(() => {
-    if (socketIo_client) {
-      socketIo_client.on("receiveMessage", () => {
-        dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
-      });
+    if (conversations.length > 0 && selectedConversation) {
+      const index = conversations.findIndex(
+        (item) => item._id === selectedConversation._id
+      );
+      if (index < 0) {
+        dispatch(resetChat());
+      }
     }
+  }, [conversations, dispatch, selectedConversation]);
 
+  useEffect(() => {
+    if (socketIo_client) {
+      socketIo_client.on(
+        "receiverUpdateInfoUser",
+        (data: { updateUserId: string }) => {
+          console.log("data: ", data);
+          dispatch(
+            userApi.util.invalidateTags([
+              { type: "Users", id: data.updateUserId },
+            ])
+          );
+        }
+      );
+    }
     return () => {
-      dispatch(resetChat());
-      socketIo_client?.off("receiveMessage");
+      if (socketIo_client) {
+        socketIo_client.off("receiverUpdateInfoUser");
+      }
     };
   }, [dispatch, socketIo_client]);
 

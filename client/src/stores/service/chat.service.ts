@@ -22,6 +22,10 @@ interface IReqSeenMessages {
   conversationId: string | null;
   userId: string | null;
 }
+interface IReqUnreadMessages {
+  conversationId: string;
+  userId: string;
+}
 
 export const chatApi = createApi({
   reducerPath: "chat",
@@ -30,7 +34,7 @@ export const chatApi = createApi({
   keepUnusedDataFor: 0,
   refetchOnFocus: false,
   endpoints: (build) => ({
-    getConversations: build.query<IConversation[] | null, string>({
+    getConversations: build.query<IConversation<IUser>[] | null, string>({
       query: (id) => ({
         url: "chat/getConversations/" + id,
         method: "GET",
@@ -46,45 +50,36 @@ export const chatApi = createApi({
             ]
           : [{ type: "Conversation", id: "LIST" }],
     }),
-    getOneConversation: build.query<IConversation, string>({
+    getOneConversation: build.query<IConversation<IUser>, string>({
       query: (id) => ({
         url: "chat/getOneConversation/" + id,
         method: "GET",
       }),
       providesTags: (result, error, id) => [{ type: "Conversation", id }],
     }),
-    getMessages: build.query<IMessage[], IReqGetMessage>({
+    getMessages: build.query<IMessage<IUser>[], IReqGetMessage>({
       query: ({ conversationId, ...params }) => ({
         url: "chat/getMessages/" + conversationId,
         method: "GET",
         params,
       }),
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.map(({ _id }) => ({
-                type: "Message" as const,
-                id: _id,
-              })),
-              { type: "Message", id: "LIST" },
-            ]
-          : [{ type: "Message", id: "LIST" }],
+      providesTags: () => [{ type: "Message", id: "LIST" }],
     }),
-    getOneMessages: build.query<IMessage, string>({
+    getOneMessages: build.query<IMessage<IUser>, string>({
       query: (messageId) => ({
         url: "chat/getOneMessages/" + messageId,
         method: "GET",
       }),
       providesTags: (result, error, id) => [{ type: "Message", id }],
     }),
-    sendMessageText: build.mutation<IMessage, IReqSendMessageText>({
+    sendMessageText: build.mutation<IMessage<IUser>, IReqSendMessageText>({
       query: ({ conversationId, ...body }) => ({
         url: "chat/sendMessage/text/" + conversationId,
         method: "POST",
         body,
       }),
     }),
-    sendMessageImages: build.mutation<IMessage, IReqSendMessageImages>({
+    sendMessageImages: build.mutation<IMessage<IUser>, IReqSendMessageImages>({
       query: ({ conversationId, ...body }) => ({
         url: "chat/sendMessage/images/" + conversationId,
         method: "POST",
@@ -105,6 +100,14 @@ export const chatApi = createApi({
         body,
       }),
     }),
+    getUnreadMessage: build.query<{ amount: number }, IReqUnreadMessages>({
+      query: ({ conversationId, ...params }) => ({
+        url: "chat/unreadMessage/" + conversationId,
+        method: "GET",
+        params,
+      }),
+      providesTags: [{ type: "Message", id: "CountUnreadMessage" }],
+    }),
   }),
 });
 
@@ -120,4 +123,6 @@ export const {
   useGetOneMessagesQuery,
   useLazyGetOneMessagesQuery,
   useSeenMessagesMutation,
+  useLazyGetUnreadMessageQuery,
+  useGetUnreadMessageQuery,
 } = chatApi;

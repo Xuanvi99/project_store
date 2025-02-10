@@ -18,4 +18,5 @@ export interface IUser {
   status: "online" | "offline";
   timeOffline: Date;
   role: string;
+  createdAt: Date;
 }

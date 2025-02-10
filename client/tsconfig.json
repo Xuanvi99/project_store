@@ -23,7 +23,8 @@
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "composite": true
   },
   "include": ["src", "src/constant/.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
