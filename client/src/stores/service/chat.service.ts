@@ -27,6 +27,11 @@ interface IReqUnreadMessages {
   userId: string;
 }
 
+interface IResSendMessage {
+  message: IMessage<IUser>;
+  totalMessage: number;
+}
+
 export const chatApi = createApi({
   reducerPath: "chat",
   tagTypes: ["Conversation", "Message"],
@@ -72,14 +77,14 @@ export const chatApi = createApi({
       }),
       providesTags: (result, error, id) => [{ type: "Message", id }],
     }),
-    sendMessageText: build.mutation<IMessage<IUser>, IReqSendMessageText>({
+    sendMessageText: build.mutation<IResSendMessage, IReqSendMessageText>({
       query: ({ conversationId, ...body }) => ({
         url: "chat/sendMessage/text/" + conversationId,
         method: "POST",
         body,
       }),
     }),
-    sendMessageImages: build.mutation<IMessage<IUser>, IReqSendMessageImages>({
+    sendMessageImages: build.mutation<IResSendMessage, IReqSendMessageImages>({
       query: ({ conversationId, ...body }) => ({
         url: "chat/sendMessage/images/" + conversationId,
         method: "POST",

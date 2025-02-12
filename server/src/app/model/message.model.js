@@ -19,7 +19,7 @@ const MessageSchema = new Schema(
       type: String,
       default: "",
     },
-    imageIds: [
+    imagesId: [
       {
         type: Schema.Types.ObjectId,
         ref: "images",

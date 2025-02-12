@@ -14,7 +14,7 @@ export interface IMessage<T> {
   receiverId: T;
   messageType: ["text", "image"];
   text?: string;
-  imageIds?: IImage[];
+  imagesId?: IImage[];
   receiverSeen: boolean;
   createdAt: Date;
 }

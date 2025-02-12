@@ -1,15 +1,11 @@
-import { IUser } from "@/types/user.type";
+import { useSelectorChatSlice } from "@/hook";
 import { cn } from "@/utils";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
-function DisplayTyping({
-  receiverInfo,
-  isDisplayTyping,
-}: {
-  receiverInfo: IUser;
-  isDisplayTyping: boolean;
-}) {
-  if (!isDisplayTyping) return;
+function DisplayTyping({ isDisplayTyping }: { isDisplayTyping: boolean }) {
+  const { receiverInfo } = useSelectorChatSlice();
+
+  if (!isDisplayTyping || !receiverInfo) return;
 
   return (
     <div className="flex items-center justify-start w-full mt-1 message gap-x-2">

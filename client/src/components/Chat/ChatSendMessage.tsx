@@ -1,7 +1,7 @@
 import { cn } from "@/utils";
 import TextareaAutosize from "react-textarea-autosize";
 import Tooltip from "../tooltip";
-import { IconSendMessage, IconArrowDown } from "../icon";
+import { IconSendMessage, IconArrowDown, IconUploadImage } from "../icon";
 import { Button } from "../button";
 import EmojiPicker from "emoji-picker-react";
 import {
@@ -20,6 +20,9 @@ import { categoriesConfigEmoji } from "@/constant/chat.constant";
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { IUser } from "@/types/user.type";
+import EditMessageImages from "./chat_Send_Mesage/EditMessageImages";
+import { ImageType } from "react-images-uploading";
+import { setChat } from "@/stores/reducer/chat.reducer";
 
 type TProps = {
   textMessage: string;
@@ -29,8 +32,9 @@ type TProps = {
   handleBtnScrollToBottom: () => void;
   handleSenderMessage: (msg: IMessage<IUser>) => void;
   handleWaitSenderMessage: (msg: IReqSendMessageText) => void;
+  handleSetImages: (images: ImageType[]) => void;
 };
-function ChatInput({
+function ChatSendMessage({
   textMessage,
   openBtnScrollDown,
   receiverSeenCvs,
@@ -38,6 +42,7 @@ function ChatInput({
   handleBtnScrollToBottom,
   handleSenderMessage,
   handleWaitSenderMessage,
+  handleSetImages,
 }: TProps) {
   const socketIo_client = useSocketIoContext();
 
@@ -62,7 +67,20 @@ function ChatInput({
 
   const [message, setMessage] = useState<string>("");
 
+  const [listImages, setListImages] = useState<ImageType[]>([]);
+
   const [amountUnreadMessage, setAmountUnreadMessage] = useState<number>(0);
+
+  const [openEditImages, setOpenEditImages] = useState<boolean>(false);
+
+  const handleSetOpenEditImages = (value: boolean) => {
+    setOpenEditImages(value);
+  };
+
+  const onChangeImages = (images: ImageType[]) => {
+    setListImages(images as never[]);
+    handleSetImages(images);
+  };
 
   const handleChangeMessage = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     handleChangeTextMessage(e.target.value);
@@ -101,7 +119,8 @@ function ChatInput({
           await sendMessageText(message)
             .unwrap()
             .then((res) => {
-              handleSenderMessage(res);
+              handleSenderMessage(res.message);
+              dispatch(setChat({ totalMessage: res.totalMessage }));
               dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
             })
             .catch((err) => {
@@ -143,11 +162,48 @@ function ChatInput({
 
   return (
     <div className="relative w-full Message_input min-h-fit">
-      <div className="relative z-40 flex flex-col justify-end w-full p-3 bg-white h-fit">
-        <div className="flex items-center gap-x-2 ">
+      <div className="relative z-40 flex flex-col justify-end bg-white h-fit">
+        <EditMessageImages
+          openEditImages={openEditImages}
+          handleSetOpenEditImage={handleSetOpenEditImages}
+          listImages={listImages}
+          onChangeImages={onChangeImages}
+        />
+        <div className="flex items-center p-3 gap-x-2">
+          <div className={cn("Icon_upload_file", openEditImages && "hidden")}>
+            <input
+              type="file"
+              name="file"
+              id="file"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files) {
+                  const files = e.target.files;
+                  const images: ImageType[] = [];
+                  for (const file of files) {
+                    const image = {
+                      data_url: URL.createObjectURL(file),
+                      file: file,
+                    };
+                    images.push(image);
+                  }
+                  console.log(images);
+                  onChangeImages(images);
+                  handleSetOpenEditImages(true);
+                }
+              }}
+            />
+            <label
+              htmlFor="file"
+              className="cursor-pointer text-blue hover:text-orange"
+            >
+              <IconUploadImage size={25} />
+            </label>
+          </div>
           <div
             className={
-              "w-full p-2 rounded-xl flex bg-grayE5 items-end border-1 border-orange gap-x-2"
+              "w-full p-2 rounded-xl flex bg-grayE5 items-end border-1 border-orange gap-x-2 transition-all"
             }
           >
             <TextareaAutosize
@@ -238,4 +294,4 @@ function ChatInput({
   );
 }
 
-export default ChatInput;
+export default ChatSendMessage;

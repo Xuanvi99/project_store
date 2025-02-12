@@ -1,21 +1,21 @@
-import { useSelectorAuthSlice } from "@/hook";
+import { useSelectorAuthSlice, useSelectorChatSlice } from "@/hook";
 import { IMessage, IReqSendMessageText } from "@/types/chat.type";
 import { momentVi } from "@/utils";
-import Message from "./Message";
+import Message from "../Message";
 import { IUser } from "@/types/user.type";
 
 const DisplayMessages = ({
   messages,
   receiverSeenCvs,
   waitMessages,
-  receiverInfo,
 }: {
   messages: IMessage<IUser>[];
   receiverSeenCvs: boolean;
   waitMessages: IReqSendMessageText[];
-  receiverInfo: IUser;
 }) => {
   const { user } = useSelectorAuthSlice();
+
+  const { receiverInfo } = useSelectorChatSlice();
 
   const checkDisplayAvatarReceiver = (index: number): boolean => {
     if (index + 1 < messages.length) {
@@ -76,6 +76,8 @@ const DisplayMessages = ({
     }
     return false;
   };
+
+  if (!receiverInfo) return;
 
   return (
     <div className="flex flex-col mt-2 gap-y-1">

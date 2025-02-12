@@ -129,7 +129,7 @@ class chat {
           .find({ conversationId })
           .populate([
             {
-              path: "imageIds",
+              path: "imagesId",
               model: "images",
               select: "url",
             },
@@ -153,6 +153,7 @@ class chat {
             },
           ])
           .sort({ createdAt: -1 })
+          .skip(skip)
           .limit(limit)
           .lean();
       } else {
@@ -169,7 +170,7 @@ class chat {
     try {
       const message = await messageModel.findById(messageId).populate([
         {
-          path: "imageIds",
+          path: "imagesId",
           model: "images",
           select: "url",
         },
@@ -252,6 +253,82 @@ class chat {
           .findById(savedMessage._id)
           .populate([
             {
+              path: "senderId",
+              model: "users",
+              populate: {
+                path: "avatar",
+                model: "images",
+                select: "url",
+              },
+            },
+            {
+              path: "receiverId",
+              model: "users",
+              populate: {
+                path: "avatar",
+                model: "images",
+                select: "url",
+              },
+            },
+          ])
+          .lean();
+
+        // Gửi tin nhắn realtime qua Socket.IO
+        const receiverSocketId = SocketIoService.getUserSocketMap(receiverId);
+        if (receiverSocketId) {
+          _io.to(receiverSocketId).emit("receiveMessage", {
+            conversationId,
+            message: newMessage,
+            totalMessage: messageCount,
+          });
+        }
+        return res
+          .status(201)
+          .json({ message: newMessage, totalMessage: messageCount });
+      }
+      res.status(400).json({ errorMessage: "error sender message text" });
+    } catch (err) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  sendMessageImages = async (req, res) => {
+    a;
+    try {
+      const conversationId = req.params.id;
+      const { files, body } = req;
+      const { senderId, receiverId } = body;
+
+      const imageIds = await imageModel.uploadMultipleFile(
+        files.images,
+        "messages"
+      );
+
+      const savedMessage = new messageModel({
+        conversationId,
+        senderId,
+        receiverId,
+        messageType: "image",
+        imageIds,
+      });
+
+      await savedMessage.save();
+
+      if (savedMessage) {
+        // Cập nhật thông tin cuộc trò chuyện
+        const messageCount = await messageModel.countDocuments({
+          conversationId,
+        });
+
+        await conversationModel.findByIdAndUpdate(conversationId, {
+          totalMessage: messageCount,
+          messageLasterId: savedMessage._id,
+        });
+
+        const newMessage = await messageModel
+          .findById(savedMessage._id)
+          .populate([
+            {
               path: "imageIds",
               model: "images",
               select: "url",
@@ -283,43 +360,14 @@ class chat {
           _io.to(receiverSocketId).emit("receiveMessage", {
             conversationId,
             message: newMessage,
+            totalMessage: messageCount,
           });
         }
-        return res.status(201).json(newMessage);
+        return res
+          .status(201)
+          .json({ message: newMessage, totalMessage: messageCount });
       }
-      res.status(400).json({ errorMessage: "eror sender mesage" });
-    } catch (err) {
-      res.status(500).json({ error: "Internal server error" });
-    }
-  };
-
-  sendMessageImages = async (req, res) => {
-    a;
-    try {
-      const conversationId = req.params.id;
-      const { files, body } = req;
-      const { senderId, receiverId } = body;
-
-      const imageIds = await imageModel.uploadMultipleFile(
-        files.images,
-        "messages"
-      );
-
-      const newMessage = new messageModel({
-        conversationId,
-        senderId,
-        receiverId,
-        messageType: "image",
-        imageIds,
-      });
-
-      await newMessage.save();
-
-      const receiverSocketId = SocketIoService.getUserSocketMap(receiverId);
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("newMessage", newMessage);
-      }
-      res.status(201).json(newMessage);
+      res.status(400).json({ errorMessage: "error sender message image" });
     } catch (error) {
       res.status(500).json({ errMessage: error || "server error" });
     }

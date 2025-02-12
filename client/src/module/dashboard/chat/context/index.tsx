@@ -1,11 +1,10 @@
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
-import {
-  useAppDispatch,
-  useSelectorAuthSlice,
-  useSelectorChatSlice,
-} from "@/hook";
+import { useAppDispatch, useSelectorAuthSlice } from "@/hook";
 import { resetChat } from "@/stores/reducer/chat.reducer";
-import { useGetConversationsQuery } from "@/stores/service/chat.service";
+import {
+  chatApi,
+  useGetConversationsQuery,
+} from "@/stores/service/chat.service";
 import { userApi } from "@/stores/service/user.service";
 import { IConversation } from "@/types/chat.type";
 import { IUser } from "@/types/user.type";
@@ -39,8 +38,6 @@ function ChatProvide({ children }: { children: React.ReactNode }) {
 
   const { user } = useSelectorAuthSlice();
 
-  const { selectedConversation } = useSelectorChatSlice();
-
   const {
     data: dataGetConversations,
     status,
@@ -67,17 +64,6 @@ function ChatProvide({ children }: { children: React.ReactNode }) {
   }, [dataGetConversations, status]);
 
   useEffect(() => {
-    if (conversations.length > 0 && selectedConversation) {
-      const index = conversations.findIndex(
-        (item) => item._id === selectedConversation._id
-      );
-      if (index < 0) {
-        dispatch(resetChat());
-      }
-    }
-  }, [conversations, dispatch, selectedConversation]);
-
-  useEffect(() => {
     if (socketIo_client) {
       socketIo_client.on(
         "receiverUpdateInfoUser",
@@ -90,11 +76,17 @@ function ChatProvide({ children }: { children: React.ReactNode }) {
           );
         }
       );
+      socketIo_client.on("receiveMessage", (data) => {
+        console.log("data: ", data);
+        dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
+      });
     }
     return () => {
       if (socketIo_client) {
         socketIo_client.off("receiverUpdateInfoUser");
+        socketIo_client.off("receiveMessage");
       }
+      dispatch(resetChat());
     };
   }, [dispatch, socketIo_client]);
 

@@ -13,8 +13,10 @@ import {
 } from "@/stores/service/chat.service";
 import { IUser } from "@/types/user.type";
 import { userApi } from "@/stores/service/user.service";
-import ChatMessages from "./ChatMessages";
-import ChatInput from "./ChatInput";
+import ChatViewMessages from "./ChatViewMessages";
+import ChatSendMessage from "./ChatSendMessage";
+import { ImageType } from "react-images-uploading";
+import { setChat } from "@/stores/reducer/chat.reducer";
 
 type TParamsGetMessages<Type> = {
   [Property in keyof Type]?: Type[Property];
@@ -26,7 +28,8 @@ function ChatContainer() {
 
   const dispatch = useAppDispatch();
 
-  const { selectedConversation, receiverId } = useSelectorChatSlice();
+  const { selectedConversation, receiverId, totalMessage } =
+    useSelectorChatSlice();
 
   const { user } = useSelectorAuthSlice();
 
@@ -46,9 +49,9 @@ function ChatContainer() {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const clientHeightContainer = useRef<number>(0);
-
   const [messages, setMessages] = useState<IMessage<IUser>[]>([]);
+
+  const [images, setImages] = useState<ImageType[]>([]);
 
   const [waitMessages, setWaitMessages] = useState<IReqSendMessageText[]>([]);
 
@@ -75,6 +78,10 @@ function ChatContainer() {
 
   const handleChangeTextMessage = (value: string) => {
     setTextMessage(value);
+  };
+
+  const handleSetImages = (images: ImageType[]) => {
+    setImages(images);
   };
 
   const handleBtnScrollToBottom = async () => {
@@ -167,6 +174,7 @@ function ChatContainer() {
     setReceiveMessage(false);
     setReceiverSeenCvs(false);
     setScrollToBottom(false);
+    setImages([]);
   }, [selectedConversation, user]);
 
   useLayoutEffect(() => {
@@ -216,27 +224,15 @@ function ChatContainer() {
     }
   }, [containerScrollHeight, containerScrollHeightOld]);
 
-  //get initial client height container
+  //set scroll top when input or images modified height
   useEffect(() => {
     const container = containerRef.current;
-    if (container) {
-      clientHeightContainer.current = container.clientHeight;
+    handleScrollTo(1033, "instant");
+    if (container && scrollToBottom) {
+      const top = containerScrollHeight;
+      handleScrollTo(top, "instant");
     }
-  }, []);
-
-  //set scroll top when input modified height
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container && textMessage) {
-      const clientHeightOld = clientHeightContainer.current;
-      const clientHeightNew = container.clientHeight;
-
-      if (clientHeightOld !== clientHeightNew && scrollToBottom) {
-        const top = containerScrollHeight;
-        handleScrollTo(top, "instant");
-      }
-    }
-  }, [containerScrollHeight, scrollToBottom, textMessage]);
+  }, [containerScrollHeight, scrollToBottom, textMessage, images]);
 
   //scroll to down when sender message
   useEffect(() => {
@@ -254,7 +250,7 @@ function ChatContainer() {
   useEffect(() => {
     const container = containerRef.current;
     const handleScrollView = () => {
-      if (container && selectedConversation && messages.length > 0) {
+      if (container && messages.length > 0) {
         setOpenBtnScrollDown(
           container.scrollTop + container.clientHeight <
             container.scrollHeight - 50
@@ -262,10 +258,7 @@ function ChatContainer() {
             : false
         );
 
-        if (
-          container.scrollTop === 0 &&
-          messages.length < selectedConversation.totalMessage
-        ) {
+        if (container.scrollTop === 0 && messages.length < totalMessage) {
           handleSetParamsGetMessage({ skip: paramsGetMessages.skip + LIMIT });
         }
 
@@ -282,12 +275,7 @@ function ChatContainer() {
         container.removeEventListener("scroll", handleScrollView);
       }
     };
-  }, [
-    containerScrollHeight,
-    messages,
-    paramsGetMessages.skip,
-    selectedConversation,
-  ]);
+  }, [containerScrollHeight, messages, paramsGetMessages.skip, totalMessage]);
 
   // scroll when typing and scroll to bottom
   useEffect(() => {
@@ -365,18 +353,27 @@ function ChatContainer() {
 
       socketIo_client.on(
         "receiveMessage",
-        (data: { conversationId: string; message: IMessage<IUser> }) => {
-          const { conversationId, message } = data;
+        (data: {
+          conversationId: string;
+          message: IMessage<IUser>;
+          totalMessage: number;
+        }) => {
+          const { conversationId, message, totalMessage } = data;
           if (conversationId === selectedConversation._id) {
             setMessages((messages) => [...messages, message]);
             setReceiveMessage(true);
+            dispatch(setChat({ totalMessage }));
             dispatch(
               chatApi.util.invalidateTags([
                 { type: "Message", id: "CountUnreadMessage" },
               ])
             );
+            dispatch(
+              chatApi.util.invalidateTags([
+                { type: "Conversation", id: conversationId },
+              ])
+            );
           }
-          dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
         }
       );
 
@@ -405,7 +402,7 @@ function ChatContainer() {
 
   return (
     <div className="flex flex-col justify-end w-full h-full conversation">
-      <ChatMessages
+      <ChatViewMessages
         ref={containerRef}
         messages={messages}
         waitMessages={waitMessages}
@@ -413,7 +410,7 @@ function ChatContainer() {
         isDisplayTyping={displayTyping}
         receiverSeenCvs={receiverSeenCvs}
       />
-      <ChatInput
+      <ChatSendMessage
         openBtnScrollDown={openBtnScrollDown}
         textMessage={textMessage}
         receiverSeenCvs={receiverSeenCvs}
@@ -421,6 +418,7 @@ function ChatContainer() {
         handleBtnScrollToBottom={handleBtnScrollToBottom}
         handleSenderMessage={handleSenderMessage}
         handleWaitSenderMessage={handleWaitSenderMessage}
+        handleSetImages={handleSetImages}
       />
     </div>
   );

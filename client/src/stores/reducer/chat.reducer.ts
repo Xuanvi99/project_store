@@ -6,6 +6,7 @@ interface IPayload {
   selectedConversation: IConversation<IUser> | null;
   receiverId: string;
   receiverInfo: IUser | null;
+  totalMessage: number;
   onlineUsers: string[];
 }
 
@@ -15,6 +16,7 @@ const initialState: IPayload = {
   selectedConversation: null,
   receiverId: "",
   receiverInfo: null,
+  totalMessage: 0,
   onlineUsers: [],
 };
 
@@ -50,6 +52,9 @@ const chatSlice = createSlice({
       return {
         ...state,
         selectedConversation: null,
+        receiverId: "",
+        receiverInfo: null,
+        totalMessage: 0,
       };
     },
   },

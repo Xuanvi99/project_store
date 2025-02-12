@@ -53,6 +53,7 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
             selectedConversation: conversation,
             receiverId: receiver._id,
             receiverInfo: receiver,
+            totalMessage: conversation.totalMessage,
           })
         );
       }

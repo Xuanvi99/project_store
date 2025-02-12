@@ -5,11 +5,7 @@ import { momentVi } from "@/utils";
 function DisplayInfoReceiver({ amountMsg = -1 }: { amountMsg: number }) {
   const { selectedConversation, receiverInfo } = useSelectorChatSlice();
 
-  if (
-    !receiverInfo ||
-    !selectedConversation ||
-    amountMsg !== selectedConversation.totalMessage
-  ) {
+  if (!receiverInfo || !selectedConversation || amountMsg > 30) {
     return null;
   }
 
