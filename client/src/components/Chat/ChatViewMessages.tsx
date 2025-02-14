@@ -15,6 +15,7 @@ type TProps = {
   isFetchingData: boolean;
   isDisplayTyping: boolean;
   receiverSeenCvs: boolean;
+  openScrollY: boolean;
 };
 
 const ChatViewMessages = forwardRef<HTMLDivElement, TProps>(
@@ -27,6 +28,7 @@ const ChatViewMessages = forwardRef<HTMLDivElement, TProps>(
       isDisplayTyping,
       receiverSeenCvs,
       waitMessages,
+      openScrollY,
     } = props;
 
     const LoadingDataMessageOld = () => {
@@ -61,7 +63,10 @@ const ChatViewMessages = forwardRef<HTMLDivElement, TProps>(
     return (
       <div
         ref={containerRef}
-        className="flex flex-col justify-between h-full px-3 pt-3 overflow-y-scroll bg-white message_list "
+        className={cn(
+          "flex flex-col h-full px-3 pt-3 bg-white message_list ",
+          openScrollY && "overflow-y-scroll"
+        )}
       >
         <FetchingDataMessagesFirst />
 

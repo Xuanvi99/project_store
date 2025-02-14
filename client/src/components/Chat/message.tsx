@@ -21,7 +21,11 @@ const Message = forwardRef<HTMLDivElement, TPropsMessage>((props, ref) => {
   const { message, displayTimeSend, displayReceiverSeen, displayDateMessage } =
     props;
 
-  const [timeSender, setTimeSender] = useState<string>("");
+  const [timeSender, setTimeSender] = useState<string>(
+    momentVi(message.createdAt).fromNow() === "vài giây trước"
+      ? ""
+      : momentVi(message.createdAt).fromNow()
+  );
 
   useEffect(() => {
     let timeRefetchSender = undefined;
@@ -49,7 +53,7 @@ const Message = forwardRef<HTMLDivElement, TPropsMessage>((props, ref) => {
         <MessageOfReceive {...props} />
       )}
       {displayTimeSend && !displayReceiverSeen && (
-        <div className="pt-1 pr-2 text-xs text-gray text-end">
+        <div className="pt-1 text-[10px] font-semibold text-gray text-end">
           Đã gửi {timeSender}
         </div>
       )}

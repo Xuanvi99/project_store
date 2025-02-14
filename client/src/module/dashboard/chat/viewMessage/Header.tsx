@@ -30,7 +30,7 @@ function HeaderView() {
   if (!receiverInfo) return <SkeletonHeader />;
 
   return (
-    <div className="flex gap-x-3 items-center px-3 border-b-1 border-orange py-2 max-h-[50px]">
+    <div className="flex gap-x-3 items-center px-3 border-b-1 border-orange py-2 h-[50px] z-50 bg-white">
       <div className="relative">
         <div className="w-8 h-8 overflow-hidden rounded-full ">
           <LazyLoadImage

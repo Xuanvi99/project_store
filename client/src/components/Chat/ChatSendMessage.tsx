@@ -25,23 +25,21 @@ import { ImageType } from "react-images-uploading";
 import { setChat } from "@/stores/reducer/chat.reducer";
 
 type TProps = {
-  textMessage: string;
   openBtnScrollDown: boolean;
   receiverSeenCvs: boolean;
-  handleChangeTextMessage: (value: string) => void;
+  handleChangeMessageText: (value: string) => void;
   handleBtnScrollToBottom: () => void;
-  handleSenderMessage: (msg: IMessage<IUser>) => void;
-  handleWaitSenderMessage: (msg: IReqSendMessageText) => void;
+  handleSetMessages: (msg: IMessage<IUser>) => void;
+  handleSetWaitMessages: (msg: IReqSendMessageText) => void;
   handleSetImages: (images: ImageType[]) => void;
 };
 function ChatSendMessage({
-  textMessage,
   openBtnScrollDown,
   receiverSeenCvs,
-  handleChangeTextMessage,
+  handleChangeMessageText,
   handleBtnScrollToBottom,
-  handleSenderMessage,
-  handleWaitSenderMessage,
+  handleSetMessages,
+  handleSetWaitMessages,
   handleSetImages,
 }: TProps) {
   const socketIo_client = useSocketIoContext();
@@ -65,7 +63,7 @@ function ChatSendMessage({
   const { toggle: openEmojiPicker, handleToggle: handleOpenEmojiPicker } =
     useToggle();
 
-  const [message, setMessage] = useState<string>("");
+  const [messageText, setMessageText] = useState<string>("");
 
   const [listImages, setListImages] = useState<ImageType[]>([]);
 
@@ -82,9 +80,9 @@ function ChatSendMessage({
     handleSetImages(images);
   };
 
-  const handleChangeMessage = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    handleChangeTextMessage(e.target.value);
-    setMessage(e.target.value);
+  const onChangeMessageText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleChangeMessageText(e.target.value);
+    setMessageText(e.target.value);
     if (socketIo_client) {
       socketIo_client.emit("typing", {
         receiverId,
@@ -94,47 +92,40 @@ function ChatSendMessage({
   };
 
   const handleSendMessage = async () => {
-    if (
-      user &&
-      selectedConversation &&
-      receiverId &&
-      message.trim().length > 0
-    ) {
-      try {
-        if (socketIo_client) {
-          socketIo_client.emit("typing", {
-            receiverId,
-            typing: false,
+    if (messageText.trim().length === 0 || !receiverId) return;
+    try {
+      if (socketIo_client && receiverId && user && selectedConversation) {
+        socketIo_client.emit("typing", {
+          receiverId: receiverId,
+          typing: false,
+        });
+        setMessageText("");
+        const message: IReqSendMessageText = {
+          conversationId: selectedConversation._id,
+          senderId: user._id,
+          receiverId: receiverId,
+          text: messageText,
+          receiverSeen: receiverSeenCvs,
+        };
+        handleSetWaitMessages({ ...message });
+        await sendMessageText(message)
+          .unwrap()
+          .then((res) => {
+            handleSetMessages(res.message);
+            dispatch(setChat({ totalMessage: res.totalMessage }));
+            dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
+          })
+          .catch((err) => {
+            throw new Error(err);
           });
-        }
-        if (receiverId) {
-          const message: IReqSendMessageText = {
-            conversationId: selectedConversation._id,
-            senderId: user._id,
-            receiverId: receiverId,
-            text: textMessage,
-            receiverSeen: receiverSeenCvs,
-          };
-          handleWaitSenderMessage({ ...message });
-          await sendMessageText(message)
-            .unwrap()
-            .then((res) => {
-              handleSenderMessage(res.message);
-              dispatch(setChat({ totalMessage: res.totalMessage }));
-              dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
-            })
-            .catch((err) => {
-              throw new Error(err);
-            });
-        }
-      } catch (error) {
-        console.log("error: ", error);
       }
+    } catch (error) {
+      console.log("error: ", error);
     }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter" && message.trim().length > 0) {
+    if (event.key === "Enter" && messageText.trim().length > 0) {
       event.preventDefault();
       handleSendMessage();
       return false;
@@ -149,7 +140,7 @@ function ChatSendMessage({
 
   useEffect(() => {
     let typingTimer = undefined;
-    if (message && socketIo_client) {
+    if (messageText && socketIo_client) {
       typingTimer = setTimeout(() => {
         socketIo_client.emit("typing", {
           receiverId,
@@ -158,10 +149,10 @@ function ChatSendMessage({
       }, 5000);
     }
     return () => clearTimeout(typingTimer);
-  }, [message, receiverId, socketIo_client]);
+  }, [messageText, receiverId, socketIo_client]);
 
   return (
-    <div className="relative w-full Message_input min-h-fit">
+    <div className="relative w-full Message_input min-h-fit border-t-1 border-t-orange">
       <div className="relative z-40 flex flex-col justify-end bg-white h-fit">
         <EditMessageImages
           openEditImages={openEditImages}
@@ -211,8 +202,8 @@ function ChatSendMessage({
               minRows={1}
               maxRows={5}
               placeholder="Nhập nội dung tin nhắn"
-              value={textMessage}
-              onChange={handleChangeMessage}
+              value={messageText}
+              onChange={onChangeMessageText}
               onKeyDown={handleKeyDown}
               className="w-full text-sm outline-none resize-none bg-grayE5"
             />

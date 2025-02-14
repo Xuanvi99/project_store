@@ -6,7 +6,7 @@ import { IConversation } from "@/types/chat.type";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "@/hook";
-import { setSelectedConversation } from "@/stores/reducer/chat.reducer";
+import { setChat } from "@/stores/reducer/chat.reducer";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
 type TProps = {
@@ -19,7 +19,9 @@ function SearchItem({ user }: TProps) {
 
   const [getOneConversation] = useLazyGetOneConversationQuery();
 
-  const [conversation, setConversation] = useState<IConversation | null>(null);
+  const [conversation, setConversation] = useState<IConversation<IUser> | null>(
+    null
+  );
 
   useEffect(() => {
     const handleGetOneConversation = async () => {
@@ -42,7 +44,14 @@ function SearchItem({ user }: TProps) {
       )}
       onClick={() => {
         handleOpenSearchResult(false);
-        dispatch(setSelectedConversation(conversation));
+        if (conversation)
+          dispatch(
+            setChat({
+              selectedConversation: conversation,
+              receiverId: user._id,
+              receiverInfo: user,
+            })
+          );
       }}
     >
       <div className="relative w-10 h-10">

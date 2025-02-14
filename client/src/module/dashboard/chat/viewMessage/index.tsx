@@ -1,8 +1,8 @@
-import ChatContainer from "@/components/Chat/ChatContainer";
 import HeaderView from "./Header";
 import { useAppSelector } from "@/hook";
 import { RootState } from "@/stores";
 import NoConversation from "./NoConversation";
+import ChatContainer from "@/components/Chat/ChatContainer";
 
 function ChatViewMessage() {
   const { selectedConversation } = useAppSelector(

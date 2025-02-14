@@ -32,7 +32,7 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
 
   const [seenMessages] = useSeenMessagesMutation();
 
-  const [receiver, setReceiver] = useState<IUser>();
+  const [receiverInfo, setReceiverInfo] = useState<IUser>();
 
   const [receiverId, setReceiverId] = useState<string>("");
 
@@ -47,12 +47,12 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
 
   const handleSelectConversation = async () => {
     try {
-      if (conversation && receiver) {
+      if (conversation && receiverInfo) {
         dispatch(
           setChat({
             selectedConversation: conversation,
-            receiverId: receiver._id,
-            receiverInfo: receiver,
+            receiverId: receiverInfo._id,
+            receiverInfo: receiverInfo,
             totalMessage: conversation.totalMessage,
           })
         );
@@ -90,7 +90,7 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
 
   useLayoutEffect(() => {
     if (dataGetProfile && statusGetProfile === "fulfilled") {
-      setReceiver(dataGetProfile.user);
+      setReceiverInfo(dataGetProfile.user);
       const id = dataGetProfile.user._id;
 
       if (selectedConversation) {
@@ -133,7 +133,7 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
           <LazyLoadImage
             alt="image"
             placeholderSrc={"/public/userName.png"}
-            srcSet={receiver?.avatar?.url || receiver?.avatarDefault}
+            srcSet={receiverInfo?.avatar?.url || receiverInfo?.avatarDefault}
             effect="blur"
             className="object-cover max-w-full "
             height={48}
@@ -147,7 +147,7 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
       </div>
       <div className="flex justify-start w-[calc(100%-50px)] h-12">
         <div className="flex flex-col w-full">
-          <div className="font-semibold ">{receiver?.userName}</div>
+          <div className="font-semibold ">{receiverInfo?.userName}</div>
           <div className="flex justify-start text-xs gap-x-1 text-secondary ">
             <span className="max-w-[70%] flex gap-x-[2px]">
               <span className="font-semibold">

@@ -52,7 +52,7 @@ export default function EditMessageImages(props: TProps) {
           >
             <div
               className={cn(
-                "upload__image-wrapper relative pt-2 px-5 w-full flex items-center gap-x-3 border-t-1 border-t-grayCa",
+                "upload__image-wrapper relative pt-2 px-5 w-full flex items-center gap-x-3 ",
                 !openEditImages && "hidden"
               )}
             >

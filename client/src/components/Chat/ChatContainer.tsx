@@ -21,7 +21,7 @@ import { setChat } from "@/stores/reducer/chat.reducer";
 type TParamsGetMessages<Type> = {
   [Property in keyof Type]?: Type[Property];
 };
-const LIMIT = 15;
+const LIMIT = 20;
 
 function ChatContainer() {
   const socketIo_client = useSocketIoContext();
@@ -49,15 +49,17 @@ function ChatContainer() {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const clientHeightContainer = useRef<number>(0);
+
   const [messages, setMessages] = useState<IMessage<IUser>[]>([]);
 
   const [images, setImages] = useState<ImageType[]>([]);
 
   const [waitMessages, setWaitMessages] = useState<IReqSendMessageText[]>([]);
 
-  const [textMessage, setTextMessage] = useState<string>("");
+  const [messageText, setMessageText] = useState<string>("");
 
-  const [countCallApi, setCountCallApi] = useState<number>(0);
+  const [firstLoadData, setFirstLoadData] = useState<boolean>(true);
 
   const [containerScrollHeight, setContainerScrollHeight] = useState<number>(0);
 
@@ -66,7 +68,7 @@ function ChatContainer() {
 
   const [openBtnScrollDown, setOpenBtnScrollDown] = useState<boolean>(false);
 
-  const [statusSender, setStatusSender] = useState<boolean>(false);
+  const [statusSend, setStatusSend] = useState<boolean>(false);
 
   const [receiveMessage, setReceiveMessage] = useState<boolean>(false);
 
@@ -76,8 +78,10 @@ function ChatContainer() {
 
   const [scrollToBottom, setScrollToBottom] = useState<boolean>(false);
 
-  const handleChangeTextMessage = (value: string) => {
-    setTextMessage(value);
+  const [openScrollY, setOpenScrollY] = useState<boolean>(false);
+
+  const handleChangeMessageText = (value: string) => {
+    setMessageText(value);
   };
 
   const handleSetImages = (images: ImageType[]) => {
@@ -125,15 +129,15 @@ function ChatContainer() {
     }));
   };
 
-  const handleWaitSenderMessage = (msg: IReqSendMessageText) => {
+  const handleSetWaitMessages = (msg: IReqSendMessageText) => {
     setWaitMessages((waitMessages) => {
       return [...waitMessages, msg];
     });
-    setStatusSender(true);
-    setTextMessage("");
+    setStatusSend(true);
+    setMessageText("");
   };
 
-  const handleSenderMessage = (msg: IMessage<IUser>) => {
+  const handleSetMessages = (msg: IMessage<IUser>) => {
     setMessages((messages) => {
       return [...messages, msg];
     });
@@ -144,8 +148,8 @@ function ChatContainer() {
       }
       return [];
     });
-    setStatusSender(true);
-    setTextMessage("");
+    setStatusSend(true);
+    setMessageText("");
   };
 
   const handleScrollTo = (top: number, behavior: ScrollBehavior) => {
@@ -164,11 +168,11 @@ function ChatContainer() {
       });
     }
     setMessages([]);
-    setCountCallApi(0);
+    setFirstLoadData(true);
     setContainerScrollHeight(0);
     setContainerScrollHeightOld(0);
-    setTextMessage("");
-    setStatusSender(false);
+    setMessageText("");
+    setStatusSend(false);
     setOpenBtnScrollDown(false);
     setDisplayTyping(false);
     setReceiveMessage(false);
@@ -182,37 +186,48 @@ function ChatContainer() {
       setMessages((messages) => {
         return [...dataGetMessage, ...messages];
       });
-      setCountCallApi((count) => count + 1);
+      setFirstLoadData(false);
     }
   }, [dataGetMessage, status]);
 
   //set scrollHeight in chat when scroll to top
   useLayoutEffect(() => {
     const container = containerRef.current;
-    if (
-      container &&
-      selectedConversation &&
-      countCallApi >= 1 &&
-      !statusSender
-    ) {
+    if (container && selectedConversation && !firstLoadData && !statusSend) {
       if (isFetching) {
         setContainerScrollHeightOld(container.scrollHeight);
       } else {
         setContainerScrollHeight(container.scrollHeight);
       }
     }
-  }, [selectedConversation, countCallApi, isFetching, statusSender]);
+  }, [selectedConversation, firstLoadData, isFetching, statusSend]);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (container && firstLoadData) {
+      clientHeightContainer.current = container.clientHeight;
+    }
+  }, [firstLoadData]);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      setOpenScrollY(
+        container.scrollHeight === clientHeightContainer.current ? false : true
+      );
+    }
+  }, [messages, messageText, images]);
 
   // scroll down first load chat message
   useEffect(() => {
     const container = containerRef.current;
-    if (container && countCallApi === 1) {
+    if (container && firstLoadData) {
       const top = container.scrollHeight;
       handleScrollTo(top, "instant");
       setContainerScrollHeight(container.scrollHeight);
       setContainerScrollHeightOld(container.scrollHeight);
     }
-  }, [countCallApi]);
+  }, [firstLoadData]);
 
   //load message older but keep scroll position
   useEffect(() => {
@@ -227,12 +242,11 @@ function ChatContainer() {
   //set scroll top when input or images modified height
   useEffect(() => {
     const container = containerRef.current;
-    handleScrollTo(1033, "instant");
     if (container && scrollToBottom) {
-      const top = containerScrollHeight;
+      const top = container.scrollHeight;
       handleScrollTo(top, "instant");
     }
-  }, [containerScrollHeight, scrollToBottom, textMessage, images]);
+  }, [scrollToBottom, messageText, images]);
 
   //scroll to down when sender message
   useEffect(() => {
@@ -242,9 +256,9 @@ function ChatContainer() {
       handleScrollTo(top, "smooth");
       setContainerScrollHeight(container.scrollHeight);
       setContainerScrollHeightOld(container.scrollHeight);
-      if (statusSender) setStatusSender(false);
+      if (statusSend) setStatusSend(false);
     }
-  }, [selectedConversation, statusSender]);
+  }, [selectedConversation, statusSend]);
 
   // add event scroll view
   useEffect(() => {
@@ -294,17 +308,19 @@ function ChatContainer() {
       handleScrollTo(top, "smooth");
       setReceiveMessage(false);
     }
-  }, [containerScrollHeight, receiveMessage, scrollToBottom]);
+  }, [receiveMessage, scrollToBottom]);
 
   // socket IO
   useEffect(() => {
     if (socketIo_client && selectedConversation && user && receiverId) {
+      // thông báo cho ng nhận bạn đang trong conversation
       socketIo_client.emit("seenConversation", {
         seen: scrollToBottom,
         conversationId: selectedConversation._id,
         receiverId: receiverId,
       });
 
+      // nhận thông báo check xem receiver có đang xem mesage và trả về kết quả
       socketIo_client.on(
         "checkReceiverSeenCvs",
         (data: { conversationId: string }) => {
@@ -323,6 +339,7 @@ function ChatContainer() {
         }
       );
 
+      // nhận thông báo xem người nhận có đang xem message hay ko
       socketIo_client.on(
         "statusReceiverSeen",
         (data: { seen: boolean; conversationId: string }) => {
@@ -346,11 +363,13 @@ function ChatContainer() {
 
   useEffect(() => {
     if (socketIo_client && selectedConversation && user && receiverId) {
+      //Check xem người nhận có đang trong conversiton ko
       socketIo_client.emit("checkReceiverSeenCvs", {
         receiverId: receiverId,
         conversationId: selectedConversation._id,
       });
 
+      // listen to messages
       socketIo_client.on(
         "receiveMessage",
         (data: {
@@ -377,6 +396,7 @@ function ChatContainer() {
         }
       );
 
+      // lắng nghe nếu reciver update info cập nhật lại info bên này
       socketIo_client.on("updateInfoUser", (data: { updateUserId: string }) => {
         dispatch(
           userApi.util.invalidateTags([
@@ -385,6 +405,7 @@ function ChatContainer() {
         );
       });
 
+      // lắng nghe typing to receiver
       socketIo_client.on(
         "displayTyping",
         (data: { typing: boolean; senderId: string }) => {
@@ -409,15 +430,15 @@ function ChatContainer() {
         isFetchingData={isFetching}
         isDisplayTyping={displayTyping}
         receiverSeenCvs={receiverSeenCvs}
+        openScrollY={openScrollY}
       />
       <ChatSendMessage
         openBtnScrollDown={openBtnScrollDown}
-        textMessage={textMessage}
         receiverSeenCvs={receiverSeenCvs}
-        handleChangeTextMessage={handleChangeTextMessage}
+        handleChangeMessageText={handleChangeMessageText}
         handleBtnScrollToBottom={handleBtnScrollToBottom}
-        handleSenderMessage={handleSenderMessage}
-        handleWaitSenderMessage={handleWaitSenderMessage}
+        handleSetMessages={handleSetMessages}
+        handleSetWaitMessages={handleSetWaitMessages}
         handleSetImages={handleSetImages}
       />
     </div>

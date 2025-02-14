@@ -27,9 +27,9 @@ export const momentVi = (
       dd: "%d ngày",
       w: "1 tuần",
       ww: "%d tuần",
-      M: "a tháng",
+      M: "1 tháng",
       MM: "%d tháng",
-      y: "a năm",
+      y: "1 năm",
       yy: "%d năm",
     },
   });

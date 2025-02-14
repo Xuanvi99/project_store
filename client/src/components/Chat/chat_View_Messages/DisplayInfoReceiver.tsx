@@ -31,7 +31,7 @@ function DisplayInfoReceiver({ amountMsg = -1 }: { amountMsg: number }) {
           </span>
         )}
         <span className="text-xs text-gray-500">
-          Ngày tạo TK:{" "}
+          Ngày đăng ký:{" "}
           <span className="font-semibold">
             {momentVi(receiverInfo.createdAt).format("L")}
           </span>

@@ -80,7 +80,7 @@ const DisplayMessages = ({
   if (!receiverInfo) return;
 
   return (
-    <div className="flex flex-col mt-2 gap-y-1">
+    <div className="flex flex-col gap-y-1 mt-auto">
       {messages.map((item, index) => {
         return (
           <Message
