@@ -1,4 +1,4 @@
-import { IMessage, IReqSendMessageText } from "@/types/chat.type";
+import { IMessage, IReqSendMessage } from "@/types/chat.type";
 import { LoadingCallApi } from "../loading";
 import { cn } from "@/utils";
 import { useSelectorChatSlice } from "@/hook";
@@ -11,7 +11,7 @@ import DisplayInfoReceiver from "./chat_View_Messages/DisplayInfoReceiver";
 
 type TProps = {
   messages: IMessage<IUser>[];
-  waitMessages: IReqSendMessageText[];
+  waitMessages: IReqSendMessage[];
   isFetchingData: boolean;
   isDisplayTyping: boolean;
   receiverSeenCvs: boolean;

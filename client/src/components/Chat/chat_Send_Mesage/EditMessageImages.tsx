@@ -85,9 +85,9 @@ export default function EditMessageImages(props: TProps) {
                 >
                   {imageList.map((image, index) => {
                     return (
-                      <div className="relative w-12 h-12">
+                      <div key={index} className="relative w-12 h-12">
                         <img
-                          alt=""
+                          alt="message_image"
                           srcSet={image["data_url"]}
                           className="object-cover w-12 h-12 overflow-hidden rounded-md"
                           loading="lazy"

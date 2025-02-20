@@ -37,6 +37,7 @@ export default {
       fontFamily: {
         poppins: "Poppins, sans-serif",
       },
+      fontsize: { 10: "10px", 13: "13px", 14: "14px" },
       backgroundImage: {
         orangeLinear: "linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)",
 

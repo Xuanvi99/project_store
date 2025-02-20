@@ -5,7 +5,7 @@ import {
   useSelectorAuthSlice,
   useSelectorChatSlice,
 } from "@/hook";
-import { IMessage, IReqSendMessageText } from "@/types/chat.type";
+import { IMessage, IReqSendMessage } from "@/types/chat.type";
 import {
   chatApi,
   IReqGetMessage,
@@ -44,7 +44,10 @@ function ChatContainer() {
     status,
     isFetching,
   } = useGetMessagesQuery(paramsGetMessages, {
-    skip: !paramsGetMessages.conversationId || !user,
+    skip:
+      !selectedConversation ||
+      paramsGetMessages.conversationId !== selectedConversation._id ||
+      !user,
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -55,11 +58,11 @@ function ChatContainer() {
 
   const [images, setImages] = useState<ImageType[]>([]);
 
-  const [waitMessages, setWaitMessages] = useState<IReqSendMessageText[]>([]);
+  const [waitMessages, setWaitMessages] = useState<IReqSendMessage[]>([]);
 
   const [messageText, setMessageText] = useState<string>("");
 
-  const [firstLoadData, setFirstLoadData] = useState<boolean>(true);
+  const [firstLoadData, setFirstLoadData] = useState<boolean>(false);
 
   const [containerScrollHeight, setContainerScrollHeight] = useState<number>(0);
 
@@ -129,7 +132,7 @@ function ChatContainer() {
     }));
   };
 
-  const handleSetWaitMessages = (msg: IReqSendMessageText) => {
+  const handleSetWaitMessages = (msg: IReqSendMessage) => {
     setWaitMessages((waitMessages) => {
       return [...waitMessages, msg];
     });
@@ -142,7 +145,7 @@ function ChatContainer() {
       return [...messages, msg];
     });
     setWaitMessages((waitMessages) => {
-      if (waitMessages.length > 1) {
+      if (waitMessages.length > 0) {
         const messages = waitMessages.splice(0, 1);
         return [...messages];
       }
@@ -166,19 +169,19 @@ function ChatContainer() {
         conversationId: selectedConversation._id,
         skip: 0,
       });
+      setMessageText("");
+      setMessages([]);
+      setFirstLoadData(true);
+      setContainerScrollHeight(0);
+      setContainerScrollHeightOld(0);
+      setStatusSend(false);
+      setOpenBtnScrollDown(false);
+      setDisplayTyping(false);
+      setReceiveMessage(false);
+      setReceiverSeenCvs(false);
+      setScrollToBottom(false);
+      setImages([]);
     }
-    setMessages([]);
-    setFirstLoadData(true);
-    setContainerScrollHeight(0);
-    setContainerScrollHeightOld(0);
-    setMessageText("");
-    setStatusSend(false);
-    setOpenBtnScrollDown(false);
-    setDisplayTyping(false);
-    setReceiveMessage(false);
-    setReceiverSeenCvs(false);
-    setScrollToBottom(false);
-    setImages([]);
   }, [selectedConversation, user]);
 
   useLayoutEffect(() => {
@@ -186,7 +189,7 @@ function ChatContainer() {
       setMessages((messages) => {
         return [...dataGetMessage, ...messages];
       });
-      setFirstLoadData(false);
+      setFirstLoadData(true);
     }
   }, [dataGetMessage, status]);
 
@@ -221,13 +224,19 @@ function ChatContainer() {
   // scroll down first load chat message
   useEffect(() => {
     const container = containerRef.current;
-    if (container && firstLoadData) {
+    if (container && firstLoadData && openScrollY) {
       const top = container.scrollHeight;
+      // const clientHeight = container.clientHeight;
+      // const scroll = container.scrollTop;
+      // console.log("ScrollTop: ", scroll);
+      // console.log("clientHeight: ", clientHeight);
+      // console.log("scrollHeight: ", top);
       handleScrollTo(top, "instant");
       setContainerScrollHeight(container.scrollHeight);
       setContainerScrollHeightOld(container.scrollHeight);
+      setFirstLoadData(false);
     }
-  }, [firstLoadData]);
+  }, [firstLoadData, openScrollY]);
 
   //load message older but keep scroll position
   useEffect(() => {
@@ -267,7 +276,7 @@ function ChatContainer() {
       if (container && messages.length > 0) {
         setOpenBtnScrollDown(
           container.scrollTop + container.clientHeight <
-            container.scrollHeight - 50
+            container.scrollHeight - 100
             ? true
             : false
         );

@@ -1,9 +1,10 @@
 import { useSelectorAuthSlice, useSelectorChatSlice } from "@/hook";
-import { IMessage, IReqSendMessageText } from "@/types/chat.type";
+import { IMessage, IReqSendMessage } from "@/types/chat.type";
 import { momentVi } from "@/utils";
 import Message from "../Message";
 import { IUser } from "@/types/user.type";
 
+export type TMessageTypeBorder = "start" | "mid" | "end" | "basis";
 const DisplayMessages = ({
   messages,
   receiverSeenCvs,
@@ -11,7 +12,7 @@ const DisplayMessages = ({
 }: {
   messages: IMessage<IUser>[];
   receiverSeenCvs: boolean;
-  waitMessages: IReqSendMessageText[];
+  waitMessages: IReqSendMessage[];
 }) => {
   const { user } = useSelectorAuthSlice();
 
@@ -69,7 +70,7 @@ const DisplayMessages = ({
 
   const displayDateMessage = (index: number): boolean => {
     if (index === 0) return true;
-    if (index + 1 < messages.length) {
+    if (index < messages.length) {
       const time1 = messages[index].createdAt;
       const time2 = messages[index - 1].createdAt;
       return momentVi(time1).isSame(time2, "day") ? false : true;
@@ -77,10 +78,66 @@ const DisplayMessages = ({
     return false;
   };
 
+  const checkMessageTypeBorder = (index: number): TMessageTypeBorder => {
+    if (index === 0) {
+      const timeCur = messages[index].createdAt;
+      const timeNext = messages[index + 1].createdAt;
+      if (
+        messages[index].senderId._id === messages[index + 1].senderId._id &&
+        momentVi(timeCur).isSame(timeNext, "day")
+      ) {
+        return "start";
+      }
+      return "basis";
+    }
+    if (index > 0 && index === messages.length - 1) {
+      const timeCur = messages[index].createdAt;
+      const timePre = messages[index - 1].createdAt;
+      if (
+        messages[index].senderId._id === messages[index - 1].senderId._id &&
+        momentVi(timeCur).isSame(timePre, "day")
+      ) {
+        return "end";
+      }
+      return "basis";
+    }
+    const messagePreId = messages[index - 1].senderId._id;
+    const messageCurId = messages[index].senderId._id;
+    const messageNextId = messages[index + 1].senderId._id;
+    const timePre = messages[index - 1].createdAt;
+    const timeCur = messages[index].createdAt;
+    const timeNext = messages[index + 1].createdAt;
+    const checkDayPre = momentVi(timeCur).isSame(timePre, "day");
+    const checkDayNext = momentVi(timeCur).isSame(timeNext, "day");
+    if (checkDayPre && checkDayNext) {
+      if (messageCurId === messagePreId && messageCurId === messageNextId) {
+        return "mid";
+      } else if (
+        messageCurId !== messagePreId &&
+        messageCurId === messageNextId
+      ) {
+        return "start";
+      } else if (
+        messageCurId === messagePreId &&
+        messageCurId !== messageNextId
+      ) {
+        return "end";
+      } else {
+        return "basis";
+      }
+    } else if (!checkDayPre && checkDayNext) {
+      return "start";
+    } else if (checkDayPre && !checkDayNext) {
+      return "end";
+    } else {
+      return "basis";
+    }
+  };
+
   if (!receiverInfo) return;
 
   return (
-    <div className="flex flex-col gap-y-1 mt-auto">
+    <div className="flex flex-col mt-auto gap-y-[2px]">
       {messages.map((item, index) => {
         return (
           <Message
@@ -93,6 +150,7 @@ const DisplayMessages = ({
             displayReceiverSeen={
               checkDisplayReceiverSeenMessage() === index ? true : false
             }
+            checkMessageTypeBorder={checkMessageTypeBorder(index)}
           />
         );
       })}

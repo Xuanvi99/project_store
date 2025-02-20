@@ -131,7 +131,7 @@ class chat {
             {
               path: "imagesId",
               model: "images",
-              select: "url",
+              select: "url width height",
             },
             {
               path: "senderId",
@@ -172,7 +172,7 @@ class chat {
         {
           path: "imagesId",
           model: "images",
-          select: "url",
+          select: "url width height",
         },
         {
           path: "senderId",
@@ -293,23 +293,20 @@ class chat {
   };
 
   sendMessageImages = async (req, res) => {
-    a;
     try {
-      const conversationId = req.params.id;
+      const conversationId = req.params.conversationId;
       const { files, body } = req;
-      const { senderId, receiverId } = body;
+      const { senderId, receiverId, receiverSeen } = body;
 
-      const imageIds = await imageModel.uploadMultipleFile(
-        files.images,
-        "messages"
-      );
+      const imagesId = await imageModel.uploadMultipleFile(files, "message");
 
       const savedMessage = new messageModel({
         conversationId,
         senderId,
         receiverId,
         messageType: "image",
-        imageIds,
+        imagesId,
+        receiverSeen: receiverSeen === "false" ? false : true,
       });
 
       await savedMessage.save();
@@ -329,9 +326,9 @@ class chat {
           .findById(savedMessage._id)
           .populate([
             {
-              path: "imageIds",
+              path: "imagesId",
               model: "images",
-              select: "url",
+              select: "url width height",
             },
             {
               path: "senderId",

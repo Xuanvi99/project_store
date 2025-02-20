@@ -3,4 +3,6 @@ export interface IImage {
   public_id: string;
   url: string;
   folder: string;
+  width: number;
+  height: number;
 }

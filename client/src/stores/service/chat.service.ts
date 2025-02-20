@@ -1,8 +1,4 @@
-import {
-  IConversation,
-  IMessage,
-  IReqSendMessageText,
-} from "@/types/chat.type";
+import { IConversation, IMessage, IReqSendMessage } from "@/types/chat.type";
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "../baseQueryToken";
 import { IUser } from "@/types/user.type";
@@ -77,7 +73,7 @@ export const chatApi = createApi({
       }),
       providesTags: (result, error, id) => [{ type: "Message", id }],
     }),
-    sendMessageText: build.mutation<IResSendMessage, IReqSendMessageText>({
+    sendMessageText: build.mutation<IResSendMessage, IReqSendMessage>({
       query: ({ conversationId, ...body }) => ({
         url: "chat/sendMessage/text/" + conversationId,
         method: "POST",
@@ -85,10 +81,10 @@ export const chatApi = createApi({
       }),
     }),
     sendMessageImages: build.mutation<IResSendMessage, IReqSendMessageImages>({
-      query: ({ conversationId, ...body }) => ({
+      query: ({ conversationId, data }) => ({
         url: "chat/sendMessage/images/" + conversationId,
         method: "POST",
-        body,
+        body: data,
       }),
     }),
     getUsersChat: build.query<IUser[], string>({

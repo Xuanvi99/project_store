@@ -24,10 +24,7 @@ routes
 
 routes
   .route("/api/chat/sendMessage/images/:conversationId")
-  .post(
-    uploadFileMdw.array([{ name: "images", maxCount: 50 }]),
-    chatCtrl.sendMessageImages
-  );
+  .post(uploadFileMdw.array("images", 50), chatCtrl.sendMessageImages);
 
 routes
   .route("/api/chat/unreadMessage/:conversationId")

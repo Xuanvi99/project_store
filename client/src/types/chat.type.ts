@@ -12,17 +12,19 @@ export interface IMessage<T> {
   roomChatId: string;
   senderId: T;
   receiverId: T;
-  messageType: ["text", "image"];
+  messageType: "text" | "image";
   text?: string;
   imagesId?: IImage[];
   receiverSeen: boolean;
   createdAt: Date;
 }
 
-export interface IReqSendMessageText {
+export interface IReqSendMessage {
   conversationId: string;
   senderId: string;
   receiverId: string;
-  text: string;
+  text?: string;
+  images?: string[];
+  messageType: "text" | "image";
   receiverSeen: boolean;
 }

@@ -5,6 +5,7 @@ import { momentVi } from "@/utils";
 import { forwardRef, useEffect, useState } from "react";
 import MessageOfSend from "./chat_Message_Type/MessageOfSend";
 import MessageOfReceive from "./chat_Message_Type/MessageOfReceive";
+import { TMessageTypeBorder } from "./chat_View_Messages/DisplayMessages";
 
 export type TPropsMessage = {
   message: IMessage<IUser>;
@@ -13,6 +14,7 @@ export type TPropsMessage = {
   displayTimeSend: boolean;
   displayReceiverSeen: boolean;
   displayDateMessage: boolean;
+  checkMessageTypeBorder: TMessageTypeBorder;
 };
 
 const Message = forwardRef<HTMLDivElement, TPropsMessage>((props, ref) => {
@@ -34,14 +36,13 @@ const Message = forwardRef<HTMLDivElement, TPropsMessage>((props, ref) => {
         setTimeSender(momentVi(message.createdAt).fromNow());
       }, 60000);
     }
-
     return () => clearInterval(timeRefetchSender);
   }, [displayTimeSend, message]);
 
   return (
-    <div ref={ref} className="w-full p-1 message">
+    <div ref={ref} className="w-full Message">
       {displayDateMessage && (
-        <div className="flex justify-center items-center w-full py-1 text-[10px] font-medium">
+        <div className="flex justify-center items-center w-full py-3 text-[10px] font-medium">
           <span className="px-2 py-1 font-semibold rounded-lg shadow-sm shadow-grayDark bg-grayCa text-gray">
             {momentVi(message.createdAt).format("ddd, ll")}
           </span>

@@ -9,6 +9,7 @@ import { useUpdateThumbnailAndImagesProductMutation } from "@/stores/service/pro
 import IconDelete from "../../../../../../components/icon/IconDelete";
 import { useToggle } from "@/hook";
 import ModalVerify from "@/components/modal/ModalVerify";
+import useDetailProductContext from "../../context/useDetailProduct";
 
 function UpLoadImagesDetail() {
   const { product, setShowTab } = useDetailProductContext();

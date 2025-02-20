@@ -13,9 +13,10 @@ import {
 import {
   chatApi,
   useGetUnreadMessageQuery,
+  useSendMessageImagesMutation,
   useSendMessageTextMutation,
 } from "@/stores/service/chat.service";
-import { IMessage, IReqSendMessageText } from "@/types/chat.type";
+import { IMessage, IReqSendMessage } from "@/types/chat.type";
 import { categoriesConfigEmoji } from "@/constant/chat.constant";
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -30,7 +31,7 @@ type TProps = {
   handleChangeMessageText: (value: string) => void;
   handleBtnScrollToBottom: () => void;
   handleSetMessages: (msg: IMessage<IUser>) => void;
-  handleSetWaitMessages: (msg: IReqSendMessageText) => void;
+  handleSetWaitMessages: (msg: IReqSendMessage) => void;
   handleSetImages: (images: ImageType[]) => void;
 };
 function ChatSendMessage({
@@ -52,6 +53,8 @@ function ChatSendMessage({
 
   const [sendMessageText] = useSendMessageTextMutation();
 
+  const [sendMessageImages] = useSendMessageImagesMutation();
+
   const { data: dataUnreadMessage, status } = useGetUnreadMessageQuery(
     {
       conversationId: selectedConversation?._id || "",
@@ -65,7 +68,7 @@ function ChatSendMessage({
 
   const [messageText, setMessageText] = useState<string>("");
 
-  const [listImages, setListImages] = useState<ImageType[]>([]);
+  const [messageImages, setMessageImages] = useState<ImageType[]>([]);
 
   const [amountUnreadMessage, setAmountUnreadMessage] = useState<number>(0);
 
@@ -73,10 +76,14 @@ function ChatSendMessage({
 
   const handleSetOpenEditImages = (value: boolean) => {
     setOpenEditImages(value);
+    if (value === false) {
+      setMessageImages([]);
+      handleSetImages([]);
+    }
   };
 
   const onChangeImages = (images: ImageType[]) => {
-    setListImages(images as never[]);
+    setMessageImages(images as never[]);
     handleSetImages(images);
   };
 
@@ -91,34 +98,75 @@ function ChatSendMessage({
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessageText = async () => {
     if (messageText.trim().length === 0 || !receiverId) return;
-    try {
-      if (socketIo_client && receiverId && user && selectedConversation) {
-        socketIo_client.emit("typing", {
-          receiverId: receiverId,
-          typing: false,
-        });
-        setMessageText("");
-        const message: IReqSendMessageText = {
-          conversationId: selectedConversation._id,
-          senderId: user._id,
-          receiverId: receiverId,
-          text: messageText,
-          receiverSeen: receiverSeenCvs,
-        };
-        handleSetWaitMessages({ ...message });
-        await sendMessageText(message)
-          .unwrap()
-          .then((res) => {
-            handleSetMessages(res.message);
-            dispatch(setChat({ totalMessage: res.totalMessage }));
-            dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
-          })
-          .catch((err) => {
-            throw new Error(err);
-          });
+
+    if (socketIo_client && receiverId && user && selectedConversation) {
+      socketIo_client.emit("typing", {
+        receiverId: receiverId,
+        typing: false,
+      });
+      setMessageText("");
+      const message: IReqSendMessage = {
+        conversationId: selectedConversation._id,
+        senderId: user._id,
+        receiverId: receiverId,
+        text: messageText,
+        receiverSeen: receiverSeenCvs,
+        messageType: "text",
+      };
+      handleSetWaitMessages(message);
+      return await sendMessageText(message).unwrap();
+    }
+  };
+
+  const handleSendMessageImages = async () => {
+    if (messageImages.length === 0 || !receiverId) return;
+    if (receiverId && user && selectedConversation) {
+      handleSetOpenEditImages(false);
+      const formData = new FormData();
+      for (const item of messageImages as ImageType[]) {
+        formData.append("images", item.file as File);
       }
+      formData.append("senderId", user._id);
+      formData.append("receiverId", receiverId);
+      formData.append("receiverSeen", receiverSeenCvs.toString());
+
+      const messageImage: IReqSendMessage = {
+        conversationId: selectedConversation._id,
+        senderId: user._id,
+        receiverId: receiverId,
+        receiverSeen: receiverSeenCvs,
+        images: messageImages.map((image) => image["data_url"]),
+        messageType: "image",
+      };
+      handleSetWaitMessages(messageImage);
+      return await sendMessageImages({
+        conversationId: selectedConversation._id,
+        data: formData,
+      }).unwrap();
+    }
+  };
+
+  const handleSendMessage = async () => {
+    try {
+      const sendMessageText = handleSendMessageText();
+      const sendMessageImages = handleSendMessageImages();
+
+      await Promise.all([sendMessageText, sendMessageImages]).then((res) => {
+        if (res[0]) {
+          handleSetMessages(res[0].message);
+        }
+        if (res[1]) {
+          handleSetMessages(res[1].message);
+        }
+        dispatch(
+          setChat({
+            totalMessage: res[1] ? res[1].totalMessage : res[0]?.totalMessage,
+          })
+        );
+        dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
+      });
     } catch (error) {
       console.log("error: ", error);
     }
@@ -157,7 +205,7 @@ function ChatSendMessage({
         <EditMessageImages
           openEditImages={openEditImages}
           handleSetOpenEditImage={handleSetOpenEditImages}
-          listImages={listImages}
+          listImages={messageImages}
           onChangeImages={onChangeImages}
         />
         <div className="flex items-center p-3 gap-x-2">
@@ -179,7 +227,6 @@ function ChatSendMessage({
                     };
                     images.push(image);
                   }
-                  console.log(images);
                   onChangeImages(images);
                   handleSetOpenEditImages(true);
                 }

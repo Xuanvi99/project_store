@@ -7,6 +7,8 @@ const ImageSchema = new Schema(
     public_id: { type: String, required: true },
     url: { type: String, required: true },
     folder: { type: String, required: true },
+    width: { type: Number },
+    height: { type: Number },
   },
   { timestamps: true, versionKey: false }
 );
@@ -17,6 +19,8 @@ ImageSchema.statics.uploadSingleFile = async function (file, folder) {
     public_id: imageCloud.public_id,
     url: imageCloud.url,
     folder: folder,
+    width: imageCloud.width,
+    height: imageCloud.height,
   });
   const result = await newImage.save();
   return result._id;
@@ -30,6 +34,8 @@ ImageSchema.statics.uploadMultipleFile = async function (files, folder) {
       public_id: imageCloud.public_id,
       url: imageCloud.url,
       folder: folder,
+      width: imageCloud.width,
+      height: imageCloud.height,
     });
     const result = await newImage.save();
     arrId.push(result._id);
