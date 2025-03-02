@@ -35,3 +35,11 @@ export const momentVi = (
   });
   return moment(time, format, strict).locale("vi");
 };
+export const checkImageUrl = (url: string) => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = url;
+  });
+};

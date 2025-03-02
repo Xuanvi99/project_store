@@ -3,6 +3,7 @@ import { TPropsMessage } from "../Message";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { TMessageTypeBorder } from "../chat_View_Messages/DisplayMessages";
 import MessageItemImage from "./MessageItemImage";
+import { marked } from "marked";
 
 export default function MessageOfSend(props: TPropsMessage) {
   const {
@@ -49,7 +50,6 @@ export default function MessageOfSend(props: TPropsMessage) {
   return (
     <div className={"MessageOfSend flex flex-col w-full items-end gap-y-1"}>
       <div
-        placeholder={isTypeBorder}
         role={messageType}
         className={cn(
           "relative min-w-[60px] max-w-[70%] bg-orange cursor-text text-[14px] flex text-white",
@@ -59,7 +59,12 @@ export default function MessageOfSend(props: TPropsMessage) {
         )}
       >
         {messageType === "text" && (
-          <div className="p-2 pb-3 text-start">{message.text}</div>
+          <span
+            className="p-2 pb-3 text-start"
+            dangerouslySetInnerHTML={{
+              __html: marked.parse(message.text || ""),
+            }}
+          ></span>
         )}
         {messageType === "image" && images && images.length > 0 && (
           <div
@@ -98,7 +103,7 @@ export default function MessageOfSend(props: TPropsMessage) {
       >
         <LazyLoadImage
           alt="image_avatar"
-          placeholderSrc={"/public/userName.png"}
+          placeholderSrc={"/userName.png"}
           srcSet={receiver?.avatar?.url || receiver?.avatarDefault}
           effect="blur"
           className="w-full h-full rounded-full"

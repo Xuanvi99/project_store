@@ -28,9 +28,7 @@ function ProductDesc() {
           <div
             className="flex flex-col gap-y-3 [&>p]:mx-auto"
             dangerouslySetInnerHTML={{
-              __html: marked.parse(
-                product && product?.desc ? product?.desc : ""
-              ),
+              __html: marked.parse(product && product.desc ? product.desc : ""),
             }}
           ></div>
         </div>

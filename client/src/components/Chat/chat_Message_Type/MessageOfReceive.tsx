@@ -3,6 +3,7 @@ import { TPropsMessage } from "../Message";
 import { cn, momentVi } from "@/utils";
 import { TMessageTypeBorder } from "../chat_View_Messages/DisplayMessages";
 import MessageItemImage from "./MessageItemImage";
+import { marked } from "marked";
 
 export default function MessageOfReceive(props: TPropsMessage) {
   const {
@@ -60,7 +61,7 @@ export default function MessageOfReceive(props: TPropsMessage) {
           <span className="overflow-hidden rounded-full w-7 h-7">
             <LazyLoadImage
               alt="image"
-              placeholderSrc={"/public/userName.png"}
+              placeholderSrc={"/userName.png"}
               srcSet={receiverInfo?.avatar?.url || receiverInfo?.avatarDefault}
               effect="blur"
               className="object-cover w-full h-full"
@@ -79,7 +80,12 @@ export default function MessageOfReceive(props: TPropsMessage) {
           )}
         >
           {messageType === "text" && (
-            <div className="p-2 pb-3 text-start">{message.text}</div>
+            <span
+              className="p-2 pb-3 text-start"
+              dangerouslySetInnerHTML={{
+                __html: marked.parse(message.text || ""),
+              }}
+            ></span>
           )}
           {messageType === "image" && images && images.length > 0 && (
             <div
@@ -118,7 +124,7 @@ export default function MessageOfReceive(props: TPropsMessage) {
       >
         <LazyLoadImage
           alt="image_avatar"
-          placeholderSrc={"/public/userName.png"}
+          placeholderSrc={"/userName.png"}
           srcSet={receiverInfo?.avatar?.url || receiverInfo?.avatarDefault}
           effect="blur"
           className="w-full h-full rounded-full"

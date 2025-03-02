@@ -1,12 +1,20 @@
 import { useSelectorChatSlice } from "@/hook";
 
 import { momentVi } from "@/utils";
+import useChatContext from "../context/useChatContext";
 
-function DisplayInfoReceiver({ amountMsg = -1 }: { amountMsg: number }) {
+function DisplayInfoReceiver() {
   const { selectedConversation, receiverInfo, totalMessage } =
     useSelectorChatSlice();
 
-  if (!receiverInfo || !selectedConversation || amountMsg !== totalMessage) {
+  const { messages, isFetchingData } = useChatContext();
+
+  if (
+    !receiverInfo ||
+    !selectedConversation ||
+    messages.length !== totalMessage ||
+    isFetchingData
+  ) {
     return null;
   }
 

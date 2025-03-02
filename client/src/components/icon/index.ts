@@ -38,8 +38,10 @@ import IconRestore from "./IconRestore";
 import IconMessage from "./IconMessage";
 import IconSendMessage from "./IconSendMessage";
 import IconArrowDown from "./IconArrowDown";
+import IconEmoji from "./IconEmoji";
 
 export {
+  IconEmoji,
   IconSendMessage,
   IconMessage,
   IconRestore,

@@ -6,13 +6,17 @@ import { useLazyGetUsersChatQuery } from "@/stores/service/chat.service";
 import { IUser } from "@/types/user.type";
 import { toast } from "react-toastify";
 import SearchReceiver from "./SearchReceiver";
-import useChatContext from "../../context/useChatContext";
 import { debounce } from "lodash";
 import LoadingSpinner from "@/components/loading";
 
-function ConversationSearch() {
-  const { openSearchResult, handleOpenSearchResult } = useChatContext();
-
+type TPropsSearch = {
+  openSearchResult: boolean;
+  handleOpenSearchResult: (status: boolean) => void;
+};
+function ConversationSearch({
+  openSearchResult,
+  handleOpenSearchResult,
+}: TPropsSearch) {
   const [getUsersChat, { isFetching }] = useLazyGetUsersChatQuery();
 
   const [textSearch, setTextSearch] = useState<string>("");
@@ -96,7 +100,10 @@ function ConversationSearch() {
         </div>
       )}
       {openSearchResult && !isFetching && usersChat.length > 0 && (
-        <SearchReceiver receiver={usersChat} />
+        <SearchReceiver
+          receiver={usersChat}
+          handleOpenSearchResult={handleOpenSearchResult}
+        />
       )}
     </Fragment>
   );

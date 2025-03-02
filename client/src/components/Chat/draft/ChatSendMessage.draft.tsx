@@ -1,10 +1,14 @@
 import { cn } from "@/utils";
+import TextareaAutosize from "react-textarea-autosize";
+import Tooltip from "../tooltip";
 import { IconSendMessage, IconArrowDown, IconUploadImage } from "../icon";
 import { Button } from "../button";
+import EmojiPicker from "emoji-picker-react";
 import {
   useAppDispatch,
   useSelectorAuthSlice,
   useSelectorChatSlice,
+  useToggle,
 } from "@/hook";
 import {
   chatApi,
@@ -12,16 +16,33 @@ import {
   useSendMessageImagesMutation,
   useSendMessageTextMutation,
 } from "@/stores/service/chat.service";
-import { IReqSendMessage } from "@/types/chat.type";
+import { IMessage, IReqSendMessage } from "@/types/chat.type";
+import { categoriesConfigEmoji } from "@/constant/chat.constant";
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
 import { useEffect, useLayoutEffect, useState } from "react";
+import { IUser } from "@/types/user.type";
 import EditMessageImages from "./chat_Send_Mesage/EditMessageImages";
 import { ImageType } from "react-images-uploading";
 import { setChat } from "@/stores/reducer/chat.reducer";
-import useChatContext from "./context/useChatContext";
-import ChatInput from "./chat_Send_Mesage/ChatInput";
 
-function ChatSendMessage() {
+type TProps = {
+  openBtnScrollDown: boolean;
+  receiverSeenCvs: boolean;
+  handleChangeMessageText: (value: string) => void;
+  handleBtnScrollToBottom: () => void;
+  handleSetMessages: (msg: IMessage<IUser>) => void;
+  handleSetWaitMessages: (msg: IReqSendMessage) => void;
+  handleSetImages: (images: ImageType[]) => void;
+};
+function ChatSendMessage({
+  openBtnScrollDown,
+  receiverSeenCvs,
+  handleChangeMessageText,
+  handleBtnScrollToBottom,
+  handleSetMessages,
+  handleSetWaitMessages,
+  handleSetImages,
+}: TProps) {
   const socketIo_client = useSocketIoContext();
 
   const { user } = useSelectorAuthSlice();
@@ -29,17 +50,6 @@ function ChatSendMessage() {
   const dispatch = useAppDispatch();
 
   const { selectedConversation, receiverId } = useSelectorChatSlice();
-
-  const {
-    receiverSeen,
-    containerDivRef,
-    handleSetMessages,
-    openBtnScrollDown,
-    handleBtnScrollToBottom,
-    handleScrollTo,
-    handleSetWaitMessages,
-    checkScrollToBottom,
-  } = useChatContext();
 
   const [sendMessageText] = useSendMessageTextMutation();
 
@@ -53,6 +63,9 @@ function ChatSendMessage() {
     { skip: !selectedConversation || !user }
   );
 
+  const { toggle: openEmojiPicker, handleToggle: handleOpenEmojiPicker } =
+    useToggle();
+
   const [messageText, setMessageText] = useState<string>("");
 
   const [messageImages, setMessageImages] = useState<ImageType[]>([]);
@@ -65,19 +78,22 @@ function ChatSendMessage() {
     setOpenEditImages(value);
     if (value === false) {
       setMessageImages([]);
+      handleSetImages([]);
     }
   };
 
   const onChangeImages = (images: ImageType[]) => {
     setMessageImages(images as never[]);
+    handleSetImages(images);
   };
 
-  const onChangeMessageText = (value: string) => {
-    setMessageText(value);
+  const onChangeMessageText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleChangeMessageText(e.target.value);
+    setMessageText(e.target.value);
     if (socketIo_client) {
       socketIo_client.emit("typing", {
         receiverId,
-        typing: value.length === 0 ? false : true,
+        typing: e.target.value.length === 0 ? false : true,
       });
     }
   };
@@ -96,7 +112,7 @@ function ChatSendMessage() {
         senderId: user._id,
         receiverId: receiverId,
         text: messageText,
-        receiverSeen: receiverSeen,
+        receiverSeen: receiverSeenCvs,
         messageType: "text",
       };
       handleSetWaitMessages(message);
@@ -114,13 +130,13 @@ function ChatSendMessage() {
       }
       formData.append("senderId", user._id);
       formData.append("receiverId", receiverId);
-      formData.append("receiverSeen", receiverSeen.toString());
+      formData.append("receiverSeen", receiverSeenCvs.toString());
 
       const messageImage: IReqSendMessage = {
         conversationId: selectedConversation._id,
         senderId: user._id,
         receiverId: receiverId,
-        receiverSeen: receiverSeen,
+        receiverSeen: receiverSeenCvs,
         images: messageImages.map((image) => image["data_url"]),
         messageType: "image",
       };
@@ -137,10 +153,6 @@ function ChatSendMessage() {
       const sendMessageText = handleSendMessageText();
       const sendMessageImages = handleSendMessageImages();
 
-      const containerDiv = containerDivRef.current;
-      if (!containerDiv) return;
-      const top = containerDiv?.scrollHeight;
-
       await Promise.all([sendMessageText, sendMessageImages]).then((res) => {
         if (res[0]) {
           handleSetMessages(res[0].message);
@@ -148,9 +160,6 @@ function ChatSendMessage() {
         if (res[1]) {
           handleSetMessages(res[1].message);
         }
-
-        handleScrollTo(top, "instant");
-
         dispatch(
           setChat({
             totalMessage: res[1] ? res[1].totalMessage : res[0]?.totalMessage,
@@ -163,25 +172,19 @@ function ChatSendMessage() {
     }
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && messageText.trim().length > 0) {
+      event.preventDefault();
+      handleSendMessage();
+      return false;
+    }
+  };
+
   useLayoutEffect(() => {
     if (dataUnreadMessage && status === "fulfilled") {
       setAmountUnreadMessage(dataUnreadMessage.amount);
     }
   }, [dataUnreadMessage, status]);
-
-  useEffect(() => {
-    const container = containerDivRef.current;
-    if (container && checkScrollToBottom) {
-      const top = container.scrollHeight;
-      handleScrollTo(top, "instant");
-    }
-  }, [
-    checkScrollToBottom,
-    messageText,
-    messageImages,
-    containerDivRef,
-    handleScrollTo,
-  ]);
 
   useEffect(() => {
     let typingTimer = undefined;
@@ -206,12 +209,7 @@ function ChatSendMessage() {
           onChangeImages={onChangeImages}
         />
         <div className="flex items-center p-3 gap-x-2">
-          <div
-            className={cn(
-              "Icon_upload_file w-[5%]",
-              openEditImages && "hidden"
-            )}
-          >
+          <div className={cn("Icon_upload_file", openEditImages && "hidden")}>
             <input
               type="file"
               name="file"
@@ -241,16 +239,74 @@ function ChatSendMessage() {
               <IconUploadImage size={25} />
             </label>
           </div>
-          <ChatInput
-            text={messageText}
-            handleSendMessage={handleSendMessage}
-            onChange={onChangeMessageText}
-          />
+          <div
+            className={
+              "w-full p-2 rounded-xl flex bg-grayE5 items-end border-1 border-orange gap-x-2 transition-all"
+            }
+          >
+            <TextareaAutosize
+              autoFocus
+              minRows={1}
+              maxRows={5}
+              placeholder="Nhập nội dung tin nhắn"
+              value={messageText}
+              onChange={onChangeMessageText}
+              onKeyDown={handleKeyDown}
+              className="w-full text-sm outline-none resize-none bg-grayE5"
+            />
+            <div className="relative">
+              <Tooltip
+                place="top"
+                className={{
+                  content:
+                    "z-50 text-xs whitespace-nowrap bg-black bg-opacity-80 text-white ",
+                }}
+                onClick={handleOpenEmojiPicker}
+                title={
+                  <p className="whitespace-nowrap">Chọn biểu tượng cảm xúc</p>
+                }
+              >
+                <div
+                  className={cn(
+                    "text-gray98 cursor-pointer",
+                    openEmojiPicker &&
+                      "before:absolute before:z-40 before:hoverDropdown before:bottom-[10px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-t-white"
+                  )}
+                >
+                  <img
+                    alt="😀"
+                    srcSet="https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f603.png"
+                    width={20}
+                  />
+                </div>
+              </Tooltip>
+              <div
+                className={cn(
+                  "emojiPicker shadow-shadow2 w-auto absolute -top-4 -translate-y-full -right-10"
+                )}
+              >
+                <EmojiPicker
+                  open={openEmojiPicker}
+                  width={300}
+                  height={350}
+                  searchPlaceHolder="Tìm kiếm biểu tượng cảm xúc"
+                  className="pb-3"
+                  onEmojiClick={(data) => {
+                    console.log(data);
+                  }}
+                  skinTonesDisabled={true}
+                  searchDisabled
+                  previewConfig={{ showPreview: false }}
+                  categories={categoriesConfigEmoji}
+                />
+              </div>
+            </div>
+          </div>
           <Button
             variant="outLine-border"
             type="button"
             onClick={handleSendMessage}
-            className="flex items-center justify-center text-white rounded-full w-[5%] h-9 w-9 bg-orange hover:bg-white"
+            className="flex items-center justify-center text-white rounded-full h-9 w-9 bg-orange hover:bg-white"
           >
             <IconSendMessage size={28} />
           </Button>

@@ -2,7 +2,7 @@ import { IConversation } from "@/types/chat.type";
 import { IUser } from "@/types/user.type";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-interface IPayload {
+export interface IPayloadChat {
   selectedConversation: IConversation<IUser> | null;
   receiverId: string;
   receiverInfo: IUser | null;
@@ -10,9 +10,9 @@ interface IPayload {
   onlineUsers: string[];
 }
 
-type TSetChat = { [P in keyof IPayload]?: IPayload[P] };
+type TSetChat = { [P in keyof IPayloadChat]?: IPayloadChat[P] };
 
-const initialState: IPayload = {
+const initialState: IPayloadChat = {
   selectedConversation: null,
   receiverId: "",
   receiverInfo: null,
@@ -41,7 +41,7 @@ const chatSlice = createSlice({
     },
     setOnlineUsers: (
       state,
-      action: PayloadAction<Pick<IPayload, "onlineUsers">>
+      action: PayloadAction<Pick<IPayloadChat, "onlineUsers">>
     ) => {
       return {
         ...state,

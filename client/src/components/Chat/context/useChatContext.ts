@@ -1,5 +1,6 @@
 import useTestContext from "@/hook/useTestContext";
-import { ChatContext, TChatProvider } from "@/module/dashboard/chat/context";
+import React from "react";
+import { ChatContext, TChatProvider } from ".";
 
 export default function useChatContext() {
   return useTestContext<TChatProvider>(

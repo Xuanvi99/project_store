@@ -12,6 +12,7 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import SkeletonConversationItem from "../../skeleton/SkeletonConversationItem";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useGetProfileQuery } from "@/stores/service/user.service";
+import { marked } from "marked";
 
 type TProps = {
   conversation: IConversation<IUser>;
@@ -132,7 +133,7 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
         <div className="w-12 h-12 overflow-hidden rounded-full ">
           <LazyLoadImage
             alt="image"
-            placeholderSrc={"/public/userName.png"}
+            placeholderSrc={"/userName.png"}
             srcSet={receiverInfo.avatar?.url || receiverInfo.avatarDefault}
             effect="blur"
             className="object-cover max-w-full "
@@ -160,9 +161,10 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
                     !message.receiverSeen &&
                     "font-semibold text-black"
                 )}
-              >
-                {message.text}
-              </span>
+                dangerouslySetInnerHTML={{
+                  __html: marked.parse(message.text || ""),
+                }}
+              ></span>
             </span>
             <span className="basis-auto">
               -{" "}

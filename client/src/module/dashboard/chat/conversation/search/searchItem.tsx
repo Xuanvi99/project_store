@@ -1,6 +1,5 @@
 import { IUser } from "@/types/user.type";
 import { cn } from "@/utils";
-import useChatContext from "../../context/useChatContext";
 import { useLazyGetOneConversationQuery } from "@/stores/service/chat.service";
 import { IConversation } from "@/types/chat.type";
 import { useEffect, useState } from "react";
@@ -11,10 +10,9 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 
 type TProps = {
   user: IUser;
+  handleOpenSearchResult: (status: boolean) => void;
 };
-function SearchItem({ user }: TProps) {
-  const { handleOpenSearchResult } = useChatContext();
-
+function SearchItem({ user, handleOpenSearchResult }: TProps) {
   const dispatch = useAppDispatch();
 
   const [getOneConversation] = useLazyGetOneConversationQuery();
@@ -58,7 +56,7 @@ function SearchItem({ user }: TProps) {
         <div className="w-10 h-10 overflow-hidden rounded-full">
           <LazyLoadImage
             alt="image"
-            placeholderSrc={"/public/userName.png"}
+            placeholderSrc={"/userName.png"}
             srcSet={user.avatar?.url || user?.avatarDefault}
             effect="blur"
             className="object-cover max-w-full "

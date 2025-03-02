@@ -1,22 +1,15 @@
 import { useSelectorAuthSlice, useSelectorChatSlice } from "@/hook";
-import { IMessage, IReqSendMessage } from "@/types/chat.type";
 import { momentVi } from "@/utils";
 import Message from "../Message";
-import { IUser } from "@/types/user.type";
+import useChatContext from "../context/useChatContext";
 
 export type TMessageTypeBorder = "start" | "mid" | "end" | "basis";
-const DisplayMessages = ({
-  messages,
-  receiverSeenCvs,
-  waitMessages,
-}: {
-  messages: IMessage<IUser>[];
-  receiverSeenCvs: boolean;
-  waitMessages: IReqSendMessage[];
-}) => {
+const DisplayMessages = () => {
   const { user } = useSelectorAuthSlice();
 
   const { receiverInfo } = useSelectorChatSlice();
+
+  const { messages, waitMessages, receiverSeen } = useChatContext();
 
   const checkDisplayAvatarReceiver = (index: number): boolean => {
     if (index + 1 < messages.length) {
@@ -47,7 +40,7 @@ const DisplayMessages = ({
   };
 
   const checkDisplayReceiverSeenMessage = () => {
-    if (receiverSeenCvs) {
+    if (receiverSeen) {
       return messages.length - 1;
     }
     if (user && messages.length > 0) {

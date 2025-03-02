@@ -57,7 +57,7 @@ function Footer() {
             <li>Phương thức thanh toán của XV Store</li>
             <li>Chính sách vận chuyển của XV Store</li>
           </ul>
-          <img src="" alt="" srcSet="/icon-footer.jpg" loading="lazy" />
+          <img alt="" srcSet="/icon-footer.jpg" loading="lazy" />
         </div>
         <div className="flex flex-col px-3 gap-y-5">
           <div className="flex flex-col justify-start gap-y-1">

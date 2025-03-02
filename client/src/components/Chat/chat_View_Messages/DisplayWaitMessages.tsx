@@ -1,11 +1,8 @@
-import { IReqSendMessage } from "@/types/chat.type";
 import { cn, momentVi } from "@/utils";
+import useChatContext from "../context/useChatContext";
 
-type TProps = {
-  waitMessages: IReqSendMessage[];
-};
-
-function DisplayWaitMessages({ waitMessages }: TProps) {
+function DisplayWaitMessages() {
+  const { waitMessages } = useChatContext();
   return (
     <div className="flex flex-col mt-1 gap-y-1">
       {waitMessages.length > 0 &&

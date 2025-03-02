@@ -3,12 +3,12 @@ import { useRef, useEffect, useState, useCallback } from "react";
 function useClickOutSide<T extends Element>(elementClick?: string) {
   const nodeRef = useRef<T>(null);
 
-  const [show, setShow] = useState<boolean | null>(false);
+  const [show, setShow] = useState<boolean>(false);
 
   const handleClickOutSide = useCallback(
     (event: MouseEvent) => {
       const element = event.target as Element;
-      if (!nodeRef.current?.contains(element)) {
+      if (nodeRef.current && !nodeRef.current.contains(element)) {
         if (elementClick && element?.matches(elementClick)) {
           return;
         }

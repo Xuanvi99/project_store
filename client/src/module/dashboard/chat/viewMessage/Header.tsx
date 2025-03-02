@@ -30,12 +30,12 @@ function HeaderView() {
   if (!receiverInfo) return <SkeletonHeader />;
 
   return (
-    <div className="flex gap-x-3 items-center px-3 border-b-1 border-orange py-2 h-[50px] z-40 bg-white">
+    <div className="flex gap-x-3 items-center px-3 border-b-1 border-orange py-2 h-[50px] z-40 bg-white shadow-sm shadow-gray98">
       <div className="relative">
         <div className="w-8 h-8 overflow-hidden rounded-full ">
           <LazyLoadImage
             alt="image"
-            placeholderSrc={"/public/userName.png"}
+            placeholderSrc={"/userName.png"}
             srcSet={receiverInfo.avatar?.url || receiverInfo.avatarDefault}
             effect="blur"
             className="object-cover max-w-full "

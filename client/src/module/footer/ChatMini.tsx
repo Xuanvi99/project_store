@@ -17,10 +17,10 @@ import {
   setChat,
   setSelectedConversation,
 } from "@/stores/reducer/chat.reducer";
-import ChatContainer from "@/components/Chat/ChatContainer";
 import { useLazyGetProfileQuery } from "@/stores/service/user.service";
 import { IUser } from "@/types/user.type";
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
+import ChatContainer from "@/components/Chat/ChatContainer";
 
 function ChatMini() {
   const { user } = useSelectorAuthSlice();

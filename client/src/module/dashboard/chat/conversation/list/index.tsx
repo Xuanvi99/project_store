@@ -1,31 +1,23 @@
 import { cn } from "@/utils";
 import ConversationItem from "./ConversationItem";
-import { useEffect, useRef, useState } from "react";
-import useChatContext from "../../context/useChatContext";
 import { useSelectorAuthSlice } from "@/hook";
+import { IConversation } from "@/types/chat.type";
+import { IUser } from "@/types/user.type";
 
-function ConversationsList() {
+type TPropsConversationList = {
+  conversations: IConversation<IUser>[] | undefined;
+  openSearchResult: boolean;
+};
+function ConversationsList({
+  conversations,
+  openSearchResult,
+}: TPropsConversationList) {
   const { user } = useSelectorAuthSlice();
-
-  const { conversations, openSearchResult } = useChatContext();
-
-  const conversationRef = useRef<HTMLDivElement>(null);
-
-  const [openScroll, setOpenScroll] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (conversationRef.current && conversations) {
-      const height = conversationRef.current.offsetHeight;
-      setOpenScroll(height / 70 < conversations.length ? true : false);
-    }
-  }, [conversations]);
 
   return (
     <div
-      ref={conversationRef}
       className={cn(
-        "w-full h-full flex flex-col mt-auto",
-        openScroll && "overflow-y-scroll pr-2",
+        "w-full h-full flex flex-col mt-auto overflow-auto",
         openSearchResult && "hidden"
       )}
     >

@@ -2,10 +2,6 @@ import { Categories } from "emoji-picker-react";
 
 export const categoriesConfigEmoji = [
   {
-    category: Categories.SUGGESTED,
-    name: "Gần đây",
-  },
-  {
     category: Categories.SMILEYS_PEOPLE,
     name: "Cảm xúc",
   },

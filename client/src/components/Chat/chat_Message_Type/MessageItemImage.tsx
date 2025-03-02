@@ -13,9 +13,11 @@ function MessageItemImage({ image, imagesCount }: TProps) {
   const ImageItemWithStyleCSS = (imagesCount: number) => {
     if (imagesCount === 0) return;
     if (imagesCount === 1 && image.height > image.width) {
+      const newWidth = Math.floor((image.width * 350) / image.height);
       return {
         height: image.height,
         maxHeight: "350px",
+        width: newWidth + "px",
       };
     }
     return { width: image.width, aspectRatio: "1/1" };

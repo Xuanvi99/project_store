@@ -36,7 +36,7 @@ class SocketIoService {
     });
 
     // check receiver seen message
-    socket.on("seenConversation", async (data) => {
+    socket.on("notificationSeenConversation", async (data) => {
       const { receiverId, seen, conversationId } = data;
       const receiverSocketId = this.userSocketMap[receiverId];
       _io
@@ -44,13 +44,13 @@ class SocketIoService {
         .emit("statusReceiverSeen", { seen, conversationId });
     });
 
-    socket.on("checkReceiverSeenCvs", async (data) => {
+    socket.on("checkReceiverSeen", async (data) => {
       const { receiverId, conversationId } = data;
       const receiverSocketId = this.userSocketMap[receiverId];
-      _io.to(receiverSocketId).emit("checkReceiverSeenCvs", { conversationId });
+      _io.to(receiverSocketId).emit("checkReceiverSeen", { conversationId });
     });
 
-    socket.on("resultCheckSeenCvs", async (data) => {
+    socket.on("resultCheckSeen", async (data) => {
       const { receiverId, seen, conversationId } = data;
       const receiverSocketId = this.userSocketMap[receiverId];
       _io

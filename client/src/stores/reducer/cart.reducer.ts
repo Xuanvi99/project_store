@@ -1,11 +1,11 @@
 import { ICart } from "@/types/cart.type";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-interface IPayload {
+export interface IPayloadCart {
   cart: ICart | null;
 }
 
-const initialState: IPayload = {
+const initialState: IPayloadCart = {
   cart: null,
 };
 
@@ -13,7 +13,7 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    updateCart: (state, action: PayloadAction<IPayload>) => {
+    updateCart: (state, action: PayloadAction<IPayloadCart>) => {
       return {
         ...state,
         ...action.payload,

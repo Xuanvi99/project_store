@@ -1,13 +1,13 @@
 import { IUser } from "@/types/user.type";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-interface IPayload {
+export interface IPayloadAuth {
   user?: IUser | null;
   accessToken?: string;
   isLogin?: boolean;
 }
 
-const initialState: IPayload = {
+const initialState: IPayloadAuth = {
   user: null,
   accessToken: "",
   isLogin: false,
@@ -17,7 +17,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    updateAuth: (state, action: PayloadAction<IPayload>) => {
+    updateAuth: (state, action: PayloadAction<IPayloadAuth>) => {
       return {
         ...state,
         ...action.payload,

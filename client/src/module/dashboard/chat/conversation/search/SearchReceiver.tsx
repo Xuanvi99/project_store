@@ -5,8 +5,9 @@ import SearchItem from "./SearchItem";
 
 type TProps = {
   receiver: IUser[];
+  handleOpenSearchResult: (status: boolean) => void;
 };
-function SearchReceiver({ receiver }: TProps) {
+function SearchReceiver({ receiver, handleOpenSearchResult }: TProps) {
   const receiverRef = useRef<HTMLDivElement>(null);
 
   const [openScroll, setOpenScroll] = useState<boolean>(false);
@@ -27,7 +28,11 @@ function SearchReceiver({ receiver }: TProps) {
       )}
     >
       {receiver.map((user) => (
-        <SearchItem key={user._id} user={user}></SearchItem>
+        <SearchItem
+          key={user._id}
+          user={user}
+          handleOpenSearchResult={handleOpenSearchResult}
+        />
       ))}
     </div>
   );

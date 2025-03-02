@@ -7,4 +7,11 @@ export default defineConfig({
   resolve: {
     alias: [{ find: "@", replacement: "/src" }],
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: "modern", // Buộc dùng Modern JS API thay vì Legacy API
+      },
+    },
+  },
 });
