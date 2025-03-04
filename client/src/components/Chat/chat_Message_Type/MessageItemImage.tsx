@@ -12,13 +12,20 @@ function MessageItemImage({ image, imagesCount }: TProps) {
 
   const ImageItemWithStyleCSS = (imagesCount: number) => {
     if (imagesCount === 0) return;
-    if (imagesCount === 1 && image.height > image.width) {
-      const newWidth = Math.floor((image.width * 350) / image.height);
-      return {
-        height: image.height,
-        maxHeight: "350px",
-        width: newWidth + "px",
-      };
+    if (imagesCount === 1) {
+      if (image.height > image.width) {
+        const newWidth = Math.floor((image.width * 350) / image.height);
+        return {
+          height: image.height,
+          maxHeight: "350px",
+          width: newWidth + "px",
+        };
+      } else {
+        return {
+          width: image.width,
+          maxHeight: "350px",
+        };
+      }
     }
     return { width: image.width, aspectRatio: "1/1" };
   };
@@ -41,6 +48,7 @@ function MessageItemImage({ image, imagesCount }: TProps) {
           imagesCount >= 2 && "aspect-square max-h-full"
         )}
         width="100%"
+        threshold={5}
         onLoad={() => {
           setLoadingImages(false);
         }}

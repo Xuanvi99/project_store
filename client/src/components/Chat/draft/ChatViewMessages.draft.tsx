@@ -5,7 +5,7 @@ import { useSelectorChatSlice } from "@/hook";
 import { forwardRef } from "react";
 import { IUser } from "@/types/user.type";
 import DisplayMessages from "../chat_View_Messages/DisplayMessages";
-import DisplayWaitMessages from "../chat_View_Messages/DisplayWaitMessages";
+import DisplayWaitMessages from "../chat_View_Messages/DisplayPreviewMessages";
 import DisplayTyping from "../chat_View_Messages/DisplayTyping";
 import DisplayInfoReceiver from "../chat_View_Messages/DisplayInfoReceiver";
 

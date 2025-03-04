@@ -29,7 +29,7 @@ export default function EditMessageImages(props: TProps) {
     const ImagesRef = ImagesContainerRef.current;
     if (ImagesRef && listImages && listImages.length > amountImage) {
       setAmountImage(listImages.length);
-      ImagesRef?.scrollTo({
+      ImagesRef.scrollTo({
         left: ImagesRef.scrollWidth,
         behavior: "smooth",
       });

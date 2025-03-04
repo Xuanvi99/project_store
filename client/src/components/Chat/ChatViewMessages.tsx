@@ -11,7 +11,7 @@ import DisplayInfoReceiver from "./chat_View_Messages/DisplayInfoReceiver";
 import useChatContext from "./context/useChatContext";
 import { useCallback, useEffect, useState } from "react";
 import { LIMIT_GET_MESSAGE } from "./context";
-import DisplayWaitMessages from "./chat_View_Messages/DisplayWaitMessages";
+import DisplayPreviewMessages from "./chat_View_Messages/DisplayPreviewMessages";
 import { chatApi } from "@/stores/service/chat.service";
 
 const ChatViewMessages = () => {
@@ -161,7 +161,7 @@ const ChatViewMessages = () => {
 
       <DisplayMessages />
 
-      <DisplayWaitMessages />
+      <DisplayPreviewMessages />
 
       <DisplayTyping />
     </section>

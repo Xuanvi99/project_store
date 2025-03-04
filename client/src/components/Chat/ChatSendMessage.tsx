@@ -1,5 +1,4 @@
-import { cn } from "@/utils";
-import { IconSendMessage, IconArrowDown, IconUploadImage } from "../icon";
+import { IconSendMessage } from "../icon";
 import { Button } from "../button";
 import {
   useAppDispatch,
@@ -8,17 +7,18 @@ import {
 } from "@/hook";
 import {
   chatApi,
-  useGetUnreadMessageQuery,
   useSendMessageImagesMutation,
   useSendMessageTextMutation,
 } from "@/stores/service/chat.service";
 import { IReqSendMessage } from "@/types/chat.type";
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import EditMessageImages from "./chat_Send_Mesage/EditMessageImages";
 import { ImageType } from "react-images-uploading";
 import { setChat } from "@/stores/reducer/chat.reducer";
 import useChatContext from "./context/useChatContext";
+import BtnScrollBottom from "./chat_Send_Mesage/BtnScrollBottom";
+import ChatFileImg from "./chat_Send_Mesage/ChatFileImg";
 import ChatInput from "./chat_Send_Mesage/ChatInput";
 
 function ChatSendMessage() {
@@ -37,7 +37,7 @@ function ChatSendMessage() {
     openBtnScrollDown,
     handleBtnScrollToBottom,
     handleScrollTo,
-    handleSetWaitMessages,
+    handleSetPreviewMessages,
     checkScrollToBottom,
   } = useChatContext();
 
@@ -45,19 +45,9 @@ function ChatSendMessage() {
 
   const [sendMessageImages] = useSendMessageImagesMutation();
 
-  const { data: dataUnreadMessage, status } = useGetUnreadMessageQuery(
-    {
-      conversationId: selectedConversation?._id || "",
-      userId: user?._id || "",
-    },
-    { skip: !selectedConversation || !user }
-  );
-
   const [messageText, setMessageText] = useState<string>("");
 
   const [messageImages, setMessageImages] = useState<ImageType[]>([]);
-
-  const [amountUnreadMessage, setAmountUnreadMessage] = useState<number>(0);
 
   const [openEditImages, setOpenEditImages] = useState<boolean>(false);
 
@@ -69,7 +59,27 @@ function ChatSendMessage() {
   };
 
   const onChangeImages = (images: ImageType[]) => {
-    setMessageImages(images as never[]);
+    if (images.length > 0) {
+      const imagePreviews = images.map((image) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.src = image["data_url"] as string;
+          img.onload = () => {
+            resolve({
+              data_url: image["data_url"],
+              width: img.width,
+              height: img.height,
+              file: image.file,
+            });
+          };
+        });
+      });
+
+      Promise.all(imagePreviews).then((results) => {
+        console.log("results: ", results);
+        setMessageImages(results as never[]);
+      });
+    }
   };
 
   const onChangeMessageText = (value: string) => {
@@ -99,7 +109,7 @@ function ChatSendMessage() {
         receiverSeen: receiverSeen,
         messageType: "text",
       };
-      handleSetWaitMessages(message);
+      handleSetPreviewMessages(message);
       return await sendMessageText(message).unwrap();
     }
   };
@@ -121,10 +131,16 @@ function ChatSendMessage() {
         senderId: user._id,
         receiverId: receiverId,
         receiverSeen: receiverSeen,
-        images: messageImages.map((image) => image["data_url"]),
         messageType: "image",
+        images: messageImages.map((image) => {
+          return {
+            url: image["data_url"],
+            width: image["width"],
+            height: image["height"],
+          };
+        }),
       };
-      handleSetWaitMessages(messageImage);
+      handleSetPreviewMessages(messageImage);
       return await sendMessageImages({
         conversationId: selectedConversation._id,
         data: formData,
@@ -157,17 +173,14 @@ function ChatSendMessage() {
           })
         );
         dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
+
+        setMessageText("");
+        setMessageImages([]);
       });
     } catch (error) {
       console.log("error: ", error);
     }
   };
-
-  useLayoutEffect(() => {
-    if (dataUnreadMessage && status === "fulfilled") {
-      setAmountUnreadMessage(dataUnreadMessage.amount);
-    }
-  }, [dataUnreadMessage, status]);
 
   useEffect(() => {
     const container = containerDivRef.current;
@@ -206,41 +219,11 @@ function ChatSendMessage() {
           onChangeImages={onChangeImages}
         />
         <div className="flex items-center p-3 gap-x-2">
-          <div
-            className={cn(
-              "Icon_upload_file w-[5%]",
-              openEditImages && "hidden"
-            )}
-          >
-            <input
-              type="file"
-              name="file"
-              id="file"
-              multiple
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files) {
-                  const files = e.target.files;
-                  const images: ImageType[] = [];
-                  for (const file of files) {
-                    const image = {
-                      data_url: URL.createObjectURL(file),
-                      file: file,
-                    };
-                    images.push(image);
-                  }
-                  onChangeImages(images);
-                  handleSetOpenEditImages(true);
-                }
-              }}
-            />
-            <label
-              htmlFor="file"
-              className="cursor-pointer text-blue hover:text-orange"
-            >
-              <IconUploadImage size={25} />
-            </label>
-          </div>
+          <ChatFileImg
+            openEditImages={openEditImages}
+            handleSetOpenEditImages={handleSetOpenEditImages}
+            onChangeImages={onChangeImages}
+          />
           <ChatInput
             text={messageText}
             handleSendMessage={handleSendMessage}
@@ -250,28 +233,16 @@ function ChatSendMessage() {
             variant="outLine-border"
             type="button"
             onClick={handleSendMessage}
-            className="flex items-center justify-center text-white rounded-full w-[5%] h-9 w-9 bg-orange hover:bg-white"
+            className="flex items-center justify-center text-white rounded-full w-9 h-9 bg-orange hover:bg-white"
           >
             <IconSendMessage size={28} />
           </Button>
         </div>
       </div>
-      <Button
-        variant="outLine"
-        className={cn(
-          "absolute -top-16 left-1/2 -translate-x-1/2 transition-all duration-300 z-30",
-          "w-10 h-10 rounded-full bg-grayF5 flex justify-center items-center text-orange shadow-sm shadow-gray98 cursor-pointer",
-          !openBtnScrollDown && "top-0"
-        )}
-        onClick={handleBtnScrollToBottom}
-      >
-        <IconArrowDown size={30} />
-        {amountUnreadMessage > 0 && (
-          <div className="absolute -right-1 top-0 text-[8px] w-4 h-4 bg-danger rounded-full text-white flex justify-center items-center">
-            {amountUnreadMessage}
-          </div>
-        )}
-      </Button>
+      <BtnScrollBottom
+        openBtnScrollDown={openBtnScrollDown}
+        handleBtnScrollToBottom={handleBtnScrollToBottom}
+      />
     </div>
   );
 }

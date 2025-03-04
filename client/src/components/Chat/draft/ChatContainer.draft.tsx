@@ -133,7 +133,7 @@ function ChatContainer() {
     }));
   };
 
-  const handleSetWaitMessages = (msg: IReqSendMessage) => {
+  const handleSetPreviewMessages = (msg: IReqSendMessage) => {
     setWaitMessages((waitMessages) => {
       return [...waitMessages, msg];
     });
@@ -445,7 +445,7 @@ function ChatContainer() {
           handleChangeMessageText={handleChangeMessageText}
           handleBtnScrollToBottom={handleBtnScrollToBottom}
           handleSetMessages={handleSetMessages}
-          handleSetWaitMessages={handleSetWaitMessages}
+          handleSetPreviewMessages={handleSetPreviewMessages}
           handleSetImages={handleSetImages}
         />
       </div>

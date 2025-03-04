@@ -9,7 +9,7 @@ const DisplayMessages = () => {
 
   const { receiverInfo } = useSelectorChatSlice();
 
-  const { messages, waitMessages, receiverSeen } = useChatContext();
+  const { messages, previewMessages, receiverSeen } = useChatContext();
 
   const checkDisplayAvatarReceiver = (index: number): boolean => {
     if (index + 1 < messages.length) {
@@ -29,7 +29,7 @@ const DisplayMessages = () => {
   };
 
   const checkDisplayTimeSendMessage = (index: number): boolean => {
-    if (waitMessages.length > 0) return false;
+    if (previewMessages.length > 0) return false;
     if (user && index + 1 === messages.length) {
       return user._id === messages[index].senderId._id &&
         !messages[index].receiverSeen

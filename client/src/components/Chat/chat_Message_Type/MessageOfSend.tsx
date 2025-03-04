@@ -52,7 +52,7 @@ export default function MessageOfSend(props: TPropsMessage) {
       <div
         role={messageType}
         className={cn(
-          "relative min-w-[60px] max-w-[70%] bg-orange cursor-text text-[14px] flex text-white",
+          "relative min-w-[60px] max-w-[70%] bg-orange cursor-text text-[14px] flex text-white transition-all",
           typeBorder(isTypeBorder),
           messageType === "image" &&
             "overflow-hidden h-fit bg-transparent cursor-pointer max-w-[55%]"

@@ -43,3 +43,14 @@ export const checkImageUrl = (url: string) => {
     img.src = url;
   });
 };
+
+export const escapeHTML = (str: string): string => {
+  const htmlEntities: { [key: string]: string } = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  return str.replace(/[&<>"']/g, (char) => htmlEntities[char] || char);
+};

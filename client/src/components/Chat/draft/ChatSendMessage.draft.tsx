@@ -31,7 +31,7 @@ type TProps = {
   handleChangeMessageText: (value: string) => void;
   handleBtnScrollToBottom: () => void;
   handleSetMessages: (msg: IMessage<IUser>) => void;
-  handleSetWaitMessages: (msg: IReqSendMessage) => void;
+  handleSetPreviewMessages: (msg: IReqSendMessage) => void;
   handleSetImages: (images: ImageType[]) => void;
 };
 function ChatSendMessage({
@@ -40,7 +40,7 @@ function ChatSendMessage({
   handleChangeMessageText,
   handleBtnScrollToBottom,
   handleSetMessages,
-  handleSetWaitMessages,
+  handleSetPreviewMessages,
   handleSetImages,
 }: TProps) {
   const socketIo_client = useSocketIoContext();
@@ -115,7 +115,7 @@ function ChatSendMessage({
         receiverSeen: receiverSeenCvs,
         messageType: "text",
       };
-      handleSetWaitMessages(message);
+      handleSetPreviewMessages(message);
       return await sendMessageText(message).unwrap();
     }
   };
@@ -140,7 +140,7 @@ function ChatSendMessage({
         images: messageImages.map((image) => image["data_url"]),
         messageType: "image",
       };
-      handleSetWaitMessages(messageImage);
+      handleSetPreviewMessages(messageImage);
       return await sendMessageImages({
         conversationId: selectedConversation._id,
         data: formData,

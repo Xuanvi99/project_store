@@ -25,7 +25,7 @@ export type TChatProvider = {
   containerDivRef: React.RefObject<HTMLDivElement>;
   messages: IMessage<IUser>[];
   isFetchingData: boolean;
-  waitMessages: IReqSendMessage[];
+  previewMessages: IReqSendMessage[];
   receiverSeen: boolean;
   paramsGetMessages: IReqGetMessage;
   openBtnScrollDown: boolean;
@@ -35,7 +35,7 @@ export type TChatProvider = {
   setCheckScrollToBottom: React.Dispatch<React.SetStateAction<boolean>>;
   handleScrollTo: (top: number, behavior: ScrollBehavior) => void;
   handleSetMessages: (msg: IMessage<IUser>) => void;
-  handleSetWaitMessages: (msg: IReqSendMessage) => void;
+  handleSetPreviewMessages: (msg: IReqSendMessage) => void;
   handleBtnScrollToBottom: () => void;
   handleSetParamsGetMessage: (
     value: TParamsGetMessages<IReqGetMessage>
@@ -71,15 +71,14 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
   } = useGetMessagesQuery(paramsGetMessages, {
     skip:
       !selectedConversation ||
-      paramsGetMessages.conversationId !== selectedConversation._id ||
-      !user,
+      paramsGetMessages.conversationId !== selectedConversation._id,
   });
 
   const containerDivRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<IMessage<IUser>[]>([]);
 
-  const [waitMessages, setWaitMessages] = useState<IReqSendMessage[]>([]);
+  const [previewMessages, setPreviewMessages] = useState<IReqSendMessage[]>([]);
 
   const [countCallData, setCountCallData] = useState<number>(0);
 
@@ -107,18 +106,18 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
       if (messages.some((m) => m._id === msg._id)) return messages;
       return [...messages, msg];
     });
-    setWaitMessages((waitMessages) => {
-      if (waitMessages.length > 0) {
-        const messages = waitMessages.splice(0, 1);
+    setPreviewMessages((previewMessages) => {
+      if (previewMessages.length > 0) {
+        const messages = previewMessages.splice(0, 1);
         return [...messages];
       }
       return [];
     });
   };
 
-  const handleSetWaitMessages = (msg: IReqSendMessage) => {
-    setWaitMessages((waitMessages) => {
-      return [...waitMessages, msg];
+  const handleSetPreviewMessages = (msg: IReqSendMessage) => {
+    setPreviewMessages((previewMessages) => {
+      return [...previewMessages, msg];
     });
   };
 
@@ -169,7 +168,7 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
         skip: 0,
       });
       setMessages([]);
-      setWaitMessages([]);
+      setPreviewMessages([]);
       setReceiverSeen(false);
       setCountCallData(0);
       setCheckScrollToBottom(false);
@@ -197,7 +196,7 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
     }
   }, [countCallData]);
 
-   // scroll when receive message
+  // scroll when receive message
   useEffect(() => {
     const container = containerDivRef.current;
     if (container && checkMessageReceive && checkScrollToBottom) {
@@ -329,7 +328,7 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
     containerDivRef,
     messages,
     isFetchingData,
-    waitMessages,
+    previewMessages,
     receiverSeen,
     paramsGetMessages,
     checkScrollToBottom,
@@ -341,7 +340,7 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
     handleSetParamsGetMessage,
     handleBtnScrollToBottom,
     handleSetMessages,
-    handleSetWaitMessages,
+    handleSetPreviewMessages,
   };
 
   return <ChatContext.Provider value={data}>{children}</ChatContext.Provider>;

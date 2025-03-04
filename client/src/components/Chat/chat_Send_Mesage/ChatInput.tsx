@@ -1,8 +1,9 @@
 import { checkImageUrl, cn } from "@/utils";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import Emoji from "./Emoji";
 import { useSelectorChatSlice } from "@/hook";
 import { emojiStyle } from "@/constant/common";
+import { debounce } from "lodash";
 
 type TChatInput = {
   text: string;
@@ -21,6 +22,9 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
 
   const [isEmpty, setIsEmpty] = useState(true);
 
+  const [history, setHistory] = useState<string[]>([""]);
+  const [historyIndex, setHistoryIndex] = useState<number>(0);
+
   const createNodeEmoji = (url: string, alt: string) => {
     const emojiImg = document.createElement("img");
     emojiImg.className =
@@ -30,6 +34,37 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
     emojiImg.width = 16;
     emojiImg.height = 16;
     return emojiImg;
+  };
+
+  const saveHistory = (newContent: string) => {
+    // Cắt bỏ các trạng thái sau historyIndex nếu có
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(newContent);
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  };
+
+  const undo = () => {
+    if (historyIndex > 0 && inputRef.current) {
+      setHistoryIndex((prev) => prev - 1);
+      inputRef.current.innerHTML = history[historyIndex - 1];
+      setIsEmpty(!history[historyIndex - 1].trim());
+      onChange(history[historyIndex - 1].trim());
+    }
+  };
+
+  const redo = () => {
+    if (historyIndex < history.length - 1 && inputRef.current) {
+      setHistoryIndex((prev) => prev + 1);
+      inputRef.current.innerHTML = history[historyIndex + 1];
+      setIsEmpty(!history[historyIndex + 1].trim());
+      onChange(history[historyIndex + 1].trim());
+    }
+  };
+
+  const resetHistory = () => {
+    setHistory([""]);
+    setHistoryIndex(0);
   };
 
   const insertEmojiAtCursor = ({ emoji, url }: TInsertEmoji) => {
@@ -53,11 +88,12 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
       selection.removeAllRanges();
       selection.addRange(range);
       setIsEmpty(false);
+      saveHistory(inputRef.current.innerHTML);
       inputRef.current.focus();
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+  const handlePaste = async (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (!inputRef.current) return;
     const clipboardData = e.clipboardData.getData("text/html"); // Lấy text thô
@@ -67,49 +103,107 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
 
     const nodes = doc.body.childNodes;
 
-    const fragment = document.createElement("div");
+    const fragment = document.createDocumentFragment();
 
-    nodes.forEach(async (node) => {
-      if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
-        fragment.appendChild(document.createTextNode(node.textContent));
+    // Hàm kiểm tra xem node hoặc node con có chứa emoji không
+    const hasEmojiImage = (node: Node): boolean => {
+      // Nếu node là ELEMENT_NODE và là thẻ <img>
+      if (
+        node.nodeType === Node.ELEMENT_NODE &&
+        (node as HTMLElement).tagName === "IMG"
+      ) {
+        const imgElement = node as HTMLImageElement;
+        // Kiểm tra dựa trên src hoặc alt (tùy theo tiêu chí của bạn)
+        return (
+          imgElement.src.includes("emoji") ||
+          imgElement.alt.startsWith(":") || // Ví dụ: alt=":smile:"
+          imgElement.className.includes("emoji") // Hoặc kiểm tra class
+        );
       }
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        if (
-          (node as HTMLElement).tagName === "IMG" &&
-          (node as HTMLImageElement).src.includes("emoji")
-        ) {
-          const nameEmoji =
-            (node as HTMLImageElement).src.split("/").pop() || "";
-          const urlEmoji = `https://cdn.jsdelivr.net/npm/emoji-datasource-${emojiStyle}/img/${emojiStyle}/64/${nameEmoji}`;
 
+      // Nếu node không phải <img>, kiểm tra các node con của nó
+      if (node.childNodes && node.childNodes.length > 0) {
+        return Array.from(node.childNodes).some((child) =>
+          hasEmojiImage(child)
+        );
+      }
+
+      // Nếu không có node con hoặc không phải emoji, trả về false
+      return false;
+    };
+
+    // Hàm đệ quy để xử lý Duyệt sâu để xử lý từng phần tử con node
+    const processNode = async (currentNode: Node) => {
+      if (
+        currentNode.nodeType === Node.ELEMENT_NODE &&
+        (currentNode as HTMLElement).tagName === "IMG" &&
+        (currentNode as HTMLImageElement).src.includes("emoji")
+      ) {
+        const nameEmoji =
+          (currentNode as HTMLImageElement).src.split("/").pop() || "";
+        const urlEmoji = `https://cdn.jsdelivr.net/npm/emoji-datasource-${emojiStyle}/img/${emojiStyle}/64/${nameEmoji}`;
+
+        try {
           const isValidUrl = await checkImageUrl(urlEmoji);
           if (isValidUrl) {
             const emojiImg = createNodeEmoji(
               urlEmoji,
-              (node as HTMLImageElement).alt
+              (currentNode as HTMLImageElement).alt
             );
-
             fragment.appendChild(emojiImg);
+          } else {
+            fragment.appendChild(
+              document.createTextNode(
+                (currentNode as HTMLImageElement).alt || ""
+              )
+            );
           }
+        } catch (error) {
+          console.error("Error checking emoji URL:", error);
+          fragment.appendChild(
+            document.createTextNode((currentNode as HTMLImageElement).alt || "")
+          );
+        }
+      } else if (currentNode.nodeType === Node.ELEMENT_NODE) {
+        // Nếu không phải <img> nhưng là element, tiếp tục duyệt các node con
+        for (const child of Array.from(currentNode.childNodes)) {
+          await processNode(child);
+        }
+      } else if (
+        currentNode.nodeType === Node.TEXT_NODE &&
+        currentNode.textContent?.trim()
+      ) {
+        fragment.appendChild(document.createTextNode(currentNode.textContent));
+      }
+    };
+
+    for (const node of Array.from(nodes)) {
+      if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
+        fragment.appendChild(document.createTextNode(node.textContent));
+      }
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        if (hasEmojiImage(node)) {
+          await processNode(node);
         } else {
           fragment.appendChild(document.createTextNode(node.textContent || ""));
         }
       }
-    });
+    }
+
+    // Chèn fragment vào vị trí con trỏ
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
       range.deleteContents();
-      const htmlToInsert = fragment.innerHTML;
-      document.execCommand("insertHTML", false, htmlToInsert);
-      // range.insertNode(fragment);
-      // if (fragment.lastChild) {
-      //   range.setStartAfter(fragment.lastChild);
-      //   range.setEndAfter(fragment.lastChild);
-      // }
-      // range.collapse(false);
-      // selection.removeAllRanges();
-      // selection.addRange(range);
+      range.insertNode(fragment);
+      if (fragment.lastChild) {
+        range.setStartAfter(fragment.lastChild);
+        range.setEndAfter(fragment.lastChild);
+      }
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      saveHistory(inputRef.current.innerHTML);
       setIsEmpty(false);
       setTimeout(() => {
         if (!inputRef.current) return;
@@ -133,6 +227,13 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!inputRef.current) return;
+
+    if (e.ctrlKey && e.key === "z") {
+      undo();
+    }
+    if (e.ctrlKey && e.key === "y") {
+      redo();
+    }
     if (e.key === "Enter" && inputRef.current.innerText.trim()) {
       e.preventDefault();
       handleSendMessage();
@@ -163,6 +264,10 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
     }
     cleanEmptyDiv();
     saveRange();
+    debounce(() => {
+      if (!inputRef.current) return;
+      saveHistory(inputRef.current.innerHTML);
+    }, 500);
     onChange(inputRef.current.innerHTML.trim());
   };
 
@@ -172,20 +277,25 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
       input.focus();
       input.innerText = "";
       setIsEmpty(true);
+      resetHistory();
     }
   }, [selectedConversation]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const input = inputRef.current;
     if (input) {
       input.scrollTo({ top: input.scrollHeight, behavior: "smooth" });
+      if (!text) {
+        input.innerText = "";
+        setIsEmpty(true);
+      }
     }
   }, [text]);
 
   return (
     <div
       className={
-        "relative w-[90%] justify-center items-center rounded-xl flex bg-grayE5 p-2 border-1 border-orange gap-x-2 transition-all"
+        "relative flex w-[calc(95%-52px)] max-w-[90%] justify-start items-center rounded-2xl bg-grayE5 py-2 pl-3 border-1 border-orange gap-x-1 transition-all"
       }
     >
       <div
@@ -195,15 +305,13 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
         onDragStart={handleDragStart}
-        onClick={() => {
-          saveRange();
-        }}
+        onClick={saveRange}
         className={cn(
-          "w-full text-[15px] leading-5 overflow-auto border-none outline-none  max-h-24 "
+          "w-[calc(100%-44px)] max-w-full text-[15px] leading-5 overflow-auto border-none outline-none max-h-24 transition-all"
         )}
       />
       {isEmpty && (
-        <div className="absolute text-[15px] -translate-y-1/2 pointer-events-none left-2 top-1/2 text-gray98">
+        <div className="absolute text-[15px] -translate-y-1/2 pointer-events-none left-3 top-1/2 text-gray98">
           Nhập nội dung tin nhắn...
         </div>
       )}
