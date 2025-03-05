@@ -27,4 +27,5 @@ export interface IReqSendMessage {
   images?: Array<Pick<IImage, "url" | "width" | "height">>;
   messageType: "text" | "image";
   receiverSeen: boolean;
+  createdAt: Date;
 }

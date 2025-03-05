@@ -4,8 +4,7 @@ import { IImage } from "@/types/commonType";
 import { TMessageTypeBorder } from "./DisplayMessages";
 
 function DisplayPreviewMessages() {
-  const { previewMessages } = useChatContext();
-  console.log("previewMessages: ", previewMessages);
+  const { previewMessages, messages } = useChatContext();
 
   const ImagesWithCSSGrid = (imagesCount: number) => {
     switch (true) {
@@ -42,6 +41,7 @@ function DisplayPreviewMessages() {
         return {
           width: image.width,
           maxHeight: "350px",
+          aspectRatio: "16/9",
         };
       }
     }
@@ -65,8 +65,60 @@ function DisplayPreviewMessages() {
   };
 
   const checkMessageTypeBorder = (index: number): TMessageTypeBorder => {
-    console.log("index: ", index);
-    return "basis";
+    if (messages.length === 0) return "basis";
+    const timeCur = previewMessages[0].createdAt;
+    const messageReal = messages[messages.length - 1];
+    const timePre = messageReal.createdAt;
+    const messagePreId = previewMessages[0].senderId;
+    const messageCurId = messageReal.senderId._id;
+
+    if (index === previewMessages.length - 1) {
+      if (
+        messageReal.senderId._id === previewMessages[index].senderId &&
+        momentVi(timeCur).isSame(timePre, "day")
+      ) {
+        return "end";
+      }
+      return "basis";
+    } else {
+      const timeNext = previewMessages[index + 1].createdAt;
+      const messageNextId = previewMessages[index + 1].senderId;
+      const checkDayPre = momentVi(timeCur).isSame(timePre, "day");
+      const checkDayNext = momentVi(timeCur).isSame(timeNext, "day");
+      if (checkDayPre && checkDayNext) {
+        if (messageCurId === messagePreId && messageCurId === messageNextId) {
+          return "mid";
+        } else if (
+          messageCurId !== messagePreId &&
+          messageCurId === messageNextId
+        ) {
+          return "start";
+        } else if (
+          messageCurId === messagePreId &&
+          messageCurId !== messageNextId
+        ) {
+          return "end";
+        } else {
+          return "basis";
+        }
+      } else if (!checkDayPre && checkDayNext) {
+        return "start";
+      } else if (checkDayPre && !checkDayNext) {
+        return "end";
+      } else {
+        return "basis";
+      }
+    }
+  };
+
+  const displayDateMessage = (index: number): boolean => {
+    if (messages.length === 0) return true;
+    if (index === 0) {
+      const time1 = messages[messages.length - 1].createdAt;
+      const time2 = previewMessages[0].createdAt;
+      return momentVi(time1).isSame(time2, "day") ? false : true;
+    }
+    return false;
   };
 
   return (
@@ -75,6 +127,13 @@ function DisplayPreviewMessages() {
         previewMessages.map((message, index) => {
           return (
             <div key={index} className="w-full message">
+              {displayDateMessage(index) && (
+                <div className="flex justify-center items-center w-full py-3 text-[10px] font-medium">
+                  <span className="px-2 py-1 font-semibold rounded-lg shadow-sm shadow-grayDark bg-grayCa text-gray">
+                    {momentVi(message.createdAt).format("ddd, ll")}
+                  </span>
+                </div>
+              )}
               <div className={"message flex flex-col w-full items-end"}>
                 <div
                   className={cn(
@@ -100,6 +159,7 @@ function DisplayPreviewMessages() {
                           {message.images.map((image, index) => {
                             return (
                               <div
+                                key={index}
                                 className={cn(
                                   "ImageItem relative h-full max-w-full"
                                 )}

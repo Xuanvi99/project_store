@@ -151,20 +151,38 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
           <div className="font-semibold ">{receiverInfo.userName}</div>
           <div className="flex justify-start text-xs gap-x-1 text-secondary ">
             <span className="max-w-[70%] flex gap-x-[2px]">
-              <span className="font-semibold">
-                {message.senderId._id !== receiverId && "Bạn: "}
-              </span>
-              <span
-                className={cn(
-                  "line-clamp-1",
-                  message.senderId._id === receiverId &&
-                    !message.receiverSeen &&
-                    "font-semibold text-black"
-                )}
-                dangerouslySetInnerHTML={{
-                  __html: marked.parse(message.text || ""),
-                }}
-              ></span>
+              {message.messageType === "text" && (
+                <span className="font-semibold">
+                  {message.senderId._id !== receiverId && "Bạn: "}
+                </span>
+              )}
+              {message.messageType === "text" && (
+                <span
+                  className={cn(
+                    "line-clamp-1",
+                    message.senderId._id === receiverId &&
+                      !message.receiverSeen &&
+                      "font-semibold text-black"
+                  )}
+                  dangerouslySetInnerHTML={{
+                    __html: marked.parse(message.text || ""),
+                  }}
+                />
+              )}
+              {message.messageType === "image" && (
+                <span
+                  className={cn(
+                    "line-clamp-1",
+                    message.senderId._id === receiverId &&
+                      !message.receiverSeen &&
+                      "font-semibold text-black"
+                  )}
+                >
+                  {message.senderId._id === receiverId
+                    ? `Bạn nhận ${message.imagesId?.length} ảnh`
+                    : `Bạn đã gửi ${message.imagesId?.length} ảnh`}
+                </span>
+              )}
             </span>
             <span className="basis-auto">
               -{" "}

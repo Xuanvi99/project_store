@@ -72,6 +72,8 @@ export default function MessageOfReceive(props: TPropsMessage) {
           </span>
         </div>
         <div
+          role={messageType}
+          data-type-border={isTypeBorder}
           className={cn(
             "relative min-w-[60px] max-w-[70%] bg-grayE5 text-black flex text-[14px] cursor-text transition-all",
             typeBorder(isTypeBorder),

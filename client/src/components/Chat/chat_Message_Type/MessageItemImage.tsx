@@ -24,6 +24,7 @@ function MessageItemImage({ image, imagesCount }: TProps) {
         return {
           width: image.width,
           maxHeight: "350px",
+          aspectRatio: "16/9",
         };
       }
     }

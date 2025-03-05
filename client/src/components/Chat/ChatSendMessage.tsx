@@ -108,6 +108,7 @@ function ChatSendMessage() {
         text: messageText,
         receiverSeen: receiverSeen,
         messageType: "text",
+        createdAt: new Date(Date.now()),
       };
       handleSetPreviewMessages(message);
       return await sendMessageText(message).unwrap();
@@ -139,6 +140,7 @@ function ChatSendMessage() {
             height: image["height"],
           };
         }),
+        createdAt: new Date(Date.now()),
       };
       handleSetPreviewMessages(messageImage);
       return await sendMessageImages({

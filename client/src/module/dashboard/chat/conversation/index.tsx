@@ -67,7 +67,7 @@ function ChatAllConversations() {
         socketIo_client.off("receiverUpdateInfoUser");
         socketIo_client.off("receiveMessage");
       }
-      dispatch(resetChat());
+      // dispatch(resetChat());
     };
   }, [dispatch, socketIo_client]);
 

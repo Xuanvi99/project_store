@@ -51,6 +51,7 @@ export default function MessageOfSend(props: TPropsMessage) {
     <div className={"MessageOfSend flex flex-col w-full items-end gap-y-1"}>
       <div
         role={messageType}
+        data-type-border={isTypeBorder}
         className={cn(
           "relative min-w-[60px] max-w-[70%] bg-orange cursor-text text-[14px] flex text-white transition-all",
           typeBorder(isTypeBorder),
