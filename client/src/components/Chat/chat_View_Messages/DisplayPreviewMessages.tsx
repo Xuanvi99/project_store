@@ -2,6 +2,7 @@ import { cn, momentVi } from "@/utils";
 import useChatContext from "../context/useChatContext";
 import { IImage } from "@/types/commonType";
 import { TMessageTypeBorder } from "./DisplayMessages";
+import { LoadingCallApi } from "../../loading/index";
 
 function DisplayPreviewMessages() {
   const { previewMessages, messages } = useChatContext();
@@ -126,7 +127,7 @@ function DisplayPreviewMessages() {
       {previewMessages.length > 0 &&
         previewMessages.map((message, index) => {
           return (
-            <div key={index} className="w-full message">
+            <div key={index} className="w-full preview_message">
               {displayDateMessage(index) && (
                 <div className="flex justify-center items-center w-full py-3 text-[10px] font-medium">
                   <span className="px-2 py-1 font-semibold rounded-lg shadow-sm shadow-grayDark bg-grayCa text-gray">
@@ -172,7 +173,17 @@ function DisplayPreviewMessages() {
                                   key={index}
                                   alt="preview"
                                   srcSet={image.url}
-                                  className="object-cover w-full h-full"
+                                  className={cn(
+                                    "object-cover rounded-md",
+                                    message.images?.length === 1 &&
+                                      "max-h-[350px]",
+                                    message.images?.length === 1 &&
+                                      image.height <= image.width &&
+                                      "aspect-video",
+                                    message.images &&
+                                      message.images.length >= 2 &&
+                                      "aspect-square max-h-full"
+                                  )}
                                 />
                               </div>
                             );
@@ -192,7 +203,9 @@ function DisplayPreviewMessages() {
                 </div>
               </div>
               {index === previewMessages.length - 1 && (
-                <div className="py-1 pr-2 text-xs text-gray text-end">{""}</div>
+                <div className="float-right w-4 h-4">
+                  <LoadingCallApi />
+                </div>
               )}
             </div>
           );

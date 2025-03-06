@@ -39,6 +39,7 @@ function ChatSendMessage() {
     handleScrollTo,
     handleSetPreviewMessages,
     checkScrollToBottom,
+    handleSplicePreviewMessage,
   } = useChatContext();
 
   const [sendMessageText] = useSendMessageTextMutation();
@@ -162,9 +163,11 @@ function ChatSendMessage() {
       await Promise.all([sendMessageText, sendMessageImages]).then((res) => {
         if (res[0]) {
           handleSetMessages(res[0].message);
+          handleSplicePreviewMessage();
         }
         if (res[1]) {
           handleSetMessages(res[1].message);
+          handleSplicePreviewMessage();
         }
 
         handleScrollTo(top, "instant");

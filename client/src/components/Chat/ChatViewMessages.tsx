@@ -32,6 +32,7 @@ const ChatViewMessages = () => {
     setOpenBtnScrollDown,
     handleSetParamsGetMessage,
     setCheckScrollToBottom,
+    setSizeChatView,
   } = useChatContext();
 
   const [prevScrollHeight, setPrevScrollHeight] = useState<number>(0);
@@ -134,6 +135,14 @@ const ChatViewMessages = () => {
     setPrevScrollHeight,
     totalMessage,
   ]);
+
+  //set size chat view
+  useEffect(() => {
+    const container = containerDivRef.current;
+    if (container) {
+      setSizeChatView(container.clientWidth > 450 ? "big" : "mini");
+    }
+  }, [containerDivRef, setSizeChatView]);
 
   //load message older but keep scroll position
   useEffect(() => {

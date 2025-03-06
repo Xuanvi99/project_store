@@ -31,12 +31,15 @@ export type TChatProvider = {
   openBtnScrollDown: boolean;
   checkScrollToBottom: boolean;
   checkMessageReceive: boolean;
+  sizeChatView: "mini" | "big";
+  setSizeChatView: React.Dispatch<React.SetStateAction<"mini" | "big">>;
   setOpenBtnScrollDown: React.Dispatch<React.SetStateAction<boolean>>;
   setCheckScrollToBottom: React.Dispatch<React.SetStateAction<boolean>>;
   handleScrollTo: (top: number, behavior: ScrollBehavior) => void;
   handleSetMessages: (msg: IMessage<IUser>) => void;
   handleSetPreviewMessages: (msg: IReqSendMessage) => void;
   handleBtnScrollToBottom: () => void;
+  handleSplicePreviewMessage: () => void;
   handleSetParamsGetMessage: (
     value: TParamsGetMessages<IReqGetMessage>
   ) => void;
@@ -82,6 +85,8 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
 
   const [countCallData, setCountCallData] = useState<number>(0);
 
+  const [sizeChatView, setSizeChatView] = useState<"mini" | "big">("big");
+
   const [openBtnScrollDown, setOpenBtnScrollDown] = useState<boolean>(false);
 
   const [checkMessageReceive, setCheckMessageReceive] =
@@ -106,6 +111,9 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
       if (messages.some((m) => m._id === msg._id)) return messages;
       return [...messages, msg];
     });
+  };
+
+  const handleSplicePreviewMessage = () => {
     setPreviewMessages((previewMessages) => {
       if (previewMessages.length > 0) {
         const messages = previewMessages.splice(0, 1);
@@ -334,13 +342,16 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
     checkScrollToBottom,
     openBtnScrollDown,
     checkMessageReceive,
+    sizeChatView,
     setCheckScrollToBottom,
     setOpenBtnScrollDown,
+    setSizeChatView,
     handleScrollTo,
     handleSetParamsGetMessage,
     handleBtnScrollToBottom,
     handleSetMessages,
     handleSetPreviewMessages,
+    handleSplicePreviewMessage,
   };
 
   return <ChatContext.Provider value={data}>{children}</ChatContext.Provider>;

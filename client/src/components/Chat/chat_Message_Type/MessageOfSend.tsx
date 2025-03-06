@@ -4,6 +4,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import { TMessageTypeBorder } from "../chat_View_Messages/DisplayMessages";
 import MessageItemImage from "./MessageItemImage";
 import { marked } from "marked";
+import useChatContext from "../context/useChatContext";
 
 export default function MessageOfSend(props: TPropsMessage) {
   const {
@@ -11,6 +12,8 @@ export default function MessageOfSend(props: TPropsMessage) {
     displayReceiverSeen,
     checkMessageTypeBorder: isTypeBorder,
   } = props;
+
+  const { sizeChatView } = useChatContext();
 
   const { receiverId: receiver, messageType, imagesId: images } = message;
 
@@ -56,7 +59,9 @@ export default function MessageOfSend(props: TPropsMessage) {
           "relative min-w-[60px] max-w-[70%] bg-orange cursor-text text-[14px] flex text-white transition-all",
           typeBorder(isTypeBorder),
           messageType === "image" &&
-            "overflow-hidden h-fit bg-transparent cursor-pointer max-w-[55%]"
+            `overflow-hidden h-fit bg-transparent cursor-pointer ${
+              sizeChatView === "big" ? "max-w-[70%]" : "max-w-[60%]"
+            } `
         )}
       >
         {messageType === "text" && (

@@ -295,7 +295,7 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
   return (
     <div
       className={
-        "relative flex w-[calc(95%-52px)] max-w-[90%] justify-start items-center rounded-2xl bg-grayE5 py-2 pl-3 border-1 border-orange gap-x-1 transition-all"
+        "relative w-full rounded-2xl bg-grayE5 py-2 pl-3 border-1 border-orange gap-x-1 transition-all overflow-hidden"
       }
     >
       <div

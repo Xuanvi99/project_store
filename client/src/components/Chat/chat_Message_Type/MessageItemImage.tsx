@@ -1,7 +1,6 @@
 import { IImage } from "@/types/commonType";
 import { cn } from "@/utils";
 import { useState } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 
 type TProps = {
   image: IImage;
@@ -39,17 +38,17 @@ function MessageItemImage({ image, imagesCount }: TProps) {
       {loadingImages && (
         <div className="absolute inset-0 rounded-md bg-grayCa animate-pulse" />
       )}
-      <LazyLoadImage
+
+      <img
         alt="messageImage"
-        src={image.url}
-        effect="blur"
+        srcSet={image.url}
         className={cn(
-          "object-cover rounded-md",
+          "object-cover rounded-md w-full",
           imagesCount === 1 && "max-h-[350px]",
-          imagesCount >= 2 && "aspect-square max-h-full"
+          imagesCount === 1 && image.height <= image.width && "aspect-video",
+          imagesCount >= 2 && "aspect-square max-h-full",
+          loadingImages && "invisible"
         )}
-        width="100%"
-        threshold={5}
         onLoad={() => {
           setLoadingImages(false);
         }}
