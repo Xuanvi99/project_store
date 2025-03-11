@@ -4,7 +4,7 @@ import SidebarItem from "./SidebarItem";
 
 function Sidebar() {
   return (
-    <aside className="px-5 fixed left-0 top-0 bg-grayDark w-[250px] border-r-1 border-r-orange h-full shadow-[0_20px_60px_-10px_rgba(0,0,0,0.3)]">
+    <aside className="px-5 fixed left-0 top-0 bg-grayDark w-[18%] border-r-1 border-r-orange h-full shadow-[0_20px_60px_-10px_rgba(0,0,0,0.3)]">
       <Link
         to={"/"}
         className="h-[60px] flex items-center justify-center cursor-pointer gap-x-2 basis-1/6"

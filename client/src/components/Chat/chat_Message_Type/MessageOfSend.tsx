@@ -1,21 +1,16 @@
 import { cn, momentVi } from "@/utils";
 import { TPropsMessage } from "../Message";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 import { TMessageTypeBorder } from "../chat_View_Messages/DisplayMessages";
 import MessageItemImage from "./MessageItemImage";
 import { marked } from "marked";
 import useChatContext from "../context/useChatContext";
 
 export default function MessageOfSend(props: TPropsMessage) {
-  const {
-    message,
-    displayReceiverSeen,
-    checkMessageTypeBorder: isTypeBorder,
-  } = props;
+  const { message, checkMessageTypeBorder: isTypeBorder } = props;
 
   const { sizeChatView } = useChatContext();
 
-  const { receiverId: receiver, messageType, imagesId: images } = message;
+  const { messageType, imagesId: images } = message;
 
   const typeBorder = (type: TMessageTypeBorder) => {
     switch (type) {
@@ -51,72 +46,56 @@ export default function MessageOfSend(props: TPropsMessage) {
   };
 
   return (
-    <div className={"MessageOfSend flex flex-col w-full items-end gap-y-1"}>
-      <div
-        role={messageType}
-        data-type-border={isTypeBorder}
-        className={cn(
-          "relative min-w-[60px] max-w-[70%] bg-orange cursor-text text-[14px] flex text-white transition-all",
-          typeBorder(isTypeBorder),
-          messageType === "image" &&
-            `overflow-hidden h-fit bg-transparent cursor-pointer ${
-              sizeChatView === "big" ? "max-w-[70%]" : "max-w-[60%]"
-            } `
-        )}
-      >
-        {messageType === "text" && (
-          <span
-            className="p-2 pb-3 text-start"
-            dangerouslySetInnerHTML={{
-              __html: marked.parse(message.text || ""),
-            }}
-          ></span>
-        )}
-        {messageType === "image" && images && images.length > 0 && (
-          <div
-            className={cn(
-              "Images_Group grid gap-1 w-full",
-              ImagesWithCSSGrid(images.length)
-            )}
-          >
-            {images.map((image) => {
-              return (
-                <MessageItemImage
-                  key={image._id}
-                  image={image}
-                  imagesCount={images.length}
-                />
-              );
-            })}
-          </div>
-        )}
+    <div className="MessageOfSend">
+      <div className="flex justify-end w-full">
         <div
+          role={messageType}
+          data-type-border={isTypeBorder}
           className={cn(
-            "absolute bottom-0 text-[10px] font-semibold right-2 text-grayF5 text-end z-30",
-            message.messageType === "image" &&
-              "absolute bottom-1 right-3 bg-opacity-50 bg-black px-1 rounded-md"
+            "relative min-w-[60px] max-w-[70%] bg-orange cursor-text text-[14px] flex text-white transition-all",
+            typeBorder(isTypeBorder),
+            messageType === "image" &&
+              `overflow-hidden h-fit bg-transparent cursor-pointer ${
+                sizeChatView === "big" ? "max-w-[480px]" : "max-w-[60%]"
+              } `
           )}
         >
-          {momentVi(message.createdAt).format("HH:mm")}
+          {messageType === "text" && (
+            <span
+              className="p-2 pb-3 text-start"
+              dangerouslySetInnerHTML={{
+                __html: marked.parse(message.text || ""),
+              }}
+            ></span>
+          )}
+          {messageType === "image" && images && images.length > 0 && (
+            <div
+              className={cn(
+                "Images_Group grid gap-1 w-full",
+                ImagesWithCSSGrid(images.length)
+              )}
+            >
+              {images.map((image) => {
+                return (
+                  <MessageItemImage
+                    key={image._id}
+                    image={image}
+                    imagesCount={images.length}
+                  />
+                );
+              })}
+            </div>
+          )}
+          <div
+            className={cn(
+              "absolute bottom-0 text-[10px] font-semibold right-2 text-grayF5 text-end z-30",
+              message.messageType === "image" &&
+                "absolute bottom-1 right-3 bg-opacity-50 bg-black px-1 rounded-md"
+            )}
+          >
+            {momentVi(message.createdAt).format("HH:mm")}
+          </div>
         </div>
-      </div>
-      {/*display receiver seen */}
-      <div
-        className={cn(
-          "float-right w-4 h-4 transition-all",
-          displayReceiverSeen ? "opacity-1" : " hidden opacity-0"
-        )}
-      >
-        <LazyLoadImage
-          alt="image_avatar"
-          placeholderSrc={"/userName.png"}
-          srcSet={receiver?.avatar?.url || receiver?.avatarDefault}
-          effect="blur"
-          className="w-full h-full rounded-full"
-          height={16}
-          width={16}
-          threshold={100}
-        />
       </div>
     </div>
   );

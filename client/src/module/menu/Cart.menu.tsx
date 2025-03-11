@@ -18,7 +18,7 @@ function Cart() {
   return (
     <Tooltip
       place="bottom-end"
-      title={
+      content={
         <Fragment>
           {cart && cart.listProduct.length > 0 && (
             <div className="h-6 text-sm leading-6 text-grayCa">

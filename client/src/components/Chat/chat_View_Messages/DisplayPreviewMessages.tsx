@@ -3,6 +3,7 @@ import useChatContext from "../context/useChatContext";
 import { IImage } from "@/types/commonType";
 import { TMessageTypeBorder } from "./DisplayMessages";
 import { LoadingCallApi } from "../../loading/index";
+import { marked } from "marked";
 
 function DisplayPreviewMessages() {
   const { previewMessages, messages } = useChatContext();
@@ -28,7 +29,6 @@ function DisplayPreviewMessages() {
     imagesCount: number,
     image: Pick<IImage, "url" | "width" | "height">
   ) => {
-    console.log(imagesCount);
     if (imagesCount === 0) return;
     if (imagesCount === 1) {
       if (image.height > image.width) {
@@ -146,7 +146,12 @@ function DisplayPreviewMessages() {
                 >
                   <div className="Message_Content">
                     {message.messageType === "text" && (
-                      <span className="text-start">{message.text}</span>
+                      <span
+                        className="p-2 pb-3 text-start"
+                        dangerouslySetInnerHTML={{
+                          __html: marked.parse(message.text || ""),
+                        }}
+                      ></span>
                     )}
                     {message.messageType === "image" &&
                       message.images &&

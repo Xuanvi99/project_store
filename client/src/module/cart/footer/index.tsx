@@ -230,11 +230,8 @@ function Footer() {
         {listCheckCart.length > 0 ? (
           <Tooltip
             place="top-end"
-            title={
-              <PromotionDetail
-                totalPrice={totalPrice}
-                discount={discount}
-              ></PromotionDetail>
+            content={
+              <PromotionDetail totalPrice={totalPrice} discount={discount} />
             }
             className={{ container: "z-40" }}
           >

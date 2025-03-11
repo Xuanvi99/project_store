@@ -15,15 +15,7 @@ export default function EditMessageImages(props: TProps) {
 
   const ImagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const [clientWidthImages, setClientWidthImages] = useState<number>(0);
-
   const [amountImage, setAmountImage] = useState<number>(0);
-
-  useEffect(() => {
-    if (ImagesContainerRef.current) {
-      setClientWidthImages(ImagesContainerRef.current.clientWidth);
-    }
-  }, []);
 
   useEffect(() => {
     const ImagesRef = ImagesContainerRef.current;
@@ -57,7 +49,7 @@ export default function EditMessageImages(props: TProps) {
               )}
             >
               <div
-                className="absolute cursor-pointer Icon_close top-1 right-1"
+                className="absolute cursor-pointer Icon_close top-1 right-1 hover:text-orange"
                 onClick={() => {
                   handleSetOpenEditImage(false);
                   onChangeImages([]);
@@ -73,11 +65,7 @@ export default function EditMessageImages(props: TProps) {
               </div>
               <div
                 ref={ImagesContainerRef}
-                className={cn(
-                  "w-full py-2",
-                  clientWidthImages < imageList.length * 60 &&
-                    "overflow-x-scroll"
-                )}
+                className={cn("w-full py-2 overflow-x-auto")}
               >
                 <div
                   className="flex items-center gap-x-3"

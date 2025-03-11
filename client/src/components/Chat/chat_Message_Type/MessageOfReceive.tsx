@@ -4,15 +4,17 @@ import { cn, momentVi } from "@/utils";
 import { TMessageTypeBorder } from "../chat_View_Messages/DisplayMessages";
 import MessageItemImage from "./MessageItemImage";
 import { marked } from "marked";
+import useChatContext from "../context/useChatContext";
 
 export default function MessageOfReceive(props: TPropsMessage) {
   const {
     message,
     displayAvatar,
-    displayReceiverSeen,
     receiverInfo,
     checkMessageTypeBorder: isTypeBorder,
   } = props;
+
+  const { sizeChatView } = useChatContext();
 
   const { messageType, imagesId: images } = message;
 
@@ -50,7 +52,7 @@ export default function MessageOfReceive(props: TPropsMessage) {
   };
 
   return (
-    <div className="flex flex-col MessageOfReceiver">
+    <div className="MessageOfReceiver">
       <div className="flex items-end justify-start w-full gap-x-2">
         <div
           className={cn(
@@ -78,7 +80,9 @@ export default function MessageOfReceive(props: TPropsMessage) {
             "relative min-w-[60px] max-w-[70%] bg-grayE5 text-black flex text-[14px] cursor-text transition-all",
             typeBorder(isTypeBorder),
             messageType === "image" &&
-              "overflow-hidden h-fit bg-transparent cursor-pointer max-w-[55%]"
+              `overflow-hidden h-fit bg-transparent cursor-pointer ${
+                sizeChatView === "big" ? "max-w-[480px]" : "max-w-[60%]"
+              } `
           )}
         >
           {messageType === "text" && (
@@ -117,23 +121,6 @@ export default function MessageOfReceive(props: TPropsMessage) {
             {momentVi(message.createdAt).format("HH:mm")}
           </div>
         </div>
-      </div>
-      <div
-        className={cn(
-          "w-4 h-4 ml-auto transition-all",
-          displayReceiverSeen ? "opacity-1" : " hidden opacity-0"
-        )}
-      >
-        <LazyLoadImage
-          alt="image_avatar"
-          placeholderSrc={"/userName.png"}
-          srcSet={receiverInfo?.avatar?.url || receiverInfo?.avatarDefault}
-          effect="blur"
-          className="w-full h-full rounded-full"
-          height={16}
-          width={16}
-          threshold={100}
-        />
       </div>
     </div>
   );

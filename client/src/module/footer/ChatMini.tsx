@@ -204,7 +204,7 @@ function ChatMini() {
               <IconCLose size={15}></IconCLose>
             </div>
           </div>
-          <div className="h-[450px]">{openChat && <ChatContainer />}</div>
+          {openChat && <ChatContainer />}
         </div>
       </div>
     </div>

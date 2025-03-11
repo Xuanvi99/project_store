@@ -7,6 +7,7 @@ function useHover<T extends RefObject<Element>>(nodeRef: T) {
   useEffect(() => {
     const mouseHover = nodeRef.current;
     if (!mouseHover) return;
+
     const handleMouseover = () => {
       setIsHover(true);
       setCoords(mouseHover.getBoundingClientRect());
@@ -21,11 +22,9 @@ function useHover<T extends RefObject<Element>>(nodeRef: T) {
       mouseHover.removeEventListener("mouseover", handleMouseover);
       mouseHover.removeEventListener("mouseout", handleMouseOut);
     };
-
-    return () => {};
   }, [nodeRef]);
 
-  return { isHover, coords };
+  return { isHover, setIsHover, coords };
 }
 
 export default useHover;

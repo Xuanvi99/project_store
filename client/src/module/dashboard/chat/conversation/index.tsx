@@ -1,4 +1,8 @@
-import { useAppDispatch, useSelectorAuthSlice } from "@/hook";
+import {
+  useAppDispatch,
+  useSelectorAuthSlice,
+  useSelectorChatSlice,
+} from "@/hook";
 import SkeletonConversation from "../skeleton/SkeletonConversation";
 import ConversationsList from "./list";
 import ConversationSearch from "./search";
@@ -17,6 +21,8 @@ function ChatAllConversations() {
   const dispatch = useAppDispatch();
 
   const socketIo_client = useSocketIoContext();
+
+  const { selectedConversation } = useSelectorChatSlice();
 
   const { user } = useSelectorAuthSlice();
 
@@ -45,6 +51,17 @@ function ChatAllConversations() {
   }, [dataGetConversations, status]);
 
   useEffect(() => {
+    if (selectedConversation && conversations) {
+      const result = conversations.find(
+        (item) => item._id === selectedConversation._id
+      );
+      if (!result) {
+        dispatch(resetChat());
+      }
+    }
+  }, [conversations, dispatch, selectedConversation]);
+
+  useEffect(() => {
     if (socketIo_client) {
       socketIo_client.on(
         "receiverUpdateInfoUser",
@@ -67,14 +84,13 @@ function ChatAllConversations() {
         socketIo_client.off("receiverUpdateInfoUser");
         socketIo_client.off("receiveMessage");
       }
-      // dispatch(resetChat());
     };
   }, [dispatch, socketIo_client]);
 
   if (isLoading) return <SkeletonConversation />;
 
   return (
-    <aside className="flex basis-[30%] h-full overflow-hidden bg-white rounded-lg ">
+    <div className="flex basis-[30%] h-full overflow-hidden bg-white rounded-lg max-w-[315px]">
       <div className="flex flex-col w-full p-3 gap-y-2">
         <div className="flex items-center gap-x-3">
           <p className="text-xl font-semibold">Danh sách tin nhắn</p>
@@ -88,7 +104,7 @@ function ChatAllConversations() {
           openSearchResult={openSearchResult}
         />
       </div>
-    </aside>
+    </div>
   );
 }
 

@@ -1,4 +1,4 @@
 import HeaderChildren from "./HeaderChildren";
-import HeaderDashboard from "./headerDashboard";
+import HeaderDashboard from "./HeaderDashboard";
 
 export { HeaderDashboard, HeaderChildren };

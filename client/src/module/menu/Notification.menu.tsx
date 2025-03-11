@@ -6,7 +6,7 @@ function Notification() {
   return (
     <Tooltip
       place="bottom-end"
-      title={
+      content={
         <div
           className={cn(
             "flex flex-col items-center max-h-[174px] justify-start w-full gap-y-3"

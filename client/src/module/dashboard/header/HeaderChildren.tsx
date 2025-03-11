@@ -28,7 +28,7 @@ function HeaderChildren({ children, handleSelectPathname }: IProps) {
   return (
     <header
       className={cn(
-        "fixed z-40 top-[60px] left-[250px] w-[calc(100%-250px)] flex items-center justify-between px-6 py-4 bg-white border-b-1 border-b-grayCa max-h-[50px] shadow-sm transition-all",
+        "fixed z-40 top-[60px] left-[18%] w-[82%] flex items-center justify-between px-6 py-4 bg-white border-b-1 border-b-grayCa max-h-[50px] shadow-sm transition-all",
         scroll ? "top-[0px]" : ""
       )}
     >

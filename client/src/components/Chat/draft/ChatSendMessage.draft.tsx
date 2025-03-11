@@ -262,7 +262,7 @@ function ChatSendMessage({
                     "z-50 text-xs whitespace-nowrap bg-black bg-opacity-80 text-white ",
                 }}
                 onClick={handleOpenEmojiPicker}
-                title={
+                content={
                   <p className="whitespace-nowrap">Chọn biểu tượng cảm xúc</p>
                 }
               >

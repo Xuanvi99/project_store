@@ -27,9 +27,9 @@ function DashboardPage() {
       }
     }
   }, [handleLogin, navigate, pathname, user]);
-
+  //max-w-screen-2xl
   return (
-    <div className="w-full min-h-screen max-w-screen-2xl bg-light">
+    <div className="w-screen min-h-screen bg-light">
       <DashboardPage.SideBar></DashboardPage.SideBar>
       <DashboardPage.Main>
         <Outlet></Outlet>

@@ -1,11 +1,12 @@
-import { useSelectorAuthSlice } from "@/hook";
+import { useSelectorAuthSlice, useSelectorChatSlice } from "@/hook";
 import { IMessage } from "@/types/chat.type";
 import { IUser } from "@/types/user.type";
-import { momentVi } from "@/utils";
+import { cn, momentVi } from "@/utils";
 import { forwardRef, useEffect, useState } from "react";
 import MessageOfSend from "./chat_Message_Type/MessageOfSend";
 import MessageOfReceive from "./chat_Message_Type/MessageOfReceive";
 import { TMessageTypeBorder } from "./chat_View_Messages/DisplayMessages";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 export type TPropsMessage = {
   message: IMessage<IUser>;
@@ -22,6 +23,8 @@ const Message = forwardRef<HTMLDivElement, TPropsMessage>((props, ref) => {
 
   const { message, displayTimeSend, displayReceiverSeen, displayDateMessage } =
     props;
+
+  const { receiverInfo } = useSelectorChatSlice();
 
   const [timeSender, setTimeSender] = useState<string>(
     momentVi(message.createdAt).fromNow() === "vài giây trước"
@@ -52,6 +55,20 @@ const Message = forwardRef<HTMLDivElement, TPropsMessage>((props, ref) => {
         <MessageOfSend {...props} />
       ) : (
         <MessageOfReceive {...props} />
+      )}
+      {displayReceiverSeen && (
+        <div className={cn("float-right w-4 h-4 transition-all mt-1")}>
+          <LazyLoadImage
+            alt="image_avatar"
+            placeholderSrc={"/userName.png"}
+            srcSet={receiverInfo?.avatar?.url || receiverInfo?.avatarDefault}
+            effect="blur"
+            className="w-full h-full rounded-full"
+            height={16}
+            width={16}
+            threshold={100}
+          />
+        </div>
       )}
       {displayTimeSend && !displayReceiverSeen && (
         <div className="pt-1 text-[10px] font-semibold text-gray text-end">

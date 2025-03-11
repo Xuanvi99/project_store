@@ -1,5 +1,3 @@
-import { IconSendMessage } from "../icon";
-import { Button } from "../button";
 import {
   useAppDispatch,
   useSelectorAuthSlice,
@@ -13,14 +11,16 @@ import {
 import { IReqSendMessage } from "@/types/chat.type";
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
 import { useEffect, useState } from "react";
-import EditMessageImages from "./chat_Send_Mesage/EditMessageImages";
+import EditMessageImages from "./chat_Send_Message/EditMessageImages";
 import { ImageType } from "react-images-uploading";
 import { setChat } from "@/stores/reducer/chat.reducer";
 import useChatContext from "./context/useChatContext";
-import BtnScrollBottom from "./chat_Send_Mesage/BtnScrollBottom";
-import ChatFileImg from "./chat_Send_Mesage/ChatFileImg";
-import ChatInput from "./chat_Send_Mesage/ChatInput";
+import BtnScrollBottom from "./chat_Send_Message/BtnScrollBottom";
+import ChatFile from "./chat_Send_Message/ChatFile";
+import ChatInput from "./chat_Send_Message/ChatInput";
+import BtnSendMessage from "./chat_Send_Message/BtnSendMessage";
 
+export type TMessageEmojis = { url: string; alt: string }[];
 function ChatSendMessage() {
   const socketIo_client = useSocketIoContext();
 
@@ -50,7 +50,16 @@ function ChatSendMessage() {
 
   const [messageImages, setMessageImages] = useState<ImageType[]>([]);
 
+  const [messageEmojis, setMessageEmojis] = useState<TMessageEmojis>([]);
+  console.log("messageEmojis: ", messageEmojis);
+
   const [openEditImages, setOpenEditImages] = useState<boolean>(false);
+
+  const isOnlyEmoji = (text: string) => {
+    const emojiRegex = /^[\p{Emoji}\uFE0F\s]+$/u;
+
+    return emojiRegex.test(text.trim());
+  };
 
   const handleSetOpenEditImages = (value: boolean) => {
     setOpenEditImages(value);
@@ -59,7 +68,7 @@ function ChatSendMessage() {
     }
   };
 
-  const onChangeImages = (images: ImageType[]) => {
+  const onChangeImagesEditImages = (images: ImageType[]) => {
     if (images.length > 0) {
       const imagePreviews = images.map((image) => {
         return new Promise((resolve) => {
@@ -77,8 +86,30 @@ function ChatSendMessage() {
       });
 
       Promise.all(imagePreviews).then((results) => {
-        console.log("results: ", results);
         setMessageImages(results as never[]);
+      });
+    }
+  };
+
+  const onChangeImagesInputFile = (images: ImageType[]) => {
+    if (images.length > 0) {
+      const imagePreviews = images.map((image) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.src = image["data_url"] as string;
+          img.onload = () => {
+            resolve({
+              data_url: image["data_url"],
+              width: img.width,
+              height: img.height,
+              file: image.file,
+            });
+          };
+        });
+      });
+
+      Promise.all(imagePreviews).then((results) => {
+        setMessageImages((images) => [...images, ...(results as never[])]);
       });
     }
   };
@@ -93,6 +124,10 @@ function ChatSendMessage() {
     }
   };
 
+  const onchangeMessageEmojis = (value: TMessageEmojis) => {
+    setMessageEmojis(value);
+  };
+
   const handleSendMessageText = async () => {
     if (messageText.trim().length === 0 || !receiverId) return;
 
@@ -101,8 +136,7 @@ function ChatSendMessage() {
         receiverId: receiverId,
         typing: false,
       });
-      setMessageText("");
-      const message: IReqSendMessage = {
+      let message: IReqSendMessage = {
         conversationId: selectedConversation._id,
         senderId: user._id,
         receiverId: receiverId,
@@ -111,7 +145,12 @@ function ChatSendMessage() {
         messageType: "text",
         createdAt: new Date(Date.now()),
       };
+      if (isOnlyEmoji(messageText)) {
+        message = { ...message, messageType: "emoji" };
+      }
+
       handleSetPreviewMessages(message);
+      setMessageText("");
       return await sendMessageText(message).unwrap();
     }
   };
@@ -158,7 +197,7 @@ function ChatSendMessage() {
 
       const containerDiv = containerDivRef.current;
       if (!containerDiv) return;
-      const top = containerDiv?.scrollHeight;
+      const top = containerDiv.scrollHeight;
 
       await Promise.all([sendMessageText, sendMessageImages]).then((res) => {
         if (res[0]) {
@@ -186,6 +225,21 @@ function ChatSendMessage() {
       console.log("error: ", error);
     }
   };
+
+  // const handleSendLike = async () => {
+  //   try {
+  //     handleScrollTo(top, "instant");
+
+  //     dispatch(
+  //       setChat({
+  //         totalMessage: res[1] ? res[1].totalMessage : res[0]?.totalMessage,
+  //       })
+  //     );
+  //     dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
+  //   } catch (error) {
+  //     console.log("error: ", error);
+  //   }
+  // };
 
   useEffect(() => {
     const container = containerDivRef.current;
@@ -215,33 +269,30 @@ function ChatSendMessage() {
   }, [messageText, receiverId, socketIo_client]);
 
   return (
-    <div className="relative w-full Message_input min-h-fit border-t-1 border-t-orange">
-      <div className="relative z-40 flex flex-col justify-end bg-white h-fit">
+    <div className="relative w-full Message_input min-h-fit">
+      <div className="relative z-40 flex flex-col justify-end w-full max-w-full bg-white rounded-b-lg h-fit flex-nowrap">
         <EditMessageImages
           openEditImages={openEditImages}
           handleSetOpenEditImage={handleSetOpenEditImages}
           listImages={messageImages}
-          onChangeImages={onChangeImages}
+          onChangeImages={onChangeImagesEditImages}
         />
-        <div className="flex items-center p-3 gap-x-2">
-          <ChatFileImg
-            openEditImages={openEditImages}
+        <div className="flex items-end justify-center w-full px-2 py-3 gap-x-3 min-h-9">
+          <ChatFile
             handleSetOpenEditImages={handleSetOpenEditImages}
-            onChangeImages={onChangeImages}
+            onChangeImages={onChangeImagesInputFile}
           />
           <ChatInput
             text={messageText}
             handleSendMessage={handleSendMessage}
             onChange={onChangeMessageText}
+            onchangeEmojis={onchangeMessageEmojis}
           />
-          <Button
-            variant="outLine-border"
-            type="button"
+          <BtnSendMessage
             onClick={handleSendMessage}
-            className="flex items-center justify-center text-white rounded-full w-9 h-9 bg-orange hover:bg-white"
-          >
-            <IconSendMessage size={28} />
-          </Button>
+            messageText={messageText}
+            messageImages={messageImages}
+          />
         </div>
       </div>
       <BtnScrollBottom

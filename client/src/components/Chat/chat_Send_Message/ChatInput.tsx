@@ -4,16 +4,23 @@ import Emoji from "./Emoji";
 import { useSelectorChatSlice } from "@/hook";
 import { emojiStyle } from "@/constant/common";
 import { debounce } from "lodash";
+import { TMessageEmojis } from "../chatSendMessage";
 
 type TChatInput = {
   text: string;
   handleSendMessage: () => Promise<void>;
   onChange: (value: string) => void;
+  onchangeEmojis: (value: TMessageEmojis) => void;
 };
 
 export type TInsertEmoji = { emoji: string; url: string };
 
-function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
+function ChatInput({
+  text,
+  handleSendMessage,
+  onChange,
+  onchangeEmojis,
+}: TChatInput) {
   const { selectedConversation } = useSelectorChatSlice();
 
   const inputRef = useRef<HTMLDivElement>(null);
@@ -28,7 +35,7 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
   const createNodeEmoji = (url: string, alt: string) => {
     const emojiImg = document.createElement("img");
     emojiImg.className =
-      "inline-block object-cover mx-[1px] align-middle max-w-4 max-h-4";
+      "emoji inline-block object-cover mx-[1px] align-middle max-w-4 max-h-4";
     emojiImg.alt = alt || "";
     emojiImg.src = url;
     emojiImg.width = 16;
@@ -67,6 +74,18 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
     setHistoryIndex(0);
   };
 
+  const setMessageEmojis = () => {
+    if (!inputRef.current) return;
+    const emojis = inputRef.current.getElementsByTagName("img");
+    const value: TMessageEmojis = [];
+    for (let i = 0; i < emojis.length; i++) {
+      value.push({ url: emojis[i].src, alt: emojis[i].alt });
+    }
+    if (emojis.length > 0) {
+      onchangeEmojis(value);
+    }
+  };
+
   const insertEmojiAtCursor = ({ emoji, url }: TInsertEmoji) => {
     const selection = window.getSelection();
     if (!selection || !inputRef.current) return;
@@ -74,13 +93,7 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
       const range = rangeRef.current || selection.getRangeAt(0);
       range.deleteContents();
 
-      const emojiImg = document.createElement("img");
-      emojiImg.className =
-        "inline-block object-cover mx-[1px] align-middle max-w-4 max-h-4";
-      emojiImg.alt = emoji;
-      emojiImg.src = url;
-      emojiImg.width = 16;
-      emojiImg.height = 16;
+      const emojiImg = createNodeEmoji(url, emoji);
 
       range.insertNode(emojiImg);
       range.setStartAfter(emojiImg);
@@ -90,6 +103,8 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
       setIsEmpty(false);
       saveHistory(inputRef.current.innerHTML);
       inputRef.current.focus();
+      onChange(inputRef.current.innerHTML.trim());
+      setMessageEmojis();
     }
   };
 
@@ -295,7 +310,7 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
   return (
     <div
       className={
-        "relative w-full rounded-2xl bg-grayE5 py-2 pl-3 border-1 border-orange gap-x-1 transition-all overflow-hidden"
+        "relative w-[calc(100%-80px)] min-h-9 rounded-2xl bg-grayE5 py-2 pl-3 transition-all"
       }
     >
       <div
@@ -307,7 +322,7 @@ function ChatInput({ text, handleSendMessage, onChange }: TChatInput) {
         onDragStart={handleDragStart}
         onClick={saveRange}
         className={cn(
-          "w-[calc(100%-44px)] max-w-full text-[15px] leading-5 overflow-auto border-none outline-none max-h-24 transition-all"
+          "w-[calc(100%-50px)] text-[15px] leading-5 overflow-y-auto border-none outline-none max-h-24 break-words whitespace-pre-wrap"
         )}
       />
       {isEmpty && (

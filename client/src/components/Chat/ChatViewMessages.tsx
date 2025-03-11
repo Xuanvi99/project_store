@@ -168,9 +168,9 @@ const ChatViewMessages = () => {
 
       <DisplayInfoReceiver />
 
-      <DisplayMessages />
-
       <DisplayPreviewMessages />
+
+      <DisplayMessages />
 
       <DisplayTyping />
     </section>

@@ -146,7 +146,7 @@ function InfoOrder() {
                 {listProductOrder.length > 0 && quantityProductOrder > 1 && (
                   <Tooltip
                     place="top-end"
-                    title={
+                    content={
                       <div className="min-w-[150px] h-10 text-xs text-center">
                         Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
                       </div>

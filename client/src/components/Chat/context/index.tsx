@@ -170,7 +170,10 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
   };
 
   useLayoutEffect(() => {
-    if (selectedConversation && user) {
+    if (
+      selectedConversation &&
+      paramsGetMessages.conversationId !== selectedConversation._id
+    ) {
       handleSetParamsGetMessage({
         conversationId: selectedConversation._id,
         skip: 0,
@@ -183,7 +186,7 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
       setCheckMessageReceive(false);
       setOpenBtnScrollDown(false);
     }
-  }, [selectedConversation, user]);
+  }, [paramsGetMessages.conversationId, selectedConversation]);
 
   useLayoutEffect(() => {
     if (dataGetMessage && status === "fulfilled") {
@@ -200,7 +203,6 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
     if (container && countCallData === 1) {
       const top = container.scrollHeight;
       handleScrollTo(top, "instant");
-      console.log("abc");
     }
   }, [countCallData]);
 

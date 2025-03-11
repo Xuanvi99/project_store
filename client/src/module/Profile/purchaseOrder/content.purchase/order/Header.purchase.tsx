@@ -31,7 +31,7 @@ function HeaderPurchase({
                 <span>Giao hàng thành công</span>
                 <Tooltip
                   place="bottom"
-                  title={
+                  content={
                     <div className="min-w-[150px] h-10 text-xs text-center">
                       Phí vận chuyển được miễn phí khi mua 2 đôi trở lên
                     </div>

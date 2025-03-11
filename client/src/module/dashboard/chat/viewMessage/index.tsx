@@ -12,11 +12,9 @@ function ChatViewMessage() {
   if (!selectedConversation) return <NoConversation />;
 
   return (
-    <div className="flex flex-col basis-[70%] h-full bg-white rounded-md overflow-hidden">
+    <div className="flex flex-col h-full bg-white rounded-lg basis-[70%] max-w-[70%]">
       <HeaderView />
-      <div className="h-[calc(100%-50px)]">
-        <ChatContainer />
-      </div>
+      <ChatContainer />
     </div>
   );
 }

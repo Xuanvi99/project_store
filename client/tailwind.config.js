@@ -59,6 +59,11 @@ export default {
           " rgb(195, 195, 195,1) 3px 3px 6px 0px ",
           " rgba(255,255,255,0.5) -3px -3px 6px 1px ",
         ],
+        shadow_5: [
+          " rgba(17, 17, 26, 0.1) 0px 8px 24px",
+          "rgba(17, 17, 26, 0.1) 0px 16px 56px",
+          "rgba(17, 17, 26, 0.1) 0px 24px 80px",
+        ],
         shadow_inset_2: [
           " rgb(195, 195, 195,1) 3px 3px 6px 0px inset",
           " rgba(255,255,255,0.5) -3px -3px 6px 1px inset",

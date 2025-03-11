@@ -12,17 +12,25 @@ const MessageSchema = new Schema(
     receiverId: { type: Schema.Types.ObjectId, ref: "users", required: true },
     messageType: {
       type: String,
-      enum: ["text", "image"],
+      enum: ["text", "image", "emojis", "like"],
       require: true,
     },
     text: {
       type: String,
-      default: "",
+      default: undefined,
+    },
+    emojis: {
+      type: {
+        url: { type: String, trim: true },
+        alt: { type: String, trim: true },
+      },
+      default: undefined,
     },
     imagesId: [
       {
         type: Schema.Types.ObjectId,
         ref: "images",
+        default: undefined,
       },
     ],
     receiverSeen: { type: Boolean, default: false },

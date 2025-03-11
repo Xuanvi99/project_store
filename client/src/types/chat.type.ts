@@ -12,9 +12,10 @@ export interface IMessage<T> {
   roomChatId: string;
   senderId: T;
   receiverId: T;
-  messageType: "text" | "image";
+  messageType: "text" | "image" | "emoji" | "like";
   text?: string;
   imagesId?: IImage[];
+  emojis?: Array<{ url: string; alt: string }>;
   receiverSeen: boolean;
   createdAt: Date;
 }
@@ -25,7 +26,8 @@ export interface IReqSendMessage {
   receiverId: string;
   text?: string;
   images?: Array<Pick<IImage, "url" | "width" | "height">>;
-  messageType: "text" | "image";
+  emojis?: Array<{ url: string; alt: string }>;
+  messageType: "text" | "image" | "emoji" | "like";
   receiverSeen: boolean;
   createdAt: Date;
 }

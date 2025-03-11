@@ -39,8 +39,10 @@ import IconMessage from "./IconMessage";
 import IconSendMessage from "./IconSendMessage";
 import IconArrowDown from "./IconArrowDown";
 import IconEmoji from "./IconEmoji";
+import IconThumbs from "./IconThumbs";
 
 export {
+  IconThumbs,
   IconEmoji,
   IconSendMessage,
   IconMessage,

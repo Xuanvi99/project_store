@@ -8,6 +8,8 @@ import { logOut } from "@/stores/reducer/auth.reducer";
 import { updateCart } from "@/stores/reducer/cart.reducer";
 import Tooltip from "@/components/tooltip";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { Fragment } from "react";
+import { resetChat } from "@/stores/reducer/chat.reducer";
 
 type TProps = {
   displayName?: boolean;
@@ -34,10 +36,11 @@ function Profile({ displayName }: TProps) {
   const handleLogOut = async () => {
     dispatch(logOut());
     dispatch(updateCart({ cart: null }));
+    dispatch(resetChat());
     await logOutAuth()
       .unwrap()
       .then((res) => {
-        console.log("logout", res.message);
+        console.log("logout", res);
         const query = encodeURIComponent(redirectUrl);
         navigate("/auth/login?next=" + query, { state: { path: pathname } });
       });
@@ -54,8 +57,8 @@ function Profile({ displayName }: TProps) {
       ) : (
         <Tooltip
           place="bottom-end"
-          title={
-            <>
+          content={
+            <Fragment>
               <div className="flex text-xs text-slate-400 gap-x-2">
                 <span>
                   <IconUser size={12}></IconUser>:
@@ -89,7 +92,7 @@ function Profile({ displayName }: TProps) {
                   Đăng xuất
                 </Button>
               </div>
-            </>
+            </Fragment>
           }
           className={{
             content: "w-[200px]",

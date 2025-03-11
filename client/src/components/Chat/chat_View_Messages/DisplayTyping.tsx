@@ -22,7 +22,6 @@ function DisplayTyping() {
     if (container && displayTyping && checkScrollToBottom) {
       const top = container.scrollHeight;
       handleScrollTo(top, "smooth");
-      console.log("typing");
     }
   }, [displayTyping, checkScrollToBottom, containerDivRef, handleScrollTo]);
 
@@ -34,6 +33,7 @@ function DisplayTyping() {
       "displayTyping",
       (data: { typing: boolean; senderId: string }) => {
         if (data.senderId === receiverId) {
+          console.log("senderId: ", data.senderId);
           setDisplayTyping(data.typing);
         }
       }
