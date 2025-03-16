@@ -1,17 +1,26 @@
-import { cn, momentVi } from "@/utils";
 import { TPropsMessage } from "../Message";
 import { TMessageTypeBorder } from "../chat_View_Messages/DisplayMessages";
-import MessageItemImage from "./MessageItemImage";
-import { marked } from "marked";
-import useChatContext from "../context/useChatContext";
+import MessageText from "./message/MessageText";
+import MessageImages from "./message/MessageImages";
+import MessageEmoji from "./message/MessageEmoji";
+import MessageLike from "./message/MessageLike";
 
 export default function MessageOfSend(props: TPropsMessage) {
-  const { message, checkMessageTypeBorder: isTypeBorder } = props;
+  const {
+    message,
+    checkMessageTypeBorder: isTypeBorder,
+    displayTimeSend,
+  } = props;
 
-  const { sizeChatView } = useChatContext();
-
-  const { messageType, imagesId: images } = message;
-
+  const {
+    messageType,
+    imagesId: images,
+    emojis,
+    senderId,
+    text,
+    createdAt,
+    receiverSeen,
+  } = message;
   const typeBorder = (type: TMessageTypeBorder) => {
     switch (type) {
       case "start":
@@ -28,75 +37,66 @@ export default function MessageOfSend(props: TPropsMessage) {
     }
   };
 
-  const ImagesWithCSSGrid = (imagesCount: number) => {
-    switch (true) {
-      case imagesCount === 1:
-        return "grid-cols-1";
-
-      case imagesCount === 2:
-      case imagesCount === 4:
-        return "grid-cols-2";
-
-      case imagesCount > 2:
-        return "grid-cols-3";
-
-      default:
-        return "";
-    }
-  };
-
   return (
-    <div className="MessageOfSend">
-      <div className="flex justify-end w-full">
-        <div
-          role={messageType}
-          data-type-border={isTypeBorder}
-          className={cn(
-            "relative min-w-[60px] max-w-[70%] bg-orange cursor-text text-[14px] flex text-white transition-all",
-            typeBorder(isTypeBorder),
-            messageType === "image" &&
-              `overflow-hidden h-fit bg-transparent cursor-pointer ${
-                sizeChatView === "big" ? "max-w-[480px]" : "max-w-[60%]"
-              } `
-          )}
+    <div
+      data-message-type={messageType}
+      data-border-type={isTypeBorder}
+      className="flex flex-col items-end w-full"
+    >
+      {messageType === "text" && text && (
+        <MessageText
+          senderId={senderId._id}
+          messageText={text}
+          messageType={messageType}
+          className={typeBorder(isTypeBorder)}
+          createdAt={createdAt}
         >
-          {messageType === "text" && (
-            <span
-              className="p-2 pb-3 text-start"
-              dangerouslySetInnerHTML={{
-                __html: marked.parse(message.text || ""),
-              }}
-            ></span>
-          )}
-          {messageType === "image" && images && images.length > 0 && (
-            <div
-              className={cn(
-                "Images_Group grid gap-1 w-full",
-                ImagesWithCSSGrid(images.length)
-              )}
-            >
-              {images.map((image) => {
-                return (
-                  <MessageItemImage
-                    key={image._id}
-                    image={image}
-                    imagesCount={images.length}
-                  />
-                );
-              })}
+          {!displayTimeSend && (
+            <div className="flex justify-end w-full pb-1 text-[10px] font-semibold">
+              {receiverSeen ? "Đã xem" : "Đã gửi"}
             </div>
           )}
-          <div
-            className={cn(
-              "absolute bottom-0 text-[10px] font-semibold right-2 text-grayF5 text-end z-30",
-              message.messageType === "image" &&
-                "absolute bottom-1 right-3 bg-opacity-50 bg-black px-1 rounded-md"
-            )}
-          >
-            {momentVi(message.createdAt).format("HH:mm")}
-          </div>
-        </div>
-      </div>
+        </MessageText>
+      )}
+      {messageType === "image" && images && images.length > 0 && (
+        <MessageImages
+          images={images}
+          messageType={messageType}
+          typeBorder={isTypeBorder}
+          className={typeBorder(isTypeBorder)}
+          createdAt={createdAt}
+        />
+      )}
+      {messageType === "emoji" && emojis && emojis.length > 0 && (
+        <MessageEmoji
+          emojis={emojis}
+          senderId={senderId._id}
+          messageType={messageType}
+          createdAt={message.createdAt}
+          className={typeBorder(isTypeBorder)}
+        >
+          {!displayTimeSend && (
+            <div className="flex justify-end w-full pb-1 text-[10px] font-semibold">
+              {receiverSeen ? "Đã xem" : "Đã gửi"}
+            </div>
+          )}
+        </MessageEmoji>
+      )}
+      {messageType === "like" && text && (
+        <MessageLike
+          messageText={text}
+          senderId={senderId._id}
+          messageType={messageType}
+          className={typeBorder(isTypeBorder)}
+          createdAt={createdAt}
+        >
+          {!displayTimeSend && (
+            <div className="flex justify-end w-full pb-1 text-[10px] font-semibold">
+              {receiverSeen ? "Đã xem" : "Đã gửi"}
+            </div>
+          )}
+        </MessageLike>
+      )}
     </div>
   );
 }

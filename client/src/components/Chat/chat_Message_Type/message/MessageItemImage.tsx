@@ -1,13 +1,24 @@
-import { IImage } from "@/types/commonType";
 import { cn } from "@/utils";
 import { useState } from "react";
+import SlideShowImage from "../slideShowImage";
 
 type TProps = {
-  image: IImage;
+  image: {
+    _id?: string;
+    url: string;
+    width: number;
+    height: number;
+  };
   imagesCount: number;
 };
 function MessageItemImage({ image, imagesCount }: TProps) {
   const [loadingImages, setLoadingImages] = useState<boolean>(true);
+
+  const [openShowImages, setOpenShowImages] = useState<boolean>(false);
+
+  const handleCloseShowImages = () => {
+    setOpenShowImages(false);
+  };
 
   const ImageItemWithStyleCSS = (imagesCount: number) => {
     if (imagesCount === 0) return;
@@ -52,7 +63,13 @@ function MessageItemImage({ image, imagesCount }: TProps) {
         onLoad={() => {
           setLoadingImages(false);
         }}
+        onClick={() => {
+          !loadingImages && setOpenShowImages(true);
+        }}
       />
+      {openShowImages && image._id && (
+        <SlideShowImage onClick={handleCloseShowImages} image={image} />
+      )}
     </div>
   );
 }

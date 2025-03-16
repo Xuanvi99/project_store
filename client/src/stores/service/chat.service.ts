@@ -73,9 +73,9 @@ export const chatApi = createApi({
       }),
       providesTags: (result, error, id) => [{ type: "Message", id }],
     }),
-    sendMessageText: build.mutation<IResSendMessage, IReqSendMessage>({
+    sendMessageTextAndEmoji: build.mutation<IResSendMessage, IReqSendMessage>({
       query: ({ conversationId, ...body }) => ({
-        url: "chat/sendMessage/text/" + conversationId,
+        url: "chat/sendMessage/textAndEmoji/" + conversationId,
         method: "POST",
         body,
       }),
@@ -118,7 +118,7 @@ export const {
   useLazyGetMessagesQuery,
   useGetMessagesQuery,
   useLazyGetUsersChatQuery,
-  useSendMessageTextMutation,
+  useSendMessageTextAndEmojiMutation,
   useSendMessageImagesMutation,
   useLazyGetOneConversationQuery,
   useGetOneMessagesQuery,

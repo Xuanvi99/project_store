@@ -69,7 +69,7 @@ const ChatViewMessages = () => {
     return (
       messages.length > 0 &&
       messages.length < totalMessage && (
-        <div className={cn("w-full max-h-16 flex justify-center")}>
+        <div className={cn("w-full max-h-16 flex justify-center loadingData")}>
           <div className="w-8 h-8">{isFetchingData && <LoadingCallApi />}</div>
         </div>
       )
@@ -159,7 +159,7 @@ const ChatViewMessages = () => {
     <section
       ref={containerDivRef}
       className={cn(
-        "flex flex-col h-full px-3 pt-3 bg-white message_list overflow-auto"
+        "flex flex-col h-full px-3 pt-3 bg-white message_list overflow-y-auto"
       )}
     >
       <FetchingDataMessagesFirst />
@@ -168,9 +168,9 @@ const ChatViewMessages = () => {
 
       <DisplayInfoReceiver />
 
-      <DisplayPreviewMessages />
-
       <DisplayMessages />
+
+      <DisplayPreviewMessages />
 
       <DisplayTyping />
     </section>

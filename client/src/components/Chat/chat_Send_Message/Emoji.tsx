@@ -18,35 +18,35 @@ function Emoji({ insert }: TProps) {
   } = useClickOutSide<HTMLDivElement>();
 
   return (
-    <div ref={nodeRef} className="absolute right-0 bottom-0">
+    <div ref={nodeRef} className="absolute bottom-0 right-0">
       <Tooltip
         place="top"
         className={{
           content:
-            "z-40 text-[10px] whitespace-nowrap bg-black bg-opacity-80 text-white ",
+            "z-50 text-[10px] whitespace-nowrap bg-black bg-opacity-80 text-white ",
         }}
         onClick={handleOpenEmojiPicker}
         content={<p className="whitespace-nowrap">Chọn biểu tượng</p>}
       >
         <div
           className={cn(
-            "text-orange cursor-pointer w-9 h-9 rounded-full flex justify-center items-center group"
+            "relative text-orange cursor-pointer w-9 h-9 rounded-full flex justify-center items-center group",
+            "before:absolute before:w-9 before:h-9 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-opacity-30 before:left-1/2 before:top-1/2 before:bg-orange before:opacity-0 hover:before:opacity-100"
           )}
         >
           <IconEmoji size={16} />
-          <span className="absolute invisible z-20 w-9 h-9 transition-all -translate-x-1/2 -translate-y-1/2 rounded-full bg-opacity-30 left-1/2 top-1/2 bg-orange group-hover:visible"></span>
         </div>
       </Tooltip>
       <div
         className={cn(
-          "emojiPicker shadow-shadow_5 w-auto absolute -top-4 -translate-y-full -right-5 z-30 rounded-xl"
+          "emojiPicker shadow-shadow_5 w-auto absolute -top-4 -translate-y-full -right-5 z-20 rounded-xl"
         )}
       >
         <div
           className={cn(
             "relative w-full",
             openEmojiPicker &&
-              "before:absolute before:z-40 before:hoverDropdown before:-bottom-7 before:right-6 before:border-l-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-t-white"
+              "before:absolute before:hoverDropdown before:-bottom-7 before:right-6 before:border-l-transparent before:border-r-transparent before:border-b-transparent before:border-[15px] before:border-t-white"
           )}
         >
           <EmojiPicker

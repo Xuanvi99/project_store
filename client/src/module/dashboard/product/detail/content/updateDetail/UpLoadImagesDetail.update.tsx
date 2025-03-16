@@ -3,13 +3,13 @@ import { IconRemoveBtn, IconRestore, IconUploadImage } from "@/components/icon";
 import { cn } from "@/utils";
 import { useEffect, useState } from "react";
 import ImageUploading, { ImageListType } from "react-images-uploading";
-import { IImage } from "@/types/commonType";
 import { toast } from "react-toastify";
 import { useUpdateThumbnailAndImagesProductMutation } from "@/stores/service/product.service";
 import IconDelete from "../../../../../../components/icon/IconDelete";
 import { useToggle } from "@/hook";
 import ModalVerify from "@/components/modal/ModalVerify";
 import useDetailProductContext from "../../context/useDetailProduct";
+import { IImage } from "@/types/image.type";
 
 function UpLoadImagesDetail() {
   const { product, setShowTab } = useDetailProductContext();

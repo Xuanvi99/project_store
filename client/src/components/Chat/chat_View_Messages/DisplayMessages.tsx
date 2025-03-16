@@ -130,7 +130,7 @@ const DisplayMessages = () => {
   if (!receiverInfo) return;
 
   return (
-    <div className="flex flex-col mt-auto gap-y-[2px]">
+    <div className="flex flex-col mt-auto gap-y-[2px] DisplayMessages">
       {messages.map((item, index) => {
         return (
           <Message

@@ -1,4 +1,4 @@
-import { IImage } from "./commonType";
+import { IImage } from "./image.type";
 import { IUser } from "./user.type";
 
 export interface IComment {

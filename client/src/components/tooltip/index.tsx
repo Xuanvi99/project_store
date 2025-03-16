@@ -8,6 +8,7 @@ type THoverDropdownProps = {
   className?: {
     container?: string;
     content?: string;
+    arrow?: string;
   };
   onClick?: () => void;
   place:
@@ -38,7 +39,7 @@ const Tooltip = ({
     switch (place) {
       case "top":
         return {
-          content: "bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 z-40",
+          content: "bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 z-50",
           arrow:
             "before:absolute before:hoverDropdown before:-top-[10px] before:left-1/2 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-b-transparent before:border-[10px] before:border-t-orange before:z-30",
         };
@@ -126,7 +127,7 @@ const Tooltip = ({
         }
       }}
       className={cn(
-        "relative transition-all cursor-pointer ",
+        "relative transition-all cursor-pointer",
         className?.container
       )}
       ref={nodeRef}
@@ -144,7 +145,11 @@ const Tooltip = ({
             {content}
           </div>
           <div
-            className={cn("arrow before:z-50", selectCssPlace(place)?.arrow)}
+            className={cn(
+              "arrow before:z-50",
+              selectCssPlace(place)?.arrow,
+              className?.arrow
+            )}
           />
         </Fragment>
       )}

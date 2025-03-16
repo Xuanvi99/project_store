@@ -1,4 +1,8 @@
-import { useAppDispatch, useSelectorChatSlice } from "@/hook";
+import {
+  useAppDispatch,
+  useSelectorAuthSlice,
+  useSelectorChatSlice,
+} from "@/hook";
 import { setChat } from "@/stores/reducer/chat.reducer";
 import {
   useGetOneMessagesQuery,
@@ -10,15 +14,17 @@ import { IUser } from "@/types/user.type";
 import { cn, momentVi } from "@/utils";
 import { useEffect, useLayoutEffect, useState } from "react";
 import SkeletonConversationItem from "../../skeleton/SkeletonConversationItem";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useGetProfileQuery } from "@/stores/service/user.service";
 import { marked } from "marked";
+import ImageLazyLoad from "@/components/image";
 
 type TProps = {
   conversation: IConversation<IUser>;
   currentUserId: string;
 };
 function ConversationItem({ conversation, currentUserId }: TProps) {
+  const { user } = useSelectorAuthSlice();
+
   const { messageLasterId } = conversation;
 
   const { onlineUsers, selectedConversation } = useSelectorChatSlice();
@@ -124,37 +130,31 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
   return (
     <div
       className={cn(
-        "flex items-center space-x-2 max-h-[68] transition-all p-[10px] cursor-pointer hover:bg-grayE5 rounded-lg",
+        "flex items-center space-x-2 h-16 max-h-16 transition-all p-2 cursor-pointer hover:bg-grayE5 rounded-lg",
         selectedConversation?._id === conversation._id && "bg-grayF0"
       )}
       onClick={handleSelectConversation}
     >
-      <div className="relative w-12 h-12 max-w-12">
-        <div className="w-12 h-12 overflow-hidden rounded-full ">
-          <LazyLoadImage
-            alt="image"
-            placeholderSrc={"/userName.png"}
-            srcSet={receiverInfo.avatar?.url || receiverInfo.avatarDefault}
-            effect="blur"
-            className="object-cover max-w-full "
-            height={48}
-            width={48}
-            threshold={100}
-          />
-        </div>
+      <ImageLazyLoad
+        srcSet={receiverInfo.avatar?.url || receiverInfo.avatarDefault}
+        alt="messageImage"
+        className={{
+          container: "min-w-12 w-12 h-12",
+        }}
+      >
         {onlineUsers.includes(receiverId) && (
           <div className="absolute bottom-0 right-0 w-4 h-4 border-2 border-white rounded-full bg-green66"></div>
         )}
-      </div>
+      </ImageLazyLoad>
       <div className="flex justify-start w-[calc(100%-50px)] h-12">
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full gap-y-1">
           <div className="font-semibold ">{receiverInfo.userName}</div>
           <div className="flex justify-start text-xs gap-x-1 text-secondary ">
-            <span className="max-w-[70%] flex gap-x-[2px]">
-              {message.messageType === "text" && (
-                <span className="font-semibold">
-                  {message.senderId._id !== receiverId && "Bạn: "}
-                </span>
+            <span className="max-w-[70%] flex gap-x-[2px] items-center">
+              {(message.messageType === "text" ||
+                message.messageType === "emoji" ||
+                message.messageType === "like") && (
+                <span>{message.senderId._id !== receiverId && "Bạn: "}</span>
               )}
               {message.messageType === "text" && (
                 <span
@@ -183,6 +183,26 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
                     : `Bạn đã gửi ${message.imagesId?.length} ảnh`}
                 </span>
               )}
+              {message.messageType === "emoji" && message.emojis && (
+                <span className={cn("line-clamp-1 flex")}>
+                  {message.emojis.map(({ url, alt }, index) => (
+                    <img
+                      key={index}
+                      srcSet={url}
+                      alt={alt}
+                      className="w-4 h-4"
+                    />
+                  ))}
+                </span>
+              )}
+              {message.messageType === "like" && (
+                <span
+                  className={cn("w-4 h-4 text-orange")}
+                  dangerouslySetInnerHTML={{
+                    __html: marked.parse(message.text || ""),
+                  }}
+                />
+              )}
             </span>
             <span className="basis-auto">
               -{" "}
@@ -198,6 +218,17 @@ function ConversationItem({ conversation, currentUserId }: TProps) {
             <div className="flex items-center w-[10px] h-full">
               <span className="w-[10px] h-[10px] rounded-full bg-orange"></span>
             </div>
+          )}
+        {message &&
+          message.senderId._id === user?._id &&
+          message.receiverSeen && (
+            <ImageLazyLoad
+              srcSet={receiverInfo.avatar?.url || receiverInfo.avatarDefault}
+              alt="messageImage"
+              className={{
+                container: "w-4 flex items-center",
+              }}
+            />
           )}
       </div>
     </div>

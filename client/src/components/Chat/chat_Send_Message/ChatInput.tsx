@@ -79,7 +79,7 @@ function ChatInput({
     const emojis = inputRef.current.getElementsByTagName("img");
     const value: TMessageEmojis = [];
     for (let i = 0; i < emojis.length; i++) {
-      value.push({ url: emojis[i].src, alt: emojis[i].alt });
+      value.push({ url: emojis[i].src, alt: `${emojis[i].alt}` });
     }
     if (emojis.length > 0) {
       onchangeEmojis(value);
@@ -223,6 +223,7 @@ function ChatInput({
       setTimeout(() => {
         if (!inputRef.current) return;
         onChange(inputRef.current.innerHTML.trim());
+        setMessageEmojis();
       }, 0);
       inputRef.current.focus();
     }

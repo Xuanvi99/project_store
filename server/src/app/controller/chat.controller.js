@@ -222,19 +222,12 @@ class chat {
     }
   };
 
-  sendMessageText = async (req, res) => {
+  sendMessageTextAndEmoji = async (req, res) => {
     try {
       const conversationId = req.params.conversationId;
-      const { senderId, receiverId, text, receiverSeen } = req.body;
+      const { createdAt, ...body } = req.body;
 
-      const newMessage = new messageModel({
-        conversationId,
-        senderId,
-        receiverId,
-        messageType: "text",
-        text,
-        receiverSeen,
-      });
+      const newMessage = new messageModel({ conversationId, ...body });
 
       const savedMessage = await newMessage.save();
 
@@ -249,7 +242,7 @@ class chat {
           messageLasterId: savedMessage._id,
         });
 
-        const newMessage = await messageModel
+        const message = await messageModel
           .findById(savedMessage._id)
           .populate([
             {
@@ -274,17 +267,17 @@ class chat {
           .lean();
 
         // Gửi tin nhắn realtime qua Socket.IO
-        const receiverSocketId = SocketIoService.getUserSocketMap(receiverId);
+        const receiverSocketId = SocketIoService.getUserSocketMap(
+          body.receiverId
+        );
         if (receiverSocketId) {
           _io.to(receiverSocketId).emit("receiveMessage", {
             conversationId,
-            message: newMessage,
+            message,
             totalMessage: messageCount,
           });
         }
-        return res
-          .status(201)
-          .json({ message: newMessage, totalMessage: messageCount });
+        return res.status(201).json({ message, totalMessage: messageCount });
       }
       res.status(400).json({ errorMessage: "error sender message text" });
     } catch (err) {

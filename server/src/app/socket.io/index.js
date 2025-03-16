@@ -20,12 +20,10 @@ class SocketIoService {
     }
 
     _io.emit("getOnlineUsers", Object.keys(this.userSocketMap));
-    console.log("userSocketMap: ", this.userSocketMap);
 
     socket.on("typing", async (data) => {
       const { receiverId, typing } = data;
       const receiverSocketId = this.userSocketMap[receiverId];
-      console.log("receiverSocketId: ", receiverSocketId);
       if (typing) {
         _io
           .to(receiverSocketId)

@@ -1,10 +1,11 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { TPropsMessage } from "../Message";
-import { cn, momentVi } from "@/utils";
+import { cn } from "@/utils";
 import { TMessageTypeBorder } from "../chat_View_Messages/DisplayMessages";
-import MessageItemImage from "./MessageItemImage";
-import { marked } from "marked";
-import useChatContext from "../context/useChatContext";
+import MessageText from "./message/MessageText";
+import MessageImages from "./message/MessageImages";
+import MessageEmoji from "./message/MessageEmoji";
+import MessageLike from "./message/MessageLike";
 
 export default function MessageOfReceive(props: TPropsMessage) {
   const {
@@ -12,11 +13,18 @@ export default function MessageOfReceive(props: TPropsMessage) {
     displayAvatar,
     receiverInfo,
     checkMessageTypeBorder: isTypeBorder,
+    displayTimeSend,
   } = props;
 
-  const { sizeChatView } = useChatContext();
-
-  const { messageType, imagesId: images } = message;
+  const {
+    messageType,
+    imagesId: images,
+    emojis,
+    senderId,
+    text,
+    createdAt,
+    receiverSeen,
+  } = message;
 
   const typeBorder = (type: TMessageTypeBorder) => {
     switch (type) {
@@ -34,93 +42,86 @@ export default function MessageOfReceive(props: TPropsMessage) {
     }
   };
 
-  const ImagesWithCSSGrid = (imagesCount: number) => {
-    switch (true) {
-      case imagesCount === 1:
-        return "grid-cols-1";
-
-      case imagesCount === 2:
-      case imagesCount === 4:
-        return "grid-cols-2";
-
-      case imagesCount > 2:
-        return "grid-cols-3";
-
-      default:
-        return "";
-    }
-  };
-
   return (
-    <div className="MessageOfReceiver">
-      <div className="flex items-end justify-start w-full gap-x-2">
-        <div
-          className={cn(
-            "flex flex-col justify-end h-full invisible",
-            displayAvatar && "visible "
-          )}
-        >
-          <span className="overflow-hidden rounded-full w-7 h-7">
-            <LazyLoadImage
-              alt="image"
-              placeholderSrc={"/userName.png"}
-              srcSet={receiverInfo?.avatar?.url || receiverInfo?.avatarDefault}
-              effect="blur"
-              className="object-cover w-full h-full"
-              height={28}
-              width={28}
-              threshold={100}
-            />
-          </span>
-        </div>
-        <div
-          role={messageType}
-          data-type-border={isTypeBorder}
-          className={cn(
-            "relative min-w-[60px] max-w-[70%] bg-grayE5 text-black flex text-[14px] cursor-text transition-all",
-            typeBorder(isTypeBorder),
-            messageType === "image" &&
-              `overflow-hidden h-fit bg-transparent cursor-pointer ${
-                sizeChatView === "big" ? "max-w-[480px]" : "max-w-[60%]"
-              } `
-          )}
-        >
-          {messageType === "text" && (
-            <span
-              className="p-2 pb-3 text-start"
-              dangerouslySetInnerHTML={{
-                __html: marked.parse(message.text || ""),
-              }}
-            ></span>
-          )}
-          {messageType === "image" && images && images.length > 0 && (
-            <div
-              className={cn(
-                "Images_Group grid gap-1 w-full h-auto",
-                ImagesWithCSSGrid(images.length)
-              )}
-            >
-              {images.map((image) => {
-                return (
-                  <MessageItemImage
-                    key={image._id}
-                    image={image}
-                    imagesCount={images.length}
-                  />
-                );
-              })}
-            </div>
-          )}
-          <div
-            className={cn(
-              "absolute bottom-0 text-[10px] font-semibold right-2 text-end text-gray z-30",
-              message.messageType === "image" &&
-                "absolute bottom-1 right-3 bg-opacity-50 bg-black px-1 rounded-md text-white"
-            )}
+    <div
+      data-message-type={messageType}
+      data-border-type={isTypeBorder}
+      className="flex items-end justify-start w-full MessageOfReceiver gap-x-2"
+    >
+      <div
+        className={cn(
+          "flex flex-col justify-end h-full invisible",
+          displayAvatar && "visible "
+        )}
+      >
+        <span className="overflow-hidden rounded-full w-7 h-7">
+          <LazyLoadImage
+            alt="image"
+            placeholderSrc={"/userName.png"}
+            srcSet={receiverInfo?.avatar?.url || receiverInfo?.avatarDefault}
+            effect="blur"
+            className="object-cover w-full h-full"
+            height={28}
+            width={28}
+            threshold={100}
+          />
+        </span>
+      </div>
+      <div className="flex flex-col justify-start w-full">
+        {messageType === "text" && text && (
+          <MessageText
+            senderId={senderId._id}
+            messageText={text}
+            messageType={messageType}
+            className={typeBorder(isTypeBorder)}
+            createdAt={createdAt}
           >
-            {momentVi(message.createdAt).format("HH:mm")}
-          </div>
-        </div>
+            {!displayTimeSend && (
+              <div className="flex justify-start w-full pb-1 text-[10px] font-semibold">
+                {receiverSeen && "Đã xem"}
+              </div>
+            )}
+          </MessageText>
+        )}
+        {messageType === "image" && images && images.length > 0 && (
+          <MessageImages
+            images={images}
+            messageType={messageType}
+            typeBorder={isTypeBorder}
+            className={typeBorder(isTypeBorder)}
+            createdAt={createdAt}
+          />
+        )}
+        {messageType === "emoji" && emojis && emojis.length > 0 && (
+          <MessageEmoji
+            emojis={emojis}
+            senderId={senderId._id}
+            messageType={messageType}
+            createdAt={message.createdAt}
+            className={typeBorder(isTypeBorder)}
+          >
+            {!displayTimeSend && (
+              <div className="flex justify-end w-full pb-1 text-[10px] font-semibold">
+                {receiverSeen ? "Đã xem" : "Đã gửi"}
+              </div>
+            )}
+          </MessageEmoji>
+        )}
+        {messageType === "like" && text && (
+          <MessageLike
+            messageText={text}
+            senderId={senderId._id}
+            messageType={messageType}
+            className={typeBorder(isTypeBorder)}
+            createdAt={createdAt}
+          >
+            {!displayTimeSend && (
+              <div className="flex justify-end w-full pb-1 text-[10px] font-semibold">
+                {receiverSeen ? "Đã xem" : "Đã gửi"}
+              </div>
+            )}
+          </MessageLike>
+        )}
       </div>
     </div>
   );

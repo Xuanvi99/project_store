@@ -29,26 +29,26 @@ function ChatFile({ handleSetOpenEditImages, onChangeImages }: TProps) {
         content={<p className="whitespace-nowrap">Mở chức năng khác</p>}
       >
         <div className="relative w-9 h-9 flex items-center justify-center group">
-          <span
+          <div
             className={cn(
               "w-5 h-5 rounded-full bg-orange flex justify-center items-center text-white cursor-pointer transition-all",
+              "before:absolute before:w-9 before:h-9 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-opacity-30 before:left-1/2 before:top-1/2 before:bg-orange before:opacity-0 hover:before:opacity-100",
               openChatFile && "rotate-45 bg-red-500"
             )}
           >
             <IconPlus size={12} />
-          </span>
-          <span className="absolute invisible z-20 w-9 h-9 transition-all -translate-x-1/2 -translate-y-1/2 rounded-full bg-opacity-30 left-1/2 top-1/2 bg-orange group-hover:visible"></span>
+          </div>
         </div>
       </Tooltip>
       {openChatFile && (
         <div
           className={cn(
-            "shadow-shadow_5 absolute -top-4 -translate-y-full -left-1 rounded-lg bg-white z-30"
+            "shadow-shadow_5 absolute -top-4 -translate-y-full -left-1 rounded-lg bg-white z-20"
           )}
         >
           <div
             className={cn(
-              "relative min-w-[200px] h-auto p-1",
+              "relative min-w-[200px] h-auto p-1 z-20",
               "before:absolute before:hoverDropdown before:-bottom-[20px] before:left-5 before:-translate-x-1/2 before:border-l-transparent before:border-r-transparent before:border-b-transparent before:border-[10px] before:border-t-white before:z-30"
             )}
           >

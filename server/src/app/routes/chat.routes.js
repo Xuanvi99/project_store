@@ -19,8 +19,8 @@ routes
 routes.route("/api/chat/getUsersChat").get(chatCtrl.getUsersChat);
 
 routes
-  .route("/api/chat/sendMessage/text/:conversationId")
-  .post(chatCtrl.sendMessageText);
+  .route("/api/chat/sendMessage/textAndEmoji/:conversationId")
+  .post(chatCtrl.sendMessageTextAndEmoji);
 
 routes
   .route("/api/chat/sendMessage/images/:conversationId")

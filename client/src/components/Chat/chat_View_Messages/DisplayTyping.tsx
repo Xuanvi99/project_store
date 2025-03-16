@@ -47,7 +47,7 @@ function DisplayTyping() {
   if (!receiverInfo || !displayTyping) return;
 
   return (
-    <div className="flex items-center justify-start w-full pb-2 mt-1 message gap-x-2">
+    <div className="flex items-center justify-start w-full pb-2 mt-1 message gap-x-2 DisplayTyping">
       <div className={cn("flex flex-col justify-center h-full")}>
         <span className="overflow-hidden rounded-full w-7 h-7">
           <LazyLoadImage

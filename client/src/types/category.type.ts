@@ -1,4 +1,4 @@
-import { IImage } from "./commonType";
+import { IImage } from "./image.type";
 import { IProductRes } from "./product.type";
 
 export interface ICategory {

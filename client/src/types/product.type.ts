@@ -1,6 +1,6 @@
 import { ICategory } from "./category.type";
 import { IComment } from "./comment.type";
-import { IImage } from "./commonType";
+import { IImage } from "./image.type";
 import { IUser } from "./user.type";
 
 export type TParams<T> = {

@@ -6,7 +6,7 @@ import {
 import {
   chatApi,
   useSendMessageImagesMutation,
-  useSendMessageTextMutation,
+  useSendMessageTextAndEmojiMutation,
 } from "@/stores/service/chat.service";
 import { IReqSendMessage } from "@/types/chat.type";
 import useSocketIoContext from "@/context/socketIo/useSocketIoContext";
@@ -19,6 +19,7 @@ import BtnScrollBottom from "./chat_Send_Message/BtnScrollBottom";
 import ChatFile from "./chat_Send_Message/ChatFile";
 import ChatInput from "./chat_Send_Message/ChatInput";
 import BtnSendMessage from "./chat_Send_Message/BtnSendMessage";
+import BtnSendLike from "./chat_Send_Message/BtnSendLike";
 
 export type TMessageEmojis = { url: string; alt: string }[];
 function ChatSendMessage() {
@@ -42,7 +43,7 @@ function ChatSendMessage() {
     handleSplicePreviewMessage,
   } = useChatContext();
 
-  const [sendMessageText] = useSendMessageTextMutation();
+  const [sendMessageTextAndEmoji] = useSendMessageTextAndEmojiMutation();
 
   const [sendMessageImages] = useSendMessageImagesMutation();
 
@@ -51,14 +52,29 @@ function ChatSendMessage() {
   const [messageImages, setMessageImages] = useState<ImageType[]>([]);
 
   const [messageEmojis, setMessageEmojis] = useState<TMessageEmojis>([]);
-  console.log("messageEmojis: ", messageEmojis);
 
   const [openEditImages, setOpenEditImages] = useState<boolean>(false);
 
-  const isOnlyEmoji = (text: string) => {
-    const emojiRegex = /^[\p{Emoji}\uFE0F\s]+$/u;
+  const MessageIsOnlyEmoji = (text: string) => {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = text;
 
-    return emojiRegex.test(text.trim());
+    const nodes = tempDiv.childNodes;
+    for (const node of nodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        if (node.nodeValue && node.nodeValue.trim() !== "") {
+          return false;
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (
+          (node as HTMLElement).tagName !== "IMG" ||
+          !(node as HTMLElement).classList.contains("emoji")
+        ) {
+          return false;
+        }
+      }
+    }
+    return nodes.length > 0;
   };
 
   const handleSetOpenEditImages = (value: boolean) => {
@@ -128,7 +144,7 @@ function ChatSendMessage() {
     setMessageEmojis(value);
   };
 
-  const handleSendMessageText = async () => {
+  const handleSendMessageTextOrEmoji = async () => {
     if (messageText.trim().length === 0 || !receiverId) return;
 
     if (socketIo_client && receiverId && user && selectedConversation) {
@@ -140,18 +156,23 @@ function ChatSendMessage() {
         conversationId: selectedConversation._id,
         senderId: user._id,
         receiverId: receiverId,
-        text: messageText,
         receiverSeen: receiverSeen,
         messageType: "text",
         createdAt: new Date(Date.now()),
       };
-      if (isOnlyEmoji(messageText)) {
-        message = { ...message, messageType: "emoji" };
+      if (MessageIsOnlyEmoji(messageText)) {
+        message = { ...message, messageType: "emoji", emojis: messageEmojis };
+      } else {
+        message = {
+          ...message,
+          messageType: "text",
+          text: messageText,
+        };
       }
 
       handleSetPreviewMessages(message);
       setMessageText("");
-      return await sendMessageText(message).unwrap();
+      return await sendMessageTextAndEmoji(message).unwrap();
     }
   };
 
@@ -192,7 +213,7 @@ function ChatSendMessage() {
 
   const handleSendMessage = async () => {
     try {
-      const sendMessageText = handleSendMessageText();
+      const sendMessageText = handleSendMessageTextOrEmoji();
       const sendMessageImages = handleSendMessageImages();
 
       const containerDiv = containerDivRef.current;
@@ -226,20 +247,43 @@ function ChatSendMessage() {
     }
   };
 
-  // const handleSendLike = async () => {
-  //   try {
-  //     handleScrollTo(top, "instant");
+  const handleSendLike = async (text: string) => {
+    if (!receiverId || !user || !selectedConversation) return;
+    try {
+      const containerDiv = containerDivRef.current;
+      if (!containerDiv) return;
+      const top = containerDiv.scrollHeight;
 
-  //     dispatch(
-  //       setChat({
-  //         totalMessage: res[1] ? res[1].totalMessage : res[0]?.totalMessage,
-  //       })
-  //     );
-  //     dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
-  //   } catch (error) {
-  //     console.log("error: ", error);
-  //   }
-  // };
+      const message: IReqSendMessage = {
+        conversationId: selectedConversation._id,
+        senderId: user._id,
+        receiverId: receiverId,
+        receiverSeen: receiverSeen,
+        messageType: "like",
+        text: text,
+        createdAt: new Date(Date.now()),
+      };
+      handleSetPreviewMessages(message);
+      handleScrollTo(top, "instant");
+      await sendMessageTextAndEmoji(message)
+        .unwrap()
+        .then((res) => {
+          handleSetMessages(res.message);
+          handleSplicePreviewMessage();
+          dispatch(
+            setChat({
+              totalMessage: res.totalMessage,
+            })
+          );
+          dispatch(chatApi.util.invalidateTags([{ type: "Conversation" }]));
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
 
   useEffect(() => {
     const container = containerDivRef.current;
@@ -290,6 +334,11 @@ function ChatSendMessage() {
           />
           <BtnSendMessage
             onClick={handleSendMessage}
+            messageText={messageText}
+            messageImages={messageImages}
+          />
+          <BtnSendLike
+            onClick={handleSendLike}
             messageText={messageText}
             messageImages={messageImages}
           />

@@ -1,4 +1,4 @@
-import { IImage } from "./commonType";
+import { IImage } from "./image.type";
 
 export interface IConversation<T> {
   _id: string;
@@ -9,7 +9,7 @@ export interface IConversation<T> {
 
 export interface IMessage<T> {
   _id: string;
-  roomChatId: string;
+  conversationId: string;
   senderId: T;
   receiverId: T;
   messageType: "text" | "image" | "emoji" | "like";
