@@ -39,27 +39,29 @@ class chat {
   getOneConversation = async (req, res) => {
     const userId = req.params.id;
     try {
+      const populateParticipants = [
+        {
+          path: "participants",
+          model: "users",
+          populate: {
+            path: "avatar",
+            model: "images",
+            select: "url",
+          },
+        },
+      ];
+
       let conversation = await conversationModel
         .findOne({
-          participants: { $in: [userId] },
+          participants: userId,
         })
-        .populate([
-          {
-            path: "participants",
-            model: "users",
-            populate: {
-              path: "avatar",
-              model: "images",
-              select: "url",
-            },
-          },
-        ])
+        .populate(populateParticipants)
         .lean();
 
       if (!conversation) {
         const admin = await userModel.findOne({ role: "admin" }).lean();
         const newConversation = await conversationModel.create({
-          participants: [id, admin._id],
+          participants: [userId, admin._id],
         });
         conversation = await conversationModel
           .findById(newConversation._id)
@@ -77,18 +79,6 @@ class chat {
           .lean();
       }
       res.status(200).json(conversation);
-    } catch (error) {
-      res.status(500).json({ errMessage: error || "server error" });
-    }
-  };
-
-  searchReceiver = async (req, res) => {
-    const keyword = req.query.keyword;
-    try {
-      const listUser = await userModel
-        .find({ $text: { $search: keyword } })
-        .select("_id userName role")
-        .lean();
     } catch (error) {
       res.status(500).json({ errMessage: error || "server error" });
     }
@@ -115,50 +105,41 @@ class chat {
 
   getMessages = async (req, res) => {
     const conversationId = req.params.conversationId;
+    const limit = +req.query.limit;
+    const skip = +req.query.skip || 0;
     try {
-      const limit = +req.query.limit;
-      const skip = +req.query.skip;
-
-      const conversation = await conversationModel
-        .findById(conversationId)
+      const messages = await messageModel
+        .find({ conversationId })
+        .populate([
+          {
+            path: "imagesId",
+            model: "images",
+            select: "url width height",
+          },
+          {
+            path: "senderId",
+            model: "users",
+            populate: {
+              path: "avatar",
+              model: "images",
+              select: "url",
+            },
+          },
+          {
+            path: "receiverId",
+            model: "users",
+            populate: {
+              path: "avatar",
+              model: "images",
+              select: "url",
+            },
+          },
+        ])
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .lean();
 
-      let messages = [];
-      if (conversation) {
-        messages = await messageModel
-          .find({ conversationId })
-          .populate([
-            {
-              path: "imagesId",
-              model: "images",
-              select: "url width height",
-            },
-            {
-              path: "senderId",
-              model: "users",
-              populate: {
-                path: "avatar",
-                model: "images",
-                select: "url",
-              },
-            },
-            {
-              path: "receiverId",
-              model: "users",
-              populate: {
-                path: "avatar",
-                model: "images",
-                select: "url",
-              },
-            },
-          ])
-          .sort({ createdAt: -1 })
-          .skip(skip)
-          .limit(limit)
-          .lean();
-      } else {
-        return res.status(201).json([]);
-      }
       res.status(200).json(messages.reverse());
     } catch (error) {
       res.status(500).json({ errMessage: error || "server error" });
@@ -232,38 +213,39 @@ class chat {
       const savedMessage = await newMessage.save();
 
       if (savedMessage) {
-        // Cập nhật thông tin cuộc trò chuyện
-        const messageCount = await messageModel.countDocuments({
+        const updatedConversation = await conversationModel.findByIdAndUpdate(
           conversationId,
-        });
+          {
+            $inc: { totalMessage: 1 },
+            messageLasterId: savedMessage._id,
+          },
+          { new: true } // Trả về document sau khi update
+        );
 
-        await conversationModel.findByIdAndUpdate(conversationId, {
-          totalMessage: messageCount,
-          messageLasterId: savedMessage._id,
-        });
+        const populateOptions = [
+          {
+            path: "senderId",
+            model: "users",
+            populate: {
+              path: "avatar",
+              model: "images",
+              select: "url",
+            },
+          },
+          {
+            path: "receiverId",
+            model: "users",
+            populate: {
+              path: "avatar",
+              model: "images",
+              select: "url",
+            },
+          },
+        ];
 
         const message = await messageModel
           .findById(savedMessage._id)
-          .populate([
-            {
-              path: "senderId",
-              model: "users",
-              populate: {
-                path: "avatar",
-                model: "images",
-                select: "url",
-              },
-            },
-            {
-              path: "receiverId",
-              model: "users",
-              populate: {
-                path: "avatar",
-                model: "images",
-                select: "url",
-              },
-            },
-          ])
+          .populate(populateOptions)
           .lean();
 
         // Gửi tin nhắn realtime qua Socket.IO
@@ -274,10 +256,12 @@ class chat {
           _io.to(receiverSocketId).emit("receiveMessage", {
             conversationId,
             message,
-            totalMessage: messageCount,
+            totalMessage: updatedConversation.totalMessage,
           });
         }
-        return res.status(201).json({ message, totalMessage: messageCount });
+        return res
+          .status(201)
+          .json({ message, totalMessage: updatedConversation.totalMessage });
       }
       res.status(400).json({ errorMessage: "error sender message text" });
     } catch (err) {
@@ -378,6 +362,20 @@ class chat {
             ],
           })
           .exec();
+        return res.status(200).json({ amount: unreadMessages });
+      }
+      res.status(404).json({ errorMessage: "conversation not found" });
+    } catch (error) {
+      res.status(500).json({ errMessage: error || "server error" });
+    }
+  };
+
+  getImagesInConversation = async () => {
+    try {
+      const conversationId = req.params.conversationId;
+      const conversation = await conversationModel.findById(conversationId);
+      if (conversation) {
+        const unreadMessages = await messageModel.find;
         return res.status(200).json({ amount: unreadMessages });
       }
       res.status(404).json({ errorMessage: "conversation not found" });

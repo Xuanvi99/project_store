@@ -2,6 +2,7 @@ import { IconChevronRight, IconCLose } from "@/components/icon";
 import { cn } from "@/utils";
 import { useState } from "react";
 import IconChevronLeft from "../../../icon/IconChevronLeft";
+import SlideImages from "./SlideImages";
 
 type TProps = {
   onClick: () => void;
@@ -31,7 +32,7 @@ function SlideShowImage({ onClick, image }: TProps) {
         <div className="absolute inset-0 bg-black/70 backdrop-blur-lg"></div>
       </div>
       <div
-        className="absolute z-30 flex items-center justify-center w-10 h-10 bg-white rounded-full text-grayDark left-5 top-2"
+        className="absolute z-30 flex items-center justify-center w-10 h-10 transition-all bg-white rounded-full text-grayDark left-5 top-2 hover:scale-110"
         onClick={onClick}
       >
         <IconCLose size={15} />
@@ -70,7 +71,9 @@ function SlideShowImage({ onClick, image }: TProps) {
             </div>
           </div>
         </div>
-        <div className="w-full overflow-x-auto bg-red-700 slideImage max-h-9 h-9 "></div>
+        <div className="w-full slideImage max-h-9 h-9 ">
+          <SlideImages />
+        </div>
       </div>
     </div>
   );

@@ -6,14 +6,14 @@ const MessageSchema = new Schema(
     conversationId: {
       type: Schema.Types.ObjectId,
       ref: "conversation",
-      require: true,
+      required: true,
     },
     senderId: { type: Schema.Types.ObjectId, ref: "users", required: true },
     receiverId: { type: Schema.Types.ObjectId, ref: "users", required: true },
     messageType: {
       type: String,
       enum: ["text", "image", "emoji", "like"],
-      require: true,
+      required: true,
     },
     text: {
       type: String,
@@ -40,12 +40,19 @@ const MessageSchema = new Schema(
 
 MessageSchema.pre("save", function (next) {
   if (this.messageType !== "image") {
-    this.imagesId = undefined;
+    this.imagesId = [];
   }
   if (this.messageType !== "emoji") {
-    this.emojis = undefined;
+    this.emojis = [];
+  }
+  if (this.messageType !== "text") {
+    this.text = undefined;
   }
   next();
 });
+
+MessageSchema.index({ conversationId: 1, createdAt: -1 });
+MessageSchema.index({ receiverId: 1, senderId: 1 });
+MessageSchema.index({ receiverId: 1 });
 
 module.exports = mongoose.model("messages", MessageSchema);
